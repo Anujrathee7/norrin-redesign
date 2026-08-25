@@ -11,12 +11,11 @@ npm run lint     # oxlint — must be zero
 node tools/palette.mjs # every rendered colour pair, measured (must be 61/61)
 node tools/audit.mjs   # axe-core (light + dark) + structure audit
 node tools/shot.mjs --vp=desktop --sections   # visual QA harness
-node tools/mascots.mjs # export the character set to standalone animated SVGs
 ```
 
-The mascot workbench is at `/#mascots` — the four characters against both
-grounds, down to 24px, with motion on and off. It is not in the nav and not in
-the page flow on purpose.
+The mascot sheet is at `/#mascots` — Nori's six poses against both grounds,
+down to 24px, with motion on and off. The artwork lives in `public/nori-*.svg`;
+the app places and sizes it and never recolours it.
 
 ---
 
@@ -43,34 +42,51 @@ the money word. That gesture is on every launch page of the last three years. Th
 is the site's own device instead — moss ink, and the solid half of the production line
 drawn beneath the word that earns it.
 
-## 2. Fyr — the mascot
+## 2. Nori — the mascot
 
-A **Nordic spar buoy**: ballasted, moored, permanently on station, carrying a light.
+**Nori** is Norrin's character: a small white robot with a lavender antenna, drawn in six
+poses. The artwork is authored directly as finished SVGs in `public/nori-*.svg`.
 
-It exists for a reason that can be argued rather than asserted. A lighthouse sits on land —
-admired, safe, a destination. A buoy is out *in the client's water*, taking the actual
-conditions, year-round. It self-rights after a knock. A demo capsizes; infrastructure comes
-back to vertical. That is Norrin's entire claim, rendered as an object.
+| Pose | Where it is used |
+|---|---|
+| `wave` | hero mark, contact, the nav and footer head crop |
+| `idea` | Thinking — "start anywhere you like" |
+| `laptop` | build / work / careers |
+| `data` | proof, platforms, numbers |
+| `rocket` | the hero crossing point — a pilot becoming production |
+| `sleep` | footer, 24/7, empty states |
 
-It is also **a diagram with a personality, not decoration**. The topmark borrows the real
-IALA buoyage grammar rather than inventing a private symbol set:
+**The app never recolours or re-paths the drawings.** `Nori.tsx` places, sizes and idles
+them and nothing else; editing a pose means editing the file. That is why the poses are
+referenced as files rather than inlined as JSX — a component that *can* repaint authored
+artwork will eventually repaint it by accident.
 
-| State | Topmark | Means |
-|---|---|---|
-| `pilot` | none, unlit, **untethered** | Floating free, marking nothing |
-| `deploying` | cone, point up | The route is being marked |
-| `production` | sphere (*safe water mark*) | Running, governed, trusted |
-| `gap` | two cones point-to-point (*isolated danger*) | The pilot→production gap itself |
+**The small mark is a crop, not a second asset.** At nav size a full-body Nori collapses
+into a grey pill — antenna, arms and feet all disappear into the silhouette — so
+`crop="head"` re-declares the viewBox over the same file to keep the eyes, which are the
+only part that has to survive. The favicon (`public/nori-mark.svg`) is the same crop baked
+into a standalone file, since a favicon cannot reliably reference another SVG.
 
-Rules it obeys: **no face, ever** — attention is expressed by orientation and light only.
-It is **moored**, so it does not follow the cursor around the page like a pet; the pointer
-raises a *wake* and it leans away, then rights itself. Roll is capped at ±6°. The lamp never
-changes colour — conditions change, the signal does not.
+Motion is placement-level only and obeys the same contract as everything else here:
+transform and opacity, no filters, no JS in the motion path, `data-static` to kill it, and
+`prefers-reduced-motion` resolving to the resting frame. The float is deliberately slow and
+shallow because the drawings already carry their own implied motion — the wave arcs, the
+rising Zzz, the rocket's speed lines — and a lively bob on top of those reads as two
+animations arguing rather than one character breathing.
 
-**State lives in shape, not motion**, so the mark says exactly the same thing with every
-animation disabled.
+**A known inconsistency, stated rather than hidden:** Nori's palette (lavender `#B7A7E8`,
+ink `#2E2A40`) is not drawn from the Norrin token system below, which is moss / sun /
+forest / lichen. The character is legible and holds its silhouette on both the paper ground
+and the forest bands, so nothing is broken — but it is the one element on the site whose
+colour is not derived from Norrin's own published theme.
 
-`src/components/mascot/Fyr.tsx` · `fyr.css`
+`src/components/mascot/nori/Nori.tsx` · `nori.css` · `public/nori-*.svg`
+
+The pilot → production diagram in `TheGap` still uses the earlier **spar-buoy** drawing
+(`src/components/mascot/Fyr.tsx`, `Lunni.tsx`). That is a diagram rather than a mascot: its
+four states borrow real IALA buoyage grammar and the section's copy names it directly
+("unlit, unmoored, marking nothing"; "isolated danger"). Swapping it for Nori is a copy
+rewrite, not an asset swap, and has deliberately been left as a separate decision.
 
 ## 3. Design system
 
@@ -115,7 +131,7 @@ Two structural rules hold it together:
 1. **Separation is carried by 1px hairlines. There are zero box-shadows on the site.**
 2. **Sun is a signal, never a surface** — budget of three solid uses per page (the
    recognition marker in the proof bar, the crossing marker in the gap diagram, and the
-   terminal square where the closing line completes), plus Fyr's lamp. Anything sitting on
+   terminal square where the closing line completes). Anything sitting on
    sun uses fixed dark ink in *both* themes.
 
 Lichen is a stroke colour, not a text colour: at 11px it clears neither theme's AA

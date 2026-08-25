@@ -1,170 +1,44 @@
 import { useState } from 'react'
 import { Container, Eyebrow } from '@/components/primitives/Layout'
 import { cx } from '@/lib/cx'
-import { FyrChar, type FyrState } from '@/components/mascot/characters/FyrChar'
-import { LunniChar } from '@/components/mascot/characters/LunniChar'
-import { Hirvi } from '@/components/mascot/characters/Hirvi'
-import { Valo } from '@/components/mascot/characters/Valo'
-import { Fyr } from '@/components/mascot/Fyr'
-import { Lunni } from '@/components/mascot/Lunni'
-import { Revontuli } from '@/components/mascot/revontuli/Revontuli'
-import {
-  Lumi,
-  Norppa,
-  Otso,
-  RevontuliChibi,
-  Sisu,
-} from '@/components/mascot/chibi/ChibiCast'
+import { Nori, type NoriPose } from '@/components/mascot/nori/Nori'
 
 /**
- * The five plush proposals.
+ * NORI — the mascot sheet.
  *
- * Every one is grounded in something Norrin actually publishes about itself,
- * and every piece of natural history used as an argument is verifiable. The
- * `why` is the sentence that has to survive being read once, by someone who
- * will not read the second sentence.
- */
-const PROPOSALS = [
-  {
-    key: 'norppa',
-    name: 'Norppa',
-    gloss: 'The Saimaa ringed seal',
-    angle: 'Infrastructure, and the people behind it',
-    why: 'It lives in one lake on earth and nowhere else. It fell below 120 animals — and it is coming back only because people build it somewhere to live: in 2026, 90% of pups were born in man-made snow banks and artificial nests.',
-    fit: '“Technology means nothing without the humans behind it.” Something precious survives because somebody engineered what it needed and kept showing up. Its name is also one letter from the company’s.',
-    render: (s: number, a: boolean) => <Norppa size={s} animated={a} />,
-  },
-  {
-    key: 'lumi',
-    name: 'Lumi',
-    gloss: 'The snowy owl',
-    angle: 'Intelligence, read instantly',
-    why: 'An owl reads as intelligence in a quarter of a second, in every market Norrin sells into, with nothing to explain. For a company whose whole product is enterprise AI that is not a small advantage.',
-    fit: '“We stay close, involve & include.” An owl is the animal that watches. Its eye is also genuinely yellow, so the brand’s sun lands on the one feature that was always going to carry the face.',
-    render: (s: number, a: boolean) => <Lumi size={s} animated={a} />,
-  },
-  {
-    key: 'revontuli',
-    name: 'Revontuli',
-    gloss: 'The naali — arctic fox',
-    angle: 'The story you already picked',
-    why: 'Finnish for the northern lights, and it means literally fox fires. The fox runs the fells and its tail throws the aurora. Redrawn in this hand so it competes on equal terms rather than winning by being the only one here.',
-    fit: 'Strongest folklore of the five. Also the riskiest: Mozilla Firefox is built on this identical myth, which is why it is an arctic fox with no orange anywhere.',
-    render: (s: number, a: boolean) => <RevontuliChibi size={s} animated={a} />,
-  },
-  {
-    key: 'otso',
-    name: 'Otso',
-    gloss: 'The bear cub',
-    angle: 'Directness and ownership',
-    why: 'Finland’s national animal, designated by parliament in 1985 and revered long before — old Finnish avoided saying its name and used otso, kontio, mesikämmen instead.',
-    fit: '“We take responsibility by addressing issues head on. We value clarity over complexity… skip the sugarcoating.” That is a bear. Warmest shape of the five, and the least ownable — bears are everywhere in branding.',
-    render: (s: number, a: boolean) => <Otso size={s} animated={a} />,
-  },
-  {
-    key: 'sisu',
-    name: 'Sisu',
-    gloss: 'The icebreaker',
-    angle: 'Won in production',
-    why: 'Finnish companies designed about 80% of the world’s icebreakers and roughly 60% were built in Finnish yards — the country’s most globally dominant industry.',
-    fit: 'Its whole job is to go first and open a route through frozen water so ordinary ships can follow and trade happens. That is “we turn AI ambition into production” with nothing left to explain. The cost is warmth: a boat cannot be hugged.',
-    render: (s: number, a: boolean) => <Sisu size={s} animated={a} />,
-  },
-]
-
-/**
- * MASCOT LAB — the character set, shown against everything that can break it.
+ * Reachable at #mascots. Not in the nav and not in the page flow: the site has
+ * one argument to make and a mascot sheet is not part of it.
  *
- * This is a workbench, not a page of the site. It is reachable at #mascots and
- * is deliberately not in the nav or the page flow: the portfolio page has an
- * argument to make and a gallery of mascots is not part of it.
+ * Everything that used to live here — the four-character cast, the buoy and
+ * puffin instruments, the fox, the five plush proposals — is gone. Nori is the
+ * mascot; the exploration is history and history does not need a page.
  *
- * What it exists to test, in the order the tests matter:
- *
- *   1. BOTH GROUNDS. The characters carry a fixed internal palette so they do
- *      not need theme-keyed internals, but that is exactly the decision that
- *      can go wrong — a forest body on a near-black ground loses its edge. The
- *      tone switch here puts every character on the forest band on demand
- *      rather than making you scroll the real site to find one.
- *   2. SMALL SIZES. Every character is shown down to 24px in the same row. A
- *      mascot that only works at 200px is an illustration, and the site needs
- *      a nav mark. Anything that turns to mush in the ladder gets redrawn
- *      compact or gets dropped.
- *   3. MOTION OFF. The set has to say the same thing static, because reduced
- *      motion is a real setting and the favicon is a still.
- *   4. AGAINST THE INSTRUMENTS. The old Fyr and Lunni are rendered at the
- *      bottom at the same size. The character set is only worth adopting if it
- *      beats them, and that is a comparison to look at rather than to assert.
+ * What the sheet is still for is testing, in the order the tests matter:
+ *   1. BOTH GROUNDS. Nori is a white character with a dark contour, which is
+ *      the combination most likely to fail on one ground or the other.
+ *   2. SMALL SIZES. The nav needs a ~28px mark. A full-body Nori at that size
+ *      is a grey pill, which is why `crop="head"` exists.
+ *   3. MOTION OFF. Reduced motion is a real setting and a favicon is a still.
  */
 
-type Cast = {
-  key: string
-  name: string
-  gloss: string
-  role: string
-  story: string
-  render: (size: number, animated: boolean) => React.ReactNode
-}
-
-const CAST: Cast[] = [
-  {
-    key: 'fyr',
-    name: 'Fyr',
-    gloss: 'Norwegian/Danish — lighthouse',
-    role: 'The thesis',
-    story:
-      'A consultant visits; a keeper stays. The waterline crosses its body, so it is in the water rather than beside it — and it is moored, which is what "integrated with your data" looks like as a shape. Bottom-heavy, so it rights itself after a knock.',
-    render: (size, animated) => <FyrChar size={size} animated={animated} />,
-  },
-  {
-    key: 'lunni',
-    name: 'Lunni',
-    gloss: 'Finnish — puffin',
-    role: 'The deployer',
-    story:
-      'A sea bird in site PPE is the anti-demo: unglamorous, equipped, standing on a girder that is already bolted down. Norrin’s own copy is dismissive of slick demos and one more pilot — this is the one who actually ships.',
-    render: (size, animated) => <LunniChar size={size} animated={animated} />,
-  },
-  {
-    key: 'hirvi',
-    name: 'Hirvi',
-    gloss: 'Finnish — elk',
-    role: 'The foundation',
-    story:
-      'Elk antlers are palmate — broad flat blades, genuinely shelf-shaped — so the platform rests across them with its services running. The only character that does not idle: it is the thing that stays still while everything else stands on it.',
-    render: (size, animated) => <Hirvi size={size} animated={animated} />,
-  },
-  {
-    key: 'valo',
-    name: 'Valo',
-    gloss: 'Finnish — light',
-    role: 'The watch',
-    story:
-      'The tonttu of folklore works at night and is never seen; the place runs because of someone you are not thinking about. That is on-call. 24/7 has no diagram — you cannot draw it as a shape, but you can draw someone still awake.',
-    render: (size, animated) => <Valo size={size} animated={animated} />,
-  },
+const POSES: { pose: NoriPose; name: string; use: string }[] = [
+  { pose: 'wave', name: 'Wave', use: 'Hero, contact — the greeting' },
+  { pose: 'idea', name: 'Idea', use: 'Thinking, insights' },
+  { pose: 'laptop', name: 'Laptop', use: 'Work, build, careers' },
+  { pose: 'data', name: 'Data', use: 'Proof, platforms, numbers' },
+  { pose: 'rocket', name: 'Rocket', use: 'Production — the thesis' },
+  { pose: 'sleep', name: 'Sleep', use: 'Footer, 24/7, empty states' },
 ]
 
 const LADDER = [96, 56, 40, 24]
-
-const FYR_STATES: { state: FyrState; label: string }[] = [
-  { state: 'pilot', label: 'Pilot' },
-  { state: 'deploying', label: 'Deploying' },
-  { state: 'gap', label: 'The gap' },
-  { state: 'production', label: 'Production' },
-]
 
 export function MascotLab() {
   const [inverse, setInverse] = useState(false)
   const [animated, setAnimated] = useState(true)
 
   return (
-    // A <main> with an <h1> inside it, rather than the <div> + SectionHeader
-    // this started as. Axe caught three moderate violations on that version —
-    // landmark-one-main, page-has-heading-one and region — because
-    // SectionHeader emits an h2 and nothing here was a landmark. This page is
-    // a workbench and would never have been audited by tools/audit.mjs, which
-    // only ever visits the site root; being off the audit path is not a reason
+    // <main> with an <h1> inside it: this page is off tools/audit.mjs's path,
+    // which only ever visits the site root, and being unaudited is not a reason
     // to be the one broken page in the project.
     <main
       data-tone={inverse ? 'inverse' : undefined}
@@ -175,23 +49,16 @@ export function MascotLab() {
     >
       <Container>
         <header className="mb-6 md:mb-7">
-          <Eyebrow index="00" label="Mascot lab" tone={inverse ? 'inverse' : 'default'} />
-          <h1 className="display-2 mt-8 max-w-[20ch]">A cast, not a mark.</h1>
+          <Eyebrow index="00" label="Mascot" tone={inverse ? 'inverse' : 'default'} />
+          <h1 className="display-2 mt-8 max-w-[20ch]">Nori.</h1>
         </header>
 
-        <p
-          className={cx(
-            'mt-6 max-w-[62ch] text-lg',
-            inverse ? 'text-inverse-ink-2' : 'text-ink-2',
-          )}
-        >
-          Four characters, one hand. Each one carries a different part of what Norrin actually
-          says about itself — the thesis, the deployer, the foundation, the watch — so the set
-          works as a cast rather than as four attempts at the same logo.
+        <p className={cx('mt-6 max-w-[62ch] text-lg', inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>
+          Six poses, one character. The artwork is authored as finished SVGs in{' '}
+          <code className="font-mono text-sm">public/</code> — the app places, sizes and idles
+          them, and never recolours or re-paths them. Editing a pose means editing the file.
         </p>
 
-        {/* Controls. Two switches, because two things break mascots: the ground
-            they sit on and having their motion taken away. */}
         <div className="mt-10 flex flex-wrap items-center gap-3">
           <button
             type="button"
@@ -210,201 +77,41 @@ export function MascotLab() {
             {animated ? 'Motion on' : 'Motion off'}
           </button>
           <span className={cx('label', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
-            Both switches change what you are judging — check every character in all four
-            combinations.
+            A white character with a dark contour is the combination most likely to fail on one
+            ground — check both.
           </span>
         </div>
 
-        {/* ── THE FIVE PROPOSALS ────────────────────────────────────────────
-            Leads the page: this is the actual offer. Everything below is now
-            working history, kept because the reasoning is the portfolio. */}
-        <section className="mt-16 md:mt-24" aria-labelledby="props-heading">
-          <Eyebrow index="01" label="Five proposals" tone={inverse ? 'inverse' : 'default'} />
-          <h2 id="props-heading" className="display-2 mt-8 max-w-[20ch]">
-            Pick a face.
-          </h2>
-          <p
-            className={cx(
-              'mt-6 max-w-[64ch] text-lg',
-              inverse ? 'text-inverse-ink-2' : 'text-ink-2',
-            )}
-          >
-            One plush hand, five arguments. Each one comes out of something Norrin actually
-            publishes — <em>“we stay close… true partnerships need presence, not just
-            promises”</em>, <em>“clarity over complexity”</em>, <em>“technology means nothing
-            without the humans behind it”</em> — and every piece of natural history used as an
-            argument is verifiable. Nothing about Norrin is invented.
-          </p>
-
-          <div className="mt-12 grid grid-cols-1 gap-px md:grid-cols-2 xl:grid-cols-3">
-            {PROPOSALS.map((p) => (
-              <article
-                key={p.key}
-                className={cx(
-                  'flex flex-col gap-6 border p-8',
-                  inverse ? 'border-inverse-hairline' : 'border-hairline',
-                )}
-              >
-                <div className="flex items-center justify-center py-2">{p.render(200, animated)}</div>
-                <div>
-                  <Eyebrow label={p.angle} tone={inverse ? 'inverse' : 'default'} />
-                  <h3 className="display-3 mt-4">{p.name}</h3>
-                  <p className={cx('label mt-2', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
-                    {p.gloss}
-                  </p>
-                </div>
-                <p className={cx(inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>{p.why}</p>
-                <p className={cx('text-sm', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
-                  {p.fit}
-                </p>
-                <div
-                  className={cx(
-                    'mt-auto flex items-end gap-5 border-t pt-6',
-                    inverse ? 'border-inverse-hairline' : 'border-hairline',
-                  )}
-                >
-                  {[64, 40, 24].map((s) => (
-                    <div key={s} className="flex flex-col items-center gap-2">
-                      {p.render(s, animated)}
-                      <span
-                        className={cx(
-                          'label tabular-nums',
-                          inverse ? 'text-inverse-ink-3' : 'text-ink-3',
-                        )}
-                      >
-                        {s}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* ── REVONTULI — the flat-drawn version ────────────────────────────
-            Kept below the proposals: same character, the other hand. Worth
-            seeing side by side, because the style choice and the character
-            choice are two separate decisions and this is the only place the
-            difference is visible. */}
-        <section className="mt-24" aria-labelledby="revo-heading">
-          <Eyebrow index="02" label="The same fox, drawn flat" tone={inverse ? 'inverse' : 'default'} />
-          <h2 id="revo-heading" className="display-2 mt-8 max-w-[18ch]">
-            Revontuli.
-          </h2>
-          <p className={cx('mt-6 max-w-[62ch] text-lg', inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>
-            Finnish for the northern lights, and it means literally{' '}
-            <em>fox fires</em> — <span className="font-mono text-sm">revon</span> is an archaic
-            word for fox. A fox runs the fells and its tail flings the sparks that become the
-            aurora. One character, one story, no caption required.
-          </p>
-
-          <div className="mt-12 grid grid-cols-1 gap-px lg:grid-cols-3">
-            {[
-              {
-                form: 'sweep' as const,
-                name: 'Sweep',
-                use: 'Hero / lead image',
-                note: 'It walks the production line — solid behind, dashed ahead — and the aurora rises off the tail over the part already crossed. The site device, not a new one.',
-              },
-              {
-                form: 'mark' as const,
-                name: 'Mark',
-                use: 'Nav, favicon, avatar',
-                note: 'Head-on, with the aurora as a crown so even the avatar carries the name. Redrawn simplified below 44px rather than scaled down.',
-              },
-              {
-                form: 'sitting' as const,
-                name: 'Sitting',
-                use: 'Contact, footer',
-                note: 'Composed, tail curled forward. The warm one, for where the page is asking rather than arguing.',
-              },
-            ].map((v) => (
-              <article
-                key={v.form}
-                className={cx(
-                  'flex flex-col gap-6 border p-8',
-                  inverse ? 'border-inverse-hairline' : 'border-hairline',
-                )}
-              >
-                <Revontuli form={v.form} size={190} animated={animated} />
-                <div>
-                  <h3 className="display-3">{v.name}</h3>
-                  <p className={cx('label mt-2', inverse ? 'text-inverse-ink-3' : 'text-accent')}>
-                    {v.use}
-                  </p>
-                  <p className={cx('mt-4', inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>
-                    {v.note}
-                  </p>
-                </div>
-                <div
-                  className={cx(
-                    'mt-auto flex items-end gap-5 border-t pt-6',
-                    inverse ? 'border-inverse-hairline' : 'border-hairline',
-                  )}
-                >
-                  {[64, 40, 24, 16].map((s) => (
-                    <div key={s} className="flex flex-col items-center gap-2">
-                      <Revontuli form={v.form} size={s} animated={animated} showAurora={s >= 40} />
-                      <span
-                        className={cx(
-                          'label tabular-nums',
-                          inverse ? 'text-inverse-ink-3' : 'text-ink-3',
-                        )}
-                      >
-                        {s}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* The cast. */}
-        <div className="mt-16 grid grid-cols-1 gap-px md:mt-24 lg:grid-cols-2">
-          {CAST.map((c) => (
+        <div className="mt-16 grid grid-cols-1 gap-px md:mt-24 md:grid-cols-2 xl:grid-cols-3">
+          {POSES.map((p) => (
             <article
-              key={c.key}
+              key={p.pose}
               className={cx(
-                'flex flex-col gap-8 p-8 md:p-10',
-                inverse
-                  ? 'border border-inverse-hairline'
-                  : 'border border-hairline',
+                'flex flex-col gap-6 border p-8',
+                inverse ? 'border-inverse-hairline' : 'border-hairline',
               )}
             >
-              <div className="flex items-start justify-between gap-6">
-                <div>
-                  <Eyebrow label={c.role} tone={inverse ? 'inverse' : 'default'} />
-                  <h2 className="display-3 mt-4">{c.name}</h2>
-                  <p
-                    className={cx(
-                      'label mt-2',
-                      inverse ? 'text-inverse-ink-3' : 'text-ink-3',
-                    )}
-                  >
-                    {c.gloss}
-                  </p>
-                </div>
-                <div className="shrink-0">{c.render(150, animated)}</div>
+              <div className="flex items-center justify-center py-2">
+                <Nori pose={p.pose} size={200} animated={animated} />
               </div>
-
-              <p className={cx('max-w-[46ch]', inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>
-                {c.story}
-              </p>
-
-              {/* The size ladder. The honest test — anything that dies at 24px
-                  is an illustration and not a mark. */}
+              <div>
+                <h2 className="display-3">{p.name}</h2>
+                <p className={cx('label mt-2', inverse ? 'text-inverse-ink-3' : 'text-accent')}>
+                  {p.use}
+                </p>
+                <p className={cx('label mt-1', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
+                  /nori-{p.pose}.svg
+                </p>
+              </div>
               <div
                 className={cx(
-                  'flex items-end gap-6 border-t pt-6',
+                  'mt-auto flex items-end gap-5 border-t pt-6',
                   inverse ? 'border-inverse-hairline' : 'border-hairline',
                 )}
               >
                 {LADDER.map((s) => (
                   <div key={s} className="flex flex-col items-center gap-2">
-                    {c.render(s, animated)}
+                    <Nori pose={p.pose} size={s} animated={animated} />
                     <span
                       className={cx(
                         'label tabular-nums',
@@ -420,81 +127,48 @@ export function MascotLab() {
           ))}
         </div>
 
-        {/* Fyr carries the same four-state grammar as the instrument, so it can
-            drop straight into TheGap. This row is where that gets checked: the
-            states have to be told apart at a glance, from the face alone. */}
-        <div className="mt-24">
-          <Eyebrow index="01" label="Fyr — the four states" tone={inverse ? 'inverse' : 'default'} />
-          <p className={cx('mt-6 max-w-[62ch]', inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>
-            The instrument changes its topmark; the character changes its face. That is the
-            trade the character form makes — more warmth, less precision — and it is why both
-            versions still exist.
+        {/* The head crop. Its own section because it is a different asset
+            decision, not a different pose. */}
+        <section className="mt-24" aria-labelledby="mark-heading">
+          <Eyebrow index="01" label="The small mark" tone={inverse ? 'inverse' : 'default'} />
+          <h2 id="mark-heading" className="display-3 mt-6">
+            Head crop, for anything under ~40px.
+          </h2>
+          <p className={cx('mt-4 max-w-[62ch]', inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>
+            Full-body Nori at nav size is a grey pill — antenna, arms and feet all collapse into
+            the silhouette. Cropping to the head keeps the eyes, which are the only part that has
+            to survive. Same file, different viewBox; no second asset to maintain.
           </p>
-          <div className="mt-10 grid grid-cols-2 gap-8 md:grid-cols-4">
-            {FYR_STATES.map((s) => (
-              <div
-                key={s.state}
-                className={cx(
-                  'flex flex-col items-center gap-4 border p-6',
-                  inverse ? 'border-inverse-hairline' : 'border-hairline',
-                )}
-              >
-                <FyrChar size={140} state={s.state} animated={animated} />
-                <span className={cx('label', inverse ? 'text-inverse-ink-2' : 'text-accent')}>
-                  {s.label}
+          <div
+            className={cx(
+              'mt-8 flex flex-wrap items-end gap-10 border p-8',
+              inverse ? 'border-inverse-hairline' : 'border-hairline',
+            )}
+          >
+            {[64, 40, 28, 20, 16].map((s) => (
+              <div key={s} className="flex flex-col items-center gap-3">
+                <Nori pose="wave" size={s} crop="head" animated={animated} />
+                <span
+                  className={cx(
+                    'label tabular-nums',
+                    inverse ? 'text-inverse-ink-3' : 'text-ink-3',
+                  )}
+                >
+                  {s}
                 </span>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* The comparison the whole thing rests on. */}
-        <div className="mt-24">
-          <Eyebrow
-            index="02"
-            label="Against the instruments"
-            tone={inverse ? 'inverse' : 'default'}
-          />
-          <p className={cx('mt-6 max-w-[62ch]', inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>
-            The originals, same size. These are diagrams and were built under a rule that Fyr
-            may never have a face. The cast is only worth adopting if it beats them at
-            something they were actually trying to do.
-          </p>
-          <div className="mt-10 flex flex-wrap items-end gap-12">
-            <div className="flex flex-col items-center gap-3 text-ink">
-              <Fyr size={140} animated={animated} showWater={false} />
-              <span className={cx('label', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
-                Fyr — instrument
-              </span>
-            </div>
             <div className="flex flex-col items-center gap-3">
-              <Lunni size={140} animated={animated} />
+              <div className="flex items-center gap-2.5">
+                <Nori pose="wave" size={28} crop="head" animated={false} />
+                <span className="wordmark">Norrin</span>
+              </div>
               <span className={cx('label', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
-                Lunni — instrument
-              </span>
-            </div>
-            <div className="flex flex-col items-center gap-3">
-              <FyrChar size={140} animated={animated} showWater={false} />
-              <span className={cx('label', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
-                Fyr — character
-              </span>
-            </div>
-            <div className="flex flex-col items-center gap-3">
-              <LunniChar size={140} animated={animated} variant="standing" />
-              <span className={cx('label', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
-                Lunni — character
+                in the bar
               </span>
             </div>
           </div>
-        </div>
-
-        <p className={cx('mt-24 max-w-[62ch]', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
-          Standalone animated SVGs of all four are written to{' '}
-          <code className="font-mono">public/mascots/</code> by{' '}
-          <code className="font-mono">node tools/mascots.mjs</code>. Those files are
-          self-contained — palette and keyframes inlined — so they work anywhere, not just in
-          this app.
-        </p>
+        </section>
       </Container>
     </main>
   )

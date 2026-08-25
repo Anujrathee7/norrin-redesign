@@ -1,6 +1,7 @@
 import { Container, SectionHeader } from '@/components/primitives/Layout'
 import { Reveal } from '@/components/primitives/Reveal'
 import { publications } from '@/data/norrin'
+import { Nori } from '@/components/mascot/nori/Nori'
 
 /**
  * Thinking — the commitment ladder.
@@ -60,9 +61,15 @@ export function Thinking() {
       className="bg-surface py-24 md:py-36"
     >
       <Container>
-        <SectionHeader index="05" label="Thinking" id="thinking-heading">
-          Start anywhere you like.
-        </SectionHeader>
+        {/* Nori beside the header rather than above the list: the pose is
+            the section's own verb, and floating it over the rungs would make
+            it decoration competing with three things you can click. */}
+        <div className="flex items-end justify-between gap-8">
+          <SectionHeader index="05" label="Thinking" id="thinking-heading" className="grow">
+            Start anywhere you like.
+          </SectionHeader>
+          <Nori pose="idea" size={150} className="hidden shrink-0 md:block" />
+        </div>
 
         <Reveal stagger={0.08}>
           {/* One frame with three cells, not three cards.

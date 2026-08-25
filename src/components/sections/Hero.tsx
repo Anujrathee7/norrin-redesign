@@ -1,6 +1,6 @@
-import { Fyr } from '@/components/mascot/Fyr'
 import { Container, Eyebrow, Grid } from '@/components/primitives/Layout'
 import { metrics, offices, positioning, story } from '@/data/norrin'
+import { Nori } from '@/components/mascot/nori/Nori'
 
 /**
  * Hero.
@@ -8,7 +8,7 @@ import { metrics, offices, positioning, story } from '@/data/norrin'
  * The composition is one idea: a horizon. Everything the visitor reads sits
  * above the waterline, and the waterline itself is the site's central device —
  * dashed to the left of the mark (pilot: provisional, unfinished) and solid to
- * the right (production: committed, load-bearing). Fyr sits exactly on the
+ * the right (production: committed, load-bearing). Nori sits exactly on the
  * crossing, which is the whole argument in one object.
  *
  * The rule is assembled as a flex row rather than an absolutely-positioned
@@ -146,15 +146,16 @@ export function Hero() {
             />
             <span aria-hidden="true" className="absolute top-0 right-0 left-1/2 h-px bg-accent" />
 
-            {/* Lifted by its own waterline (14.6 of a 24-unit viewBox), so the
-                float straddles the rule without a hard-coded offset. */}
-            <div className="absolute inset-x-0 top-0 -translate-y-[60.83%]">
-              <Fyr
+            {/* Nori sits at the crossing point, where dashed becomes solid.
+                Lifted by 92% of its own box rather than by a magic number:
+                the rocket pose's lowest mark (the flame, cy 486 of a 512
+                viewBox) has to land ON the rule, not below it. */}
+            <div className="absolute inset-x-0 top-0 -translate-y-[92%]">
+              <Nori
+                pose="rocket"
                 size={300}
-                state="production"
-                className="h-auto w-full"
-                showWater={false}
-                title="Fyr — Norrin's sea mark, on station in production"
+                className="mx-auto block w-[72%]"
+                title="Nori, at the point where a pilot becomes production"
               />
             </div>
           </div>

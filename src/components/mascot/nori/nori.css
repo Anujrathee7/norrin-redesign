@@ -1,0 +1,80 @@
+/* ==========================================================================
+   NORI
+   --------------------------------------------------------------------------
+   Placement and idle only. The artwork is authored in `public/nori-*.svg` and
+   nothing in this file recolours, re-paths or filters it.
+
+   Motion contract, same as everything else in this repo:
+     - transform and opacity only, no filters, no JS in the motion path
+     - `data-static` kills it
+     - prefers-reduced-motion resolves to the RESTING frame
+
+   The float is deliberately slower and shallower than a typical mascot bob.
+   The drawings already carry their own implied motion — the wave arcs, the
+   rising Zzz, the rocket's speed lines — and a lively bob on top of those
+   reads as two animations arguing rather than one character breathing.
+   ========================================================================== */
+
+.nori {
+  display: inline-block;
+  line-height: 0;
+}
+
+.nori img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* The files are drawn on a 512 square; letting the browser resample them
+     with default smoothing keeps the 8px strokes clean at small sizes. */
+  user-select: none;
+}
+
+.nori--float {
+  animation: nori-float 6.2s ease-in-out infinite;
+}
+
+@keyframes nori-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.4%);
+  }
+}
+
+/* The sleeping pose gets a longer, gentler cycle. A sleeping character that
+   bobs at waking speed reads as restless, which is the opposite of the pose. */
+.nori[data-pose='sleep'].nori--float {
+  animation-duration: 8.6s;
+}
+
+/* The rocket rises a little further and holds at the top — it is launching,
+   not floating. */
+.nori[data-pose='rocket'].nori--float {
+  animation-name: nori-lift;
+  animation-duration: 5.4s;
+}
+
+@keyframes nori-lift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45%,
+  60% {
+    transform: translateY(-4.2%);
+  }
+}
+
+.nori[data-static='true'],
+.nori[data-static='true'].nori--float {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nori--float {
+    animation: none !important;
+    transform: none !important;
+  }
+}

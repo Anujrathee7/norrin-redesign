@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- antenna -->
+  <circle cx="256" cy="76" r="26" fill="#B7A7E8" opacity=".22"/>
+  <path d="M256 142 L256 96" stroke="#2E2A40" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="256" cy="78" r="15" fill="#B7A7E8" stroke="#2E2A40" stroke-width="6"/>
+  <circle cx="250" cy="72" r="4.5" fill="#FFFFFF"/>
+  <!-- feet -->
+  <ellipse cx="214" cy="420" rx="26" ry="13" fill="#FFFFFF" stroke="#2E2A40" stroke-width="8"/>
+  <ellipse cx="298" cy="420" rx="26" ry="13" fill="#FFFFFF" stroke="#2E2A40" stroke-width="8"/>
+  <!-- ears -->
+  <rect x="110" y="238" width="36" height="46" rx="18" fill="#FFFFFF" stroke="#2E2A40" stroke-width="7"/>
+  <rect x="366" y="238" width="36" height="46" rx="18" fill="#FFFFFF" stroke="#2E2A40" stroke-width="7"/>
+  <!-- body -->
+  <path d="M256 138 C172 138 150 214 150 300 C150 372 182 418 256 418 C330 418 362 372 362 300 C362 214 340 138 256 138 Z" fill="#FFFFFF" stroke="#2E2A40" stroke-width="8" stroke-linejoin="round"/>
+  <!-- soft lavender shading -->
+  <ellipse cx="256" cy="396" rx="62" ry="15" fill="#E7E1F7" opacity=".6"/>
+  <!-- face -->
+  <ellipse cx="214" cy="252" rx="19" ry="25" fill="#2E2A40"/>
+  <circle cx="207" cy="243" r="6" fill="#FFFFFF"/>
+  <circle cx="221" cy="261" r="3.5" fill="#FFFFFF"/>
+  <ellipse cx="298" cy="252" rx="19" ry="25" fill="#2E2A40"/>
+  <circle cx="291" cy="243" r="6" fill="#FFFFFF"/>
+  <circle cx="305" cy="261" r="3.5" fill="#FFFFFF"/>
+  <ellipse cx="192" cy="292" rx="15" ry="9" fill="#F6D5E8" opacity=".85"/>
+  <ellipse cx="320" cy="292" rx="15" ry="9" fill="#F6D5E8" opacity=".85"/>
+  <path d="M238 298 Q256 314 274 298" stroke="#2E2A40" stroke-width="7" stroke-linecap="round"/>
+  <!-- laptop screen (lid) -->
+  <rect x="178" y="292" width="156" height="106" rx="16" fill="#FFFFFF" stroke="#2E2A40" stroke-width="8"/>
+  <path d="M214 338 Q230 328 246 338 T278 338" stroke="#8E7BD8" stroke-width="5" stroke-linecap="round"/>
+  <path d="M224 354 Q240 345 256 354 T288 354" stroke="#B7A7E8" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="298" cy="330" r="4" fill="#8E7BD8"/>
+  <!-- arms typing -->
+  <path d="M164 306 Q188 340 206 364" stroke="#2E2A40" stroke-width="26" stroke-linecap="round"/>
+  <path d="M164 306 Q188 340 206 364" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="209" cy="369" r="13" fill="#FFFFFF" stroke="#2E2A40" stroke-width="6"/>
+  <path d="M348 306 Q324 340 306 364" stroke="#2E2A40" stroke-width="26" stroke-linecap="round"/>
+  <path d="M348 306 Q324 340 306 364" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="303" cy="369" r="13" fill="#FFFFFF" stroke="#2E2A40" stroke-width="6"/>
+  <!-- laptop base -->
+  <path d="M166 398 L346 398 L366 430 L146 430 Z" fill="#F5F2FC" stroke="#2E2A40" stroke-width="8" stroke-linejoin="round"/>
+</svg>

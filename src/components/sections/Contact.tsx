@@ -2,6 +2,7 @@ import { Container, Eyebrow, Grid } from '@/components/primitives/Layout'
 import { Reveal } from '@/components/primitives/Reveal'
 import { useDrawLine } from '@/hooks/useDrawLine'
 import { contactEmail, contacts } from '@/data/norrin'
+import { Nori } from '@/components/mascot/nori/Nori'
 
 /**
  * Closing CTA.
@@ -16,7 +17,7 @@ import { contactEmail, contacts } from '@/data/norrin'
  * sections. On an inverse ground sun is the stand-in for moss, not a budget
  * spend. The budget is stated once, in index.css, where it can be counted.
  *
- * Note the mark is deliberately absent here. Fyr appears nowhere near the
+ * Note the sea mark is gone from this file. Nori waves here instead — the
  * primary call to action: it would compete with the only click that matters.
  *
  * Named humans rather than a faceless form — Norrin publishes these people and
@@ -87,6 +88,7 @@ export function Contact() {
 
           {/* Named humans. No headshots — we hold no rights to their images. */}
           <div className="col-span-4 mt-16 self-end md:col-span-4 md:col-start-9 md:mt-0">
+            <Nori pose="wave" size={132} className="mb-8 block" />
             <p className="label mb-6 text-inverse-ink-3">Who you&rsquo;ll reach</p>
             <ul className="border-t border-inverse-hairline-strong">
               {contacts.map((c) => (
