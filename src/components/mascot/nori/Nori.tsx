@@ -20,29 +20,69 @@ import './nori.css'
  * imply (the wave arcs, the Zzz) instead of fighting it.
  */
 
-export type NoriPose = 'wave' | 'idea' | 'laptop' | 'data' | 'rocket' | 'sleep'
+export type NoriPose =
+  | 'wave'
+  | 'idea'
+  | 'laptop'
+  | 'data'
+  | 'rocket'
+  | 'sleep'
+  // Poses drawn to be COMPOSED WITH TYPE rather than parked beside it. The
+  // first six are whole-figure drawings that only work at 150px+; these are
+  // built to sit against a heading, a rule or a card edge at 80-140px.
+  | 'lean'
+  | 'sit'
+  | 'peek'
+  | 'point'
+  | 'hold'
+  | 'read'
+
+/**
+ * Each pose's own box, in its file's coordinates.
+ *
+ * Every pose is square except `peek`, which is 512x274 because the bottom of
+ * its viewBox IS the edge being peeked over — the body is cut flat there. A
+ * square box would leave 192 units of blank space below the drawing, and the
+ * whole point of that file is that it butts flush against a real rule.
+ *
+ * `size` always means WIDTH. Height is derived, so nothing ever squashes.
+ */
+const POSE_BOX: Record<NoriPose, { w: number; h: number }> = {
+  wave: { w: 512, h: 512 },
+  idea: { w: 512, h: 512 },
+  laptop: { w: 512, h: 512 },
+  data: { w: 512, h: 512 },
+  rocket: { w: 512, h: 512 },
+  sleep: { w: 512, h: 512 },
+  lean: { w: 512, h: 512 },
+  sit: { w: 512, h: 512 },
+  peek: { w: 512, h: 274 },
+  point: { w: 512, h: 512 },
+  hold: { w: 512, h: 512 },
+  read: { w: 512, h: 512 },
+}
 
 /**
  * Head-and-ears crop, in the source files' own 512 coordinate space.
  *
- * The nav needs a ~28px mark and a full-body Nori at that size is a grey pill
- * — antenna, arms and feet all collapse into the silhouette. Cropping to the
- * head keeps the eyes, which are the only part that has to survive.
+ * The nav needs a ~28px mark, and a full-body Nori at that size is a grey pill:
+ * arms, feet and chest panel all collapse into the silhouette. Cropping to the
+ * head keeps the two things that survive — the ears and the eyes.
  *
- * Measured off the files: skull top y138, ears y238-284 spanning x110-402.
- * The box stops at y300 because that is where the arms attach.
+ * Measured off the current drawings: ear tips reach y30 and span x118-394, the
+ * head runs y86-314. The box is a little wider and taller than that so nothing
+ * touches its edge.
  */
-const HEAD_CROP = '104 132 304 172'
+const HEAD_CROP = { x: 112, y: 22, w: 288, h: 302 }
 
 /**
  * The pose the head crop is taken from.
  *
- * NOT `wave`, which is the obvious choice and the wrong one: its raised arm
- * reaches (402,228) with the hand at (405,219) — ABOVE the eyes — so it lands
- * inside any box tight enough to be a head, and the mark renders as a face
- * with a lump stuck to its ear. `data` keeps both arms below y308, which is
- * outside the crop entirely. The skull, ears, antenna and eyes are identical
- * across every pose, so this costs nothing but the expression.
+ * NOT `wave`: its raised arm passes y250 on the way out, which is inside any
+ * box tight enough to be a head, and the mark renders as a face with a lump
+ * stuck to one ear. `data` keeps both arms below y326, outside the crop
+ * entirely. Head, ears and eyes are identical across every pose, so this costs
+ * nothing but the expression.
  */
 const HEAD_POSE: NoriPose = 'data'
 
@@ -72,6 +112,7 @@ function NoriComponent({
   const alt = title ?? ''
   // The head crop always draws from HEAD_POSE — see the note there.
   const src = `/nori-${crop === 'head' ? HEAD_POSE : pose}.svg`
+  const box = POSE_BOX[pose]
 
   if (crop === 'head') {
     // An <svg> wrapper is what makes the crop possible: <img> has no viewBox,
@@ -80,9 +121,9 @@ function NoriComponent({
     return (
       <svg
         className={`nori ${className ?? ''}`}
-        width={(size * 304) / 172}
+        width={Math.round((size * HEAD_CROP.w) / HEAD_CROP.h)}
         height={size}
-        viewBox={HEAD_CROP}
+        viewBox={`${HEAD_CROP.x} ${HEAD_CROP.y} ${HEAD_CROP.w} ${HEAD_CROP.h}`}
         data-static={!animated || undefined}
         data-pose={pose}
         role={title ? 'img' : 'presentation'}
@@ -105,7 +146,10 @@ function NoriComponent({
       <img
         src={src}
         width={size}
-        height={size}
+        // Derived, never assumed square: `peek` is 512x320 and an explicit
+        // square height would squash it. Both dimensions stay explicit so the
+        // image reserves its own space and nothing shifts on load.
+        height={Math.round((size * box.h) / box.w)}
         alt={alt}
         // Decorative instances must be removed from the tree entirely, not
         // just given an empty alt — an empty alt on a sized img still reports

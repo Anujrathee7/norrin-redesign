@@ -22,10 +22,16 @@
 
 .nori img {
   display: block;
-  width: 100%;
+  /* NOT `width: 100%`. That is what this rule used to say, and because `.nori`
+     is a shrink-to-fit inline-block it made the percentage circular — so the
+     browser fell back to the SVG's default intrinsic size, 300px, and the
+     `size` prop was silently ignored on every mascot on the site. Every Nori
+     rendered at 300px wide regardless of what it asked for.
+
+     The width/height attributes now do the sizing, and `max-width` still lets a
+     caller cap it with a class on the wrapper (the hero does exactly that). */
+  max-width: 100%;
   height: auto;
-  /* The files are drawn on a 512 square; letting the browser resample them
-     with default smoothing keeps the 8px strokes clean at small sizes. */
   user-select: none;
 }
 
