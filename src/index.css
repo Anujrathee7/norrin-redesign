@@ -709,19 +709,88 @@
 
 html.js [data-reveal]:not([data-revealed]) {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translate(var(--reveal-x, 0), var(--reveal-y, 18px)) scale(var(--reveal-s, 1));
 }
 
 html.js [data-reveal='stagger']:not([data-revealed]) > * {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translate(var(--reveal-x, 0), var(--reveal-y, 18px)) scale(var(--reveal-s, 1));
 }
 
 [data-reveal],
 [data-reveal='stagger'] > * {
   transition:
     opacity 0.72s var(--ease-entrance) var(--reveal-delay, 0s),
-    transform 0.72s var(--ease-entrance) var(--reveal-delay, 0s);
+    transform 0.72s var(--ease-entrance) var(--reveal-delay, 0s),
+    clip-path 0.9s var(--ease-entrance) var(--reveal-delay, 0s);
+}
+
+/* Direction is carried by three custom properties rather than by four separate
+   transform declarations, so a variant only has to override the axis it cares
+   about and the composed transform stays a single value. Overriding
+   `transform` per variant instead would mean restating the whole thing each
+   time, and the stagger selector would need duplicating for every direction. */
+[data-variant='left'] {
+  --reveal-x: -44px;
+  --reveal-y: 0;
+}
+
+[data-variant='right'] {
+  --reveal-x: 44px;
+  --reveal-y: 0;
+}
+
+[data-variant='rise'] {
+  --reveal-y: 56px;
+}
+
+[data-variant='scale'] {
+  --reveal-y: 26px;
+  --reveal-s: 0.94;
+}
+
+/* The wipe. A clip-path inset costs no layout and no paint of its own, which
+   is why it is the one non-transform property allowed to animate here. */
+html.js [data-variant='wipe'][data-reveal]:not([data-revealed]),
+html.js [data-variant='wipe'][data-reveal='stagger']:not([data-revealed]) > * {
+  clip-path: inset(0 100% 0 0);
+  opacity: 1;
+  transform: none;
+}
+
+[data-variant='wipe'][data-reveal],
+[data-variant='wipe'][data-reveal='stagger'] > * {
+  clip-path: inset(0 0 0 0);
+}
+
+/* ==========================================================================
+   Masked lines
+   A line of type that rises out from behind its own edge. The mask needs a
+   little vertical breathing room or descenders are sliced off — hence the
+   padding/negative-margin pair, which buys the room without moving the line.
+   ========================================================================== */
+
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-block-end: 0.14em;
+  margin-block-end: -0.14em;
+}
+
+.line-mask > span {
+  display: block;
+  transition: transform 0.92s var(--ease-entrance) var(--line-delay, 0s);
+}
+
+html.js [data-reveal]:not([data-revealed]) .line-mask > span {
+  transform: translateY(110%);
+}
+
+/* The heading block itself must not also fade, or the mask reads as a fade and
+   the rise is wasted. */
+html.js [data-reveal='lines']:not([data-revealed]) {
+  opacity: 1;
+  transform: none;
 }
 
 /* ==========================================================================
@@ -747,5 +816,123 @@ html.js [data-reveal='stagger']:not([data-revealed]) > * {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    clip-path: none !important;
+  }
+
+  /* Masked lines and every scroll-driven effect resolve to their finished
+     state, not to a paused mid-transition one. A reader who asked for less
+     motion gets the whole page, still. */
+  html.js [data-reveal]:not([data-revealed]) .line-mask > span,
+  .line-mask > span {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  [data-scroll] {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   Scroll-driven motion
+   --------------------------------------------------------------------------
+   Parallax and scroll-linked movement, done natively.
+
+   WHY NOT A LIBRARY. This project removed GSAP once already: it was down to
+   animating a single stroke, removing it cut 46 kB gzip, and the deeper
+   objection was that a ScrollTrigger misfire leaves an element stuck at
+   opacity 0 forever. `animation-timeline` runs the same effects off the
+   compositor with no JS in the path at all, so there is no misfire to have.
+
+   EVERYTHING HERE IS ADDITIVE. The whole layer sits inside `@supports`, and
+   every animation moves an element that is already in its correct, readable
+   position. A browser without scroll timelines shows the finished page,
+   static — which is the same contract `Reveal` was built to honour.
+   ========================================================================== */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Depth. Three rates, because parallax reads as depth only when layers
+       disagree — one rate applied to everything is just a slow scroll. */
+    [data-scroll='drift-slow'],
+    [data-scroll='drift'],
+    [data-scroll='drift-fast'] {
+      animation: scroll-drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    [data-scroll='drift-slow'] {
+      --drift: 14px;
+    }
+
+    [data-scroll='drift'] {
+      --drift: 34px;
+    }
+
+    [data-scroll='drift-fast'] {
+      --drift: 62px;
+    }
+
+    @keyframes scroll-drift {
+      from {
+        transform: translateY(var(--drift));
+      }
+      to {
+        transform: translateY(calc(var(--drift) * -1));
+      }
+    }
+
+    /* A rule that draws itself across as its section is read. Used for the
+       production line's section-scale appearances. */
+    [data-scroll='draw'] {
+      animation: scroll-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 55%;
+      transform-origin: left center;
+    }
+
+    @keyframes scroll-draw {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    /* Media settling out of a slight overscale. The classic editorial image
+       reveal, and the reason it is `scale` and not `width` is that only one of
+       those is free. */
+    [data-scroll='settle'] {
+      animation: scroll-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+
+    @keyframes scroll-settle {
+      from {
+        transform: scale(1.07);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+
+    /* The header condenses once the page has moved. Deliberately NOT touching
+       the bottom rule: that rule already encodes which section you are reading,
+       and two meanings on one line is one too many. */
+    [data-scroll='condense'] {
+      animation: scroll-condense linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 220px;
+    }
+
+    @keyframes scroll-condense {
+      to {
+        --header-shrink: 1;
+      }
+    }
   }
 }

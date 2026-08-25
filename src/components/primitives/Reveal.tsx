@@ -20,6 +20,16 @@ import { cx } from '@/lib/cx'
  *   - reduced motion          → revealed on mount, no transition
  */
 
+/**
+ * Which way the content arrives.
+ *
+ * Direction is not decoration: a list of roles reading left-to-right wants to
+ * arrive from the left, a stat wants to rise, and a case card wants to be
+ * uncovered. Using one direction everywhere is what makes a page feel
+ * templated even when every other decision is considered.
+ */
+export type RevealVariant = 'up' | 'rise' | 'left' | 'right' | 'scale' | 'wipe'
+
 type RevealProps = {
   children: ReactNode
   as?: ElementType
@@ -28,9 +38,24 @@ type RevealProps = {
   delay?: number
   /** Stagger direct children by this many seconds instead of moving as a block. */
   stagger?: number
+  variant?: RevealVariant
+  /**
+   * `lines` mode: children are expected to be `.line-mask` wrappers, and the
+   * block itself does not fade — only the lines inside it rise. Used for
+   * headings, via SplitLines.
+   */
+  lines?: boolean
 }
 
-export function Reveal({ children, as: Tag = 'div', className, delay = 0, stagger }: RevealProps) {
+export function Reveal({
+  children,
+  as: Tag = 'div',
+  className,
+  delay = 0,
+  stagger,
+  variant = 'up',
+  lines = false,
+}: RevealProps) {
   const ref = useRef<HTMLElement>(null)
   const reduced = useReducedMotion()
 
@@ -47,7 +72,13 @@ export function Reveal({ children, as: Tag = 'div', className, delay = 0, stagge
       return
     }
 
-    if (stagger) {
+    if (lines) {
+      // Each masked line gets its own delay, so the heading arrives as a
+      // sequence rather than as a block that happens to be split.
+      el.querySelectorAll<HTMLElement>('.line-mask > *').forEach((line, i) => {
+        line.style.setProperty('--line-delay', `${delay + i * (stagger ?? 0.09)}s`)
+      })
+    } else if (stagger) {
       Array.from(el.children).forEach((child, i) => {
         ;(child as HTMLElement).style.setProperty('--reveal-delay', `${delay + i * stagger}s`)
       })
@@ -70,10 +101,15 @@ export function Reveal({ children, as: Tag = 'div', className, delay = 0, stagge
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [reduced, delay, stagger])
+  }, [reduced, delay, stagger, lines])
 
   return (
-    <Tag ref={ref} data-reveal={stagger ? 'stagger' : ''} className={cx(className)}>
+    <Tag
+      ref={ref}
+      data-reveal={lines ? 'lines' : stagger ? 'stagger' : ''}
+      data-variant={variant === 'up' ? undefined : variant}
+      className={cx(className)}
+    >
       {children}
     </Tag>
   )
