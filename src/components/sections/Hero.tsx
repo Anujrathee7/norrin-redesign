@@ -63,7 +63,7 @@ export function Hero() {
     <section
       id="top"
       data-shot="hero"
-      className="relative flex min-h-[94svh] flex-col justify-between overflow-hidden pt-[calc(72px+6vh)] pb-[clamp(120px,17vh,190px)]"
+      className="relative flex min-h-[94svh] flex-col justify-between overflow-clip pt-[calc(72px+6vh)] pb-[clamp(120px,17vh,190px)]"
     >
       <Container>
         <Grid>

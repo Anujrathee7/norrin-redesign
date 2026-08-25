@@ -68,7 +68,7 @@ export function TheGap() {
       data-tone="inverse"
       data-shot="gap"
       aria-labelledby="gap-heading"
-      className="relative overflow-hidden bg-inverse py-28 text-inverse-ink md:py-40"
+      className="relative overflow-clip bg-inverse py-28 text-inverse-ink md:py-40"
     >
       <Container>
         <div className="grid grid-cols-4 items-end gap-x-6 md:grid-cols-12">

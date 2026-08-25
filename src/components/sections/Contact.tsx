@@ -33,7 +33,7 @@ export function Contact() {
       data-shot="contact"
       aria-labelledby="contact-heading"
       data-tone="inverse"
-      className="relative overflow-hidden bg-inverse py-24 text-inverse-ink md:py-36"
+      className="relative overflow-clip bg-inverse py-24 text-inverse-ink md:py-36"
     >
       {/* The line completes. */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-4" aria-hidden="true">
@@ -53,7 +53,7 @@ export function Contact() {
             as an orphaned square floating in the corner. */}
         <Reveal delay={1.15} variant="rise">
           {/* Sits fully inside the band — a negative translate put half of it
-              above the section edge, where overflow-hidden clipped it. */}
+              above the section edge, where overflow-clip clipped it. */}
           <div className="absolute top-[3px] right-0 h-2.5 w-2.5 bg-signal" />
         </Reveal>
       </div>
