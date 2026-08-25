@@ -41,6 +41,7 @@ export function Work() {
         {/* The roster, as type. */}
         {/* A fast tick across the roster — this is a list of names being read
             out, so the stagger is tight and the travel is small. */}
+        <div data-scroll="pan" style={{ ["--pan" as string]: "38px" }}>
         <Reveal stagger={0.04} variant="left">
           {/* A grid, not flex-wrap: the old wrap produced nine names then a
               lone orphan at desktop, and 3/4/2/1 at 390px. */}
@@ -55,6 +56,7 @@ export function Work() {
             ))}
           </ul>
         </Reveal>
+        </div>
 
         {/* Cases, as full-width rows. Each row is uncovered left to right, in
             sequence — a wipe suits a ruled row better than a fade, because the

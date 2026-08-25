@@ -68,7 +68,9 @@ export function Thinking() {
           <SectionHeader index="05" label="Thinking" id="thinking-heading" className="grow">
             Start anywhere you like.
           </SectionHeader>
-          <Nori pose="idea" size={150} className="hidden shrink-0 md:block" />
+          <span data-scroll="tilt" className="hidden shrink-0 md:block">
+            <Nori pose="idea" size={150} />
+          </span>
         </div>
 
         {/* Wiped rather than faded: the three rungs are one framed object, and

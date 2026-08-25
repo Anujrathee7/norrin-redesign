@@ -169,7 +169,10 @@ export function Pillars() {
               <p className="caption mt-6 max-w-[44ch] text-inverse-ink-3">{partnership}</p>
             </div>
 
-            <ul className="col-span-4 mt-12 grid grid-cols-1 self-start border-t border-inverse-hairline-strong sm:grid-cols-2 md:col-span-6 md:col-start-7 md:mt-0">
+            <ul
+              data-scroll="breathe"
+              className="col-span-4 mt-12 grid grid-cols-1 self-start border-t border-inverse-hairline-strong sm:grid-cols-2 md:col-span-6 md:col-start-7 md:mt-0"
+            >
               {technologies.map((t) => (
                 <li
                   key={t.name}

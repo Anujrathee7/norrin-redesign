@@ -122,7 +122,7 @@ export function TheGap() {
         {/* Desktop: horizontal. */}
         <div className="hidden md:block">
           <Container>
-            <ol className="grid grid-cols-3">
+            <ol data-scroll="drift" className="grid grid-cols-3">
               {STATIONS.map((s, i) => (
                 <li key={s.name} className="relative">
                   {i < 2 ? (

@@ -129,7 +129,10 @@ export function Hero() {
               people durable enough for a three-year programme" never sees
               them. Answering that in the first five seconds is the single
               highest-leverage change available. Every figure is published. */}
-          <aside className="col-span-4 mt-14 self-start md:col-span-4 md:col-start-9 md:mt-2 md:self-center lg:col-span-3 lg:col-start-10">
+          <aside
+            data-scroll="drift-slow"
+            className="col-span-4 mt-14 self-start md:col-span-4 md:col-start-9 md:mt-2 md:self-center lg:col-span-3 lg:col-start-10"
+          >
             <Reveal as="dl" stagger={0.06} variant="right" delay={0.2} className="border-t border-hairline">
               {STATION.map((row) => (
                 <div

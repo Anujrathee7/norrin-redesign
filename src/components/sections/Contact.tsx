@@ -88,7 +88,9 @@ export function Contact() {
 
           {/* Named humans. No headshots — we hold no rights to their images. */}
           <div className="col-span-4 mt-16 self-end md:col-span-4 md:col-start-9 md:mt-0">
-            <Nori pose="wave" size={132} className="mb-8 block" />
+            <span data-scroll="drift" className="mb-8 block">
+              <Nori pose="wave" size={132} />
+            </span>
             <p className="label mb-6 text-inverse-ink-3">Who you&rsquo;ll reach</p>
             <ul className="border-t border-inverse-hairline-strong">
               {contacts.map((c) => (
