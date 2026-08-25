@@ -928,6 +928,108 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
     }
 
+    /* ── Continuous motion ────────────────────────────────────────────────
+       These run for the WHOLE time an element is on screen and unwind when
+       you scroll back up, which is the difference between a page that
+       animates and a page that played an animation once. The one-shot
+       reveals still handle arrival; this layer handles everything after it.
+
+       A NOTE ON WHY THIS WAS INVISIBLE AT FIRST: `view()` resolves against the
+       nearest scrollport, and `overflow: hidden` creates one. Any element
+       inside a hidden-overflow ancestor is measured against a box that never
+       scrolls, so its timeline sits frozen at 0% forever. `overflow: clip`
+       clips identically without creating a scroll container, which is why the
+       hero and the contact band use it. */
+
+    /* For anything at the very bottom of the page. An `entry -> exit` range
+       can never complete down there: the element enters the viewport and then
+       the document runs out of scroll, so the animation freezes part-way and
+       reads as static. Completing within `entry` is the only range that
+       finishes when there is nothing left to scroll.
+
+       Note the second constraint: `entry 100%` means fully in view, so this
+       still cannot complete for an element TALLER than the viewport sitting at
+       the page end. The footer block is exactly that, which is why the footer
+       simply has no scroll motion — it is the quietest moment on the page and
+       forcing movement into it was chasing completeness, not quality. */
+    [data-scroll='settle-in'] {
+      animation: scroll-drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+      --drift: 26px;
+    }
+
+    /* Sideways travel — the roster slides as you read past it. */
+    [data-scroll='pan'] {
+      animation: scroll-pan linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    @keyframes scroll-pan {
+      from {
+        transform: translateX(var(--pan, 60px));
+      }
+      to {
+        transform: translateX(calc(var(--pan, 60px) * -1));
+      }
+    }
+
+    /* A slow lean. Capped low on purpose: past about 3deg text stops looking
+       alive and starts looking broken. */
+    [data-scroll='tilt'] {
+      animation: scroll-tilt linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    @keyframes scroll-tilt {
+      from {
+        transform: rotate(2.2deg) translateY(24px);
+      }
+      to {
+        transform: rotate(-2.2deg) translateY(-24px);
+      }
+    }
+
+    /* Depth on a whole block: it grows very slightly as it comes toward the
+       middle of the viewport and recedes again on the way out. */
+    [data-scroll='breathe'] {
+      animation: scroll-breathe linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    @keyframes scroll-breathe {
+      0% {
+        transform: scale(0.965) translateY(20px);
+      }
+      50% {
+        transform: scale(1) translateY(0);
+      }
+      100% {
+        transform: scale(0.965) translateY(-20px);
+      }
+    }
+
+    /* A rule that fills as its section is read, and empties again on the way
+       back up. */
+    [data-scroll='grow'] {
+      animation: scroll-grow linear both;
+      animation-timeline: view();
+      animation-range: entry 60% exit 20%;
+      transform-origin: left center;
+    }
+
+    @keyframes scroll-grow {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
     /* The header condenses once the page has moved. Deliberately NOT touching
        the bottom rule: that rule already encodes which section you are reading,
        and two meanings on one line is one too many. */
