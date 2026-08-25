@@ -8,6 +8,69 @@ import { Valo } from '@/components/mascot/characters/Valo'
 import { Fyr } from '@/components/mascot/Fyr'
 import { Lunni } from '@/components/mascot/Lunni'
 import { Revontuli } from '@/components/mascot/revontuli/Revontuli'
+import {
+  Lumi,
+  Norppa,
+  Otso,
+  RevontuliChibi,
+  Sisu,
+} from '@/components/mascot/chibi/ChibiCast'
+
+/**
+ * The five plush proposals.
+ *
+ * Every one is grounded in something Norrin actually publishes about itself,
+ * and every piece of natural history used as an argument is verifiable. The
+ * `why` is the sentence that has to survive being read once, by someone who
+ * will not read the second sentence.
+ */
+const PROPOSALS = [
+  {
+    key: 'norppa',
+    name: 'Norppa',
+    gloss: 'The Saimaa ringed seal',
+    angle: 'Infrastructure, and the people behind it',
+    why: 'It lives in one lake on earth and nowhere else. It fell below 120 animals — and it is coming back only because people build it somewhere to live: in 2026, 90% of pups were born in man-made snow banks and artificial nests.',
+    fit: '“Technology means nothing without the humans behind it.” Something precious survives because somebody engineered what it needed and kept showing up. Its name is also one letter from the company’s.',
+    render: (s: number, a: boolean) => <Norppa size={s} animated={a} />,
+  },
+  {
+    key: 'lumi',
+    name: 'Lumi',
+    gloss: 'The snowy owl',
+    angle: 'Intelligence, read instantly',
+    why: 'An owl reads as intelligence in a quarter of a second, in every market Norrin sells into, with nothing to explain. For a company whose whole product is enterprise AI that is not a small advantage.',
+    fit: '“We stay close, involve & include.” An owl is the animal that watches. Its eye is also genuinely yellow, so the brand’s sun lands on the one feature that was always going to carry the face.',
+    render: (s: number, a: boolean) => <Lumi size={s} animated={a} />,
+  },
+  {
+    key: 'revontuli',
+    name: 'Revontuli',
+    gloss: 'The naali — arctic fox',
+    angle: 'The story you already picked',
+    why: 'Finnish for the northern lights, and it means literally fox fires. The fox runs the fells and its tail throws the aurora. Redrawn in this hand so it competes on equal terms rather than winning by being the only one here.',
+    fit: 'Strongest folklore of the five. Also the riskiest: Mozilla Firefox is built on this identical myth, which is why it is an arctic fox with no orange anywhere.',
+    render: (s: number, a: boolean) => <RevontuliChibi size={s} animated={a} />,
+  },
+  {
+    key: 'otso',
+    name: 'Otso',
+    gloss: 'The bear cub',
+    angle: 'Directness and ownership',
+    why: 'Finland’s national animal, designated by parliament in 1985 and revered long before — old Finnish avoided saying its name and used otso, kontio, mesikämmen instead.',
+    fit: '“We take responsibility by addressing issues head on. We value clarity over complexity… skip the sugarcoating.” That is a bear. Warmest shape of the five, and the least ownable — bears are everywhere in branding.',
+    render: (s: number, a: boolean) => <Otso size={s} animated={a} />,
+  },
+  {
+    key: 'sisu',
+    name: 'Sisu',
+    gloss: 'The icebreaker',
+    angle: 'Won in production',
+    why: 'Finnish companies designed about 80% of the world’s icebreakers and roughly 60% were built in Finnish yards — the country’s most globally dominant industry.',
+    fit: 'Its whole job is to go first and open a route through frozen water so ordinary ships can follow and trade happens. That is “we turn AI ambition into production” with nothing left to explain. The cost is warmth: a boat cannot be hugged.',
+    render: (s: number, a: boolean) => <Sisu size={s} animated={a} />,
+  },
+]
 
 /**
  * MASCOT LAB — the character set, shown against everything that can break it.
@@ -152,11 +215,80 @@ export function MascotLab() {
           </span>
         </div>
 
-        {/* ── REVONTULI — the proposal ──────────────────────────────────────
-            Leads the page because it is the recommendation, and because the
-            cast below it is now context rather than the offer. */}
-        <section className="mt-16 md:mt-24" aria-labelledby="revo-heading">
-          <Eyebrow index="01" label="The proposal" tone={inverse ? 'inverse' : 'default'} />
+        {/* ── THE FIVE PROPOSALS ────────────────────────────────────────────
+            Leads the page: this is the actual offer. Everything below is now
+            working history, kept because the reasoning is the portfolio. */}
+        <section className="mt-16 md:mt-24" aria-labelledby="props-heading">
+          <Eyebrow index="01" label="Five proposals" tone={inverse ? 'inverse' : 'default'} />
+          <h2 id="props-heading" className="display-2 mt-8 max-w-[20ch]">
+            Pick a face.
+          </h2>
+          <p
+            className={cx(
+              'mt-6 max-w-[64ch] text-lg',
+              inverse ? 'text-inverse-ink-2' : 'text-ink-2',
+            )}
+          >
+            One plush hand, five arguments. Each one comes out of something Norrin actually
+            publishes — <em>“we stay close… true partnerships need presence, not just
+            promises”</em>, <em>“clarity over complexity”</em>, <em>“technology means nothing
+            without the humans behind it”</em> — and every piece of natural history used as an
+            argument is verifiable. Nothing about Norrin is invented.
+          </p>
+
+          <div className="mt-12 grid grid-cols-1 gap-px md:grid-cols-2 xl:grid-cols-3">
+            {PROPOSALS.map((p) => (
+              <article
+                key={p.key}
+                className={cx(
+                  'flex flex-col gap-6 border p-8',
+                  inverse ? 'border-inverse-hairline' : 'border-hairline',
+                )}
+              >
+                <div className="flex items-center justify-center py-2">{p.render(200, animated)}</div>
+                <div>
+                  <Eyebrow label={p.angle} tone={inverse ? 'inverse' : 'default'} />
+                  <h3 className="display-3 mt-4">{p.name}</h3>
+                  <p className={cx('label mt-2', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
+                    {p.gloss}
+                  </p>
+                </div>
+                <p className={cx(inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>{p.why}</p>
+                <p className={cx('text-sm', inverse ? 'text-inverse-ink-3' : 'text-ink-3')}>
+                  {p.fit}
+                </p>
+                <div
+                  className={cx(
+                    'mt-auto flex items-end gap-5 border-t pt-6',
+                    inverse ? 'border-inverse-hairline' : 'border-hairline',
+                  )}
+                >
+                  {[64, 40, 24].map((s) => (
+                    <div key={s} className="flex flex-col items-center gap-2">
+                      {p.render(s, animated)}
+                      <span
+                        className={cx(
+                          'label tabular-nums',
+                          inverse ? 'text-inverse-ink-3' : 'text-ink-3',
+                        )}
+                      >
+                        {s}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* ── REVONTULI — the flat-drawn version ────────────────────────────
+            Kept below the proposals: same character, the other hand. Worth
+            seeing side by side, because the style choice and the character
+            choice are two separate decisions and this is the only place the
+            difference is visible. */}
+        <section className="mt-24" aria-labelledby="revo-heading">
+          <Eyebrow index="02" label="The same fox, drawn flat" tone={inverse ? 'inverse' : 'default'} />
           <h2 id="revo-heading" className="display-2 mt-8 max-w-[18ch]">
             Revontuli.
           </h2>
