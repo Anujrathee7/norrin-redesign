@@ -1,0 +1,205 @@
+/* ==========================================================================
+   REVONTULI — the naali
+   --------------------------------------------------------------------------
+   THE TWO COATS.
+
+   The arctic fox has a dark summer coat and a white winter coat, and that
+   fact does real work here. The last mascot set shipped a bug where the body
+   was the same colour as the band behind it, so every character lost its
+   silhouette on an inverse ground. The coat swap fixes that class of bug
+   permanently, and fixes it with something biologically true rather than an
+   arbitrary token flip:
+
+     paper ground   -> SUMMER coat (dark), so it holds against light
+     dark ground    -> WINTER coat (pale), so it holds against near-black
+     forest band    -> WINTER coat (pale), so it holds against forest
+
+   The face patch is fixed paper in BOTH coats. In summer it reads as the
+   mask a real naali has; in winter it disappears into the coat and only the
+   eyes remain. Either way the eyes are dark on pale and always legible —
+   which is the whole reason the patch is there, and why it is never keyed to
+   the theme. A dark face with pale eyes reads haunted; that was learned on
+   Lunni and is not being relearned.
+
+   NO ORANGE ANYWHERE. Norrin's full brand CSS does contain `sand` (#ca8b50)
+   and `bark` (#75562d), and both are forbidden on this drawing: warm brown on
+   a fox is the single fastest route back to looking like Mozilla Firefox,
+   whose name and logo come from the same myth. Escaping that is the design
+   problem, and colour is the biggest lever we have.
+   ========================================================================== */
+
+.chRevo {
+  display: block;
+  overflow: visible;
+
+  /* Summer coat — the default, for the paper ground. */
+  --r-coat: #1f5238;
+  --r-line: #0b2418;
+  --r-shade: #163d29;
+  --r-face: #eef0e6;
+  --r-ear: light-dark(#504e18, #9fb87e);
+  --r-eye: #14170f;
+  --r-sun: var(--signal);
+  --r-lichen: #88967e;
+}
+
+/* Winter coat. The ground went dark, so the fox turned white. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .chRevo {
+    --r-coat: #eef0e6;
+    --r-line: #123e28;
+    --r-shade: #c6d0bd;
+    --r-face: #ffffff;
+    --r-eye: #14170f;
+  }
+}
+
+:root[data-theme='dark'] .chRevo {
+  --r-coat: #eef0e6;
+  --r-line: #123e28;
+  --r-shade: #c6d0bd;
+  --r-face: #ffffff;
+}
+
+/* On a forest band the fox is in winter coat regardless of theme — the band
+   is dark in both. This has to come after the theme blocks to win. */
+[data-tone='inverse'] .chRevo {
+  --r-coat: #eef0e6;
+  --r-line: #123e28;
+  --r-shade: #c6d0bd;
+  --r-face: #ffffff;
+  --r-ear: #504e18;
+}
+
+.chRevo [stroke] {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chRevo[data-facing='left'] {
+  transform: scaleX(-1);
+}
+
+/* --------------------------------------------------------------------------
+   MOTION. Same contract as every other mascot here: transform and opacity
+   only, no filters, no JS in the motion path, and nothing the drawing MEANS
+   depends on movement.
+   -------------------------------------------------------------------------- */
+
+/* Breathe. Smaller than the other characters' idles — this one is composed,
+   not bouncy, which is the register that was asked for. */
+.chRevo__breathe {
+  transform-origin: 50px 78px;
+  animation: revo-breathe 6.4s ease-in-out infinite;
+}
+
+@keyframes revo-breathe {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(-0.7px) scaleY(1.008);
+  }
+}
+
+.chRevo__eyes {
+  transform-origin: 50px 44px;
+  animation: revo-blink 6.9s steps(1, end) infinite;
+}
+
+@keyframes revo-blink {
+  0%,
+  95.6% {
+    transform: scaleY(1);
+  }
+  95.7%,
+  97.7% {
+    transform: scaleY(0.08);
+  }
+  97.8%,
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+/* Ear flick. Foxes track sound constantly; one ear moving alone is the tell
+   that reads as alive, and moving both together reads as a puppet. */
+.chRevo__ear {
+  animation: revo-ear 7.6s ease-in-out infinite;
+}
+
+@keyframes revo-ear {
+  0%,
+  86%,
+  100% {
+    transform: rotate(0deg);
+  }
+  89% {
+    transform: rotate(-11deg);
+  }
+  92% {
+    transform: rotate(4deg);
+  }
+}
+
+/* The tail sweep. This is the one animation that carries meaning, so it is
+   deliberately slow: the tail is DRAWING the line, and a fast sweep would
+   read as wagging. */
+.chRevo__tail {
+  transform-origin: 32px 50px;
+  animation: revo-tail 8.2s ease-in-out infinite;
+}
+
+@keyframes revo-tail {
+  0%,
+  100% {
+    transform: rotate(-2.4deg);
+  }
+  50% {
+    transform: rotate(2.4deg);
+  }
+}
+
+/* The aurora. A slow travelling shimmer, not a pulse — the northern lights
+   move along themselves rather than flashing on and off. */
+.chRevo__aurora {
+  animation: revo-aurora 5.4s ease-in-out infinite;
+}
+
+@keyframes revo-aurora {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.chRevo__aurora--b {
+  animation-delay: 1.8s;
+}
+
+/* --------------------------------------------------------------------------
+   Switches.
+   -------------------------------------------------------------------------- */
+.chRevo[data-static='true'] .chRevo__breathe,
+.chRevo[data-static='true'] .chRevo__eyes,
+.chRevo[data-static='true'] .chRevo__ear,
+.chRevo[data-static='true'] .chRevo__tail,
+.chRevo[data-static='true'] .chRevo__aurora {
+  animation: none;
+}
+
+/* Reduced motion resolves to the RESTING frame, never a mid-blink one. */
+@media (prefers-reduced-motion: reduce) {
+  .chRevo__breathe,
+  .chRevo__eyes,
+  .chRevo__ear,
+  .chRevo__tail,
+  .chRevo__aurora {
+    animation: none !important;
+    transform: none !important;
+  }
+}

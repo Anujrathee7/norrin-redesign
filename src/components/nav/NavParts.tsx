@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Fyr } from '@/components/mascot/Fyr'
+import { Revontuli } from '@/components/mascot/revontuli/Revontuli'
 import { Container } from '@/components/primitives/Layout'
 import { LocaleMenu } from '@/components/primitives/LocaleMenu'
 import { cx } from '@/lib/cx'
@@ -15,7 +15,7 @@ export function Wordmark({ inverted }: { inverted: boolean }) {
         inverted ? 'text-signal' : 'text-accent',
       )}
     >
-      <Fyr size={26} variant="mark" animated={false} showWater={false} state="production" />
+      <Revontuli form="mark" size={28} animated={false} showAurora={false} />
       <span
         className={cx(
           'wordmark transition-colors duration-500',

@@ -1,4 +1,4 @@
-import { Fyr } from '@/components/mascot/Fyr'
+import { Revontuli } from '@/components/mascot/revontuli/Revontuli'
 import { Container, Grid } from '@/components/primitives/Layout'
 import { footerBlurb, offices, social } from '@/data/norrin'
 
@@ -65,7 +65,7 @@ export function Footer() {
         <Grid className="mt-20 gap-y-10 border-t border-hairline pt-12">
           <div className="col-span-4 md:col-span-3">
             <a href="#top" className="flex w-fit items-center gap-2.5 text-accent">
-              <Fyr size={24} variant="mark" animated={false} showWater={false} />
+              <Revontuli form="mark" size={26} animated={false} showAurora={false} />
               <span className="wordmark text-ink">
                 Norrin
               </span>

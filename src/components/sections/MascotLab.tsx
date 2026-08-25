@@ -7,6 +7,7 @@ import { Hirvi } from '@/components/mascot/characters/Hirvi'
 import { Valo } from '@/components/mascot/characters/Valo'
 import { Fyr } from '@/components/mascot/Fyr'
 import { Lunni } from '@/components/mascot/Lunni'
+import { Revontuli } from '@/components/mascot/revontuli/Revontuli'
 
 /**
  * MASCOT LAB — the character set, shown against everything that can break it.
@@ -150,6 +151,84 @@ export function MascotLab() {
             combinations.
           </span>
         </div>
+
+        {/* ── REVONTULI — the proposal ──────────────────────────────────────
+            Leads the page because it is the recommendation, and because the
+            cast below it is now context rather than the offer. */}
+        <section className="mt-16 md:mt-24" aria-labelledby="revo-heading">
+          <Eyebrow index="01" label="The proposal" tone={inverse ? 'inverse' : 'default'} />
+          <h2 id="revo-heading" className="display-2 mt-8 max-w-[18ch]">
+            Revontuli.
+          </h2>
+          <p className={cx('mt-6 max-w-[62ch] text-lg', inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>
+            Finnish for the northern lights, and it means literally{' '}
+            <em>fox fires</em> — <span className="font-mono text-sm">revon</span> is an archaic
+            word for fox. A fox runs the fells and its tail flings the sparks that become the
+            aurora. One character, one story, no caption required.
+          </p>
+
+          <div className="mt-12 grid grid-cols-1 gap-px lg:grid-cols-3">
+            {[
+              {
+                form: 'sweep' as const,
+                name: 'Sweep',
+                use: 'Hero / lead image',
+                note: 'It walks the production line — solid behind, dashed ahead — and the aurora rises off the tail over the part already crossed. The site device, not a new one.',
+              },
+              {
+                form: 'mark' as const,
+                name: 'Mark',
+                use: 'Nav, favicon, avatar',
+                note: 'Head-on, with the aurora as a crown so even the avatar carries the name. Redrawn simplified below 44px rather than scaled down.',
+              },
+              {
+                form: 'sitting' as const,
+                name: 'Sitting',
+                use: 'Contact, footer',
+                note: 'Composed, tail curled forward. The warm one, for where the page is asking rather than arguing.',
+              },
+            ].map((v) => (
+              <article
+                key={v.form}
+                className={cx(
+                  'flex flex-col gap-6 border p-8',
+                  inverse ? 'border-inverse-hairline' : 'border-hairline',
+                )}
+              >
+                <Revontuli form={v.form} size={190} animated={animated} />
+                <div>
+                  <h3 className="display-3">{v.name}</h3>
+                  <p className={cx('label mt-2', inverse ? 'text-inverse-ink-3' : 'text-accent')}>
+                    {v.use}
+                  </p>
+                  <p className={cx('mt-4', inverse ? 'text-inverse-ink-2' : 'text-ink-2')}>
+                    {v.note}
+                  </p>
+                </div>
+                <div
+                  className={cx(
+                    'mt-auto flex items-end gap-5 border-t pt-6',
+                    inverse ? 'border-inverse-hairline' : 'border-hairline',
+                  )}
+                >
+                  {[64, 40, 24, 16].map((s) => (
+                    <div key={s} className="flex flex-col items-center gap-2">
+                      <Revontuli form={v.form} size={s} animated={animated} showAurora={s >= 40} />
+                      <span
+                        className={cx(
+                          'label tabular-nums',
+                          inverse ? 'text-inverse-ink-3' : 'text-ink-3',
+                        )}
+                      >
+                        {s}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
 
         {/* The cast. */}
         <div className="mt-16 grid grid-cols-1 gap-px md:mt-24 lg:grid-cols-2">
