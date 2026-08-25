@@ -1,6 +1,8 @@
 import { Container, Eyebrow, Grid } from '@/components/primitives/Layout'
 import { metrics, offices, positioning, story } from '@/data/norrin'
 import { Nori } from '@/components/mascot/nori/Nori'
+import { Line } from '@/components/primitives/SplitLines'
+import { Reveal } from '@/components/primitives/Reveal'
 
 /**
  * Hero.
@@ -50,28 +52,32 @@ export function Hero() {
           <div className="col-span-4 md:col-span-8 lg:col-span-7">
             <Eyebrow label="Nordic partner for enterprise AI" className="mb-7" />
 
-            <h1 className="display-1">
-              {/* No highlighter behind the money word — that gesture is on
-                  every launch page of the last three years. The emphasis is the
-                  site's own device instead: moss ink, and the solid half of the
-                  production line drawn under the word that earns it. */}
-              <span className="block">Enterprise AI is won in</span>
-              <span className="relative block w-fit pb-[0.14em] text-accent after:absolute after:right-0 after:bottom-0 after:left-0 after:h-px after:bg-accent after:content-['']">
-                production.
-              </span>
-            </h1>
+            {/* No highlighter behind the money word — that gesture is on
+                every launch page of the last three years. The emphasis is the
+                site's own device instead: moss ink, and the solid half of the
+                production line drawn under the word that earns it.
 
-            <p className="lead measure-serif mt-7 text-ink-2">
+                The two lines rise out from behind their own edges, in sequence.
+                The split is stated in the markup rather than measured, so it
+                cannot disagree with what actually renders. */}
+            <Reveal as="h1" lines className="display-1" stagger={0.11}>
+              <Line>Enterprise AI is won in</Line>
+              <Line className="relative block w-fit pb-[0.14em] text-accent after:absolute after:right-0 after:bottom-0 after:left-0 after:h-px after:bg-accent after:content-['']">
+                production.
+              </Line>
+            </Reveal>
+
+            <Reveal as="p" delay={0.34} className="lead measure-serif mt-7 text-ink-2">
               We turn AI ambition into production — co-creating the solutions, infrastructure and
               adoption that make it stick.
-            </p>
+            </Reveal>
 
             {/* The ghost carries the same pill geometry as the solid one, so the
                 pair sits on one baseline and one height. It was previously bare
                 inline text beside a 51px button — a 22px tap target next to a
                 51px one, and visually a caption that had wandered in. The gap
                 closes from 32px to 8px now that both have real padding. */}
-            <div className="mt-9 flex flex-wrap items-center gap-x-2 gap-y-2">
+            <Reveal delay={0.46} className="mt-9 flex flex-wrap items-center gap-x-2 gap-y-2">
               <a
                 href="#contact"
                 className="btn btn-solid"
@@ -94,7 +100,7 @@ export function Hero() {
                   />
                 </svg>
               </a>
-            </div>
+            </Reveal>
           </div>
 
           {/* Station log.
@@ -106,7 +112,7 @@ export function Hero() {
               them. Answering that in the first five seconds is the single
               highest-leverage change available. Every figure is published. */}
           <aside className="col-span-4 mt-14 self-start md:col-span-4 md:col-start-9 md:mt-2 md:self-center lg:col-span-3 lg:col-start-10">
-            <dl className="border-t border-hairline">
+            <Reveal as="dl" stagger={0.06} variant="right" delay={0.2} className="border-t border-hairline">
               {STATION.map(([term, value]) => (
                 <div
                   key={term}
@@ -116,7 +122,7 @@ export function Hero() {
                   <dd className="label tabular-nums text-ink">{value}</dd>
                 </div>
               ))}
-            </dl>
+            </Reveal>
           </aside>
         </Grid>
       </Container>
@@ -150,7 +156,10 @@ export function Hero() {
                 Lifted by 92% of its own box rather than by a magic number:
                 the rocket pose's lowest mark (the flame, cy 486 of a 512
                 viewBox) has to land ON the rule, not below it. */}
-            <div className="absolute inset-x-0 top-0 -translate-y-[92%]">
+            {/* The mascot drifts faster than the rule it stands on, which is
+                what separates the two into layers. `data-scroll` is inert
+                unless the browser supports scroll timelines. */}
+            <div data-scroll="drift" className="absolute inset-x-0 top-0 -translate-y-[92%]">
               <Nori
                 pose="rocket"
                 size={300}
