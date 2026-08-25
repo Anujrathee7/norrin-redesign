@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 import { cx } from '@/lib/cx'
 import { Reveal } from './Reveal'
 
@@ -12,7 +12,16 @@ import { Reveal } from './Reveal'
  * at every width. Both claims are now either true or gone.
  */
 
-type ContainerProps = {
+/**
+ * These forward the rest of their props to the underlying div.
+ *
+ * Without it, anything the caller passes that is not `children` or `className`
+ * is silently dropped — and TypeScript will not complain about `data-*` on a
+ * component, so the attribute simply never reaches the DOM and whatever
+ * depended on it quietly does nothing. That happened three times while wiring
+ * the scroll layer before the cause was spotted.
+ */
+type ContainerProps = ComponentPropsWithoutRef<'div'> & {
   children: ReactNode
   className?: string
 }
@@ -24,9 +33,9 @@ type ContainerProps = {
  * All sixteen call sites passed `wide`; the other two were dead options that
  * still had to be read and reasoned about. One measure, no prop.
  */
-export function Container({ children, className }: ContainerProps) {
+export function Container({ children, className, ...rest }: ContainerProps) {
   return (
-    <div className={cx('mx-auto w-full max-w-[1512px] px-(--spacing-gutter)', className)}>
+    <div className={cx('mx-auto w-full max-w-[1512px] px-(--spacing-gutter)', className)} {...rest}>
       {children}
     </div>
   )
@@ -40,8 +49,12 @@ export function Container({ children, className }: ContainerProps) {
  * spans — that asymmetry is deliberate and is what stops the page reading as a
  * stack of identical bands — but they no longer each restate what the grid *is*.
  */
-export function Grid({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cx('grid grid-cols-4 gap-x-6 md:grid-cols-12', className)}>{children}</div>
+export function Grid({ children, className, ...rest }: ContainerProps) {
+  return (
+    <div className={cx('grid grid-cols-4 gap-x-6 md:grid-cols-12', className)} {...rest}>
+      {children}
+    </div>
+  )
 }
 
 /**
@@ -87,7 +100,7 @@ export function SectionHeader({
         <Eyebrow index={index} label={label} tone={tone} />
       </span>
       {children ? (
-        <h2 id={id} className="display-2 mt-8 max-w-[20ch]">
+        <h2 id={id} data-scroll="drift-slow" className="display-2 mt-8 max-w-[20ch]">
           <span className="line-mask">
             <span>{children}</span>
           </span>
