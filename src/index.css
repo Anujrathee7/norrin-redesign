@@ -777,12 +777,20 @@ html.js [data-variant='wipe'][data-reveal='stagger']:not([data-revealed]) > * {
   margin-block-end: -0.14em;
 }
 
-.line-mask > span {
-  display: block;
+.line-mask > * {
   transition: transform 0.92s var(--ease-entrance) var(--line-delay, 0s);
 }
 
-html.js [data-reveal]:not([data-revealed]) .line-mask > span {
+/* Only SPANS need forcing to block — they are inline by default, and a
+   transform on an inline box does nothing. Applying `display: block` to every
+   child instead flattens whatever the child already was: it silently turned the
+   eyebrow's `flex` row into a block and took its `gap` with it, collapsing the
+   rule, index and label into one run of text. */
+.line-mask > span {
+  display: block;
+}
+
+html.js [data-reveal]:not([data-revealed]) .line-mask > * {
   transform: translateY(110%);
 }
 
@@ -823,7 +831,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
      state, not to a paused mid-transition one. A reader who asked for less
      motion gets the whole page, still. */
   html.js [data-reveal]:not([data-revealed]) .line-mask > span,
-  .line-mask > span {
+  .line-mask > * {
     transform: none !important;
     transition: none !important;
   }

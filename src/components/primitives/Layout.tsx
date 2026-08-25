@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { cx } from '@/lib/cx'
+import { Reveal } from './Reveal'
 
 /**
  * Layout primitives.
@@ -72,14 +73,27 @@ export function SectionHeader({
   gap?: 'section' | 'tight'
 }) {
   return (
-    <header className={cx(gap === 'tight' ? 'mb-6 md:mb-7' : 'mb-12 md:mb-20', className)}>
-      <Eyebrow index={index} label={label} tone={tone} />
+    // Every section header arrives the same way: the eyebrow rises out from
+    // behind its own edge, then the heading follows. Doing this once here
+    // rather than per section is what keeps the page feeling like one hand —
+    // and it means a new section inherits the entrance for free.
+    <Reveal
+      as="header"
+      lines
+      stagger={0.1}
+      className={cx(gap === 'tight' ? 'mb-6 md:mb-7' : 'mb-12 md:mb-20', className)}
+    >
+      <span className="line-mask">
+        <Eyebrow index={index} label={label} tone={tone} />
+      </span>
       {children ? (
         <h2 id={id} className="display-2 mt-8 max-w-[20ch]">
-          {children}
+          <span className="line-mask">
+            <span>{children}</span>
+          </span>
         </h2>
       ) : null}
-    </header>
+    </Reveal>
   )
 }
 
