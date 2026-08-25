@@ -1,0 +1,751 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   Fonts — self-hosted, latin subset only, woff2 only.
+   Three families, three files. The mono is used at a single weight (500) and
+   the two text faces are variable, so one file each covers the whole range.
+   Newsreader's italic is deliberately absent: it would have been a second
+   ~55 kB face serving four headings.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Schibsted Grotesk Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url('/fonts/schibsted-grotesk-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Newsreader Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/newsreader-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+/* ==========================================================================
+   NORRIN — DESIGN SYSTEM
+   --------------------------------------------------------------------------
+   Palette derived from Norrin's own published theme tokens (moss #504e18,
+   sun #f6f279, forest #123e28, lichen #88967e). We kept the four that carry
+   meaning and dropped sky/turquoise/bark/sand as UI colours — seven nature
+   colours is a mood board, not a system.
+
+   Two structural rules hold the whole thing together:
+     1. Separation is carried by 1px hairlines. There are no box-shadows.
+     2. Sun is a signal, never a surface.
+
+   Declared ONCE, via light-dark(). This was previously three blocks — a light
+   :root, a prefers-color-scheme copy, and an explicit [data-theme] copy — with
+   a nine-line comment explaining the specificity ordering that made the last
+   one win. Every token had to be edited in two places and one of them was
+   already drifting. light-dark() keys off `color-scheme`, so the OS preference
+   and the explicit override are the same mechanism and the ordering problem
+   does not exist.
+
+   The [data-theme] attribute is what tools/audit.mjs and tools/shot.mjs set to
+   force a theme, so it must keep working: deleting it would make every "dark"
+   test silently assert against light.
+
+   DARK IS A TRANSLATION, NOT AN INVERSION. Two dark values are deliberately
+   not the mechanical flip of their light counterparts — see --inverse and
+   --accent below.
+   ========================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* Ground & surfaces ---------------------------------------------------- */
+  --ground: light-dark(#f8f7f3, #0e120f); /* warm paper, 0.005 chroma */
+  --surface: light-dark(#f1f0ea, #161b17);
+
+  /* The forest band.
+     In light this is the darkest plane on the page: you cross into it and the
+     rules change. Dark used to "deepen" it to #0d2a1b — L* 14.5 against a
+     ground at L* 5.1, which made it the LIGHTEST plane, 1.23:1 from the page,
+     with no hairline marking the edge. Same pixels, opposite rhetoric, and
+     practically invisible. It is now RAISED (L* 25.6, 1.73:1) and sits within
+     three L* of the light-mode forest, so it reads as the same material at a
+     different exposure rather than as an inverted one. */
+  --inverse: light-dark(#123e28, #16452c);
+
+  /* Ink ------------------------------------------------------------------ */
+  --ink: light-dark(#14170f, #f2f2ec);
+  --ink-2: light-dark(#4a4d42, #b4b8ac);
+  --ink-3: light-dark(#696d5f, #868a7c); /* 4.96:1 on light ground — AA at 11px */
+
+  /* The forest bands used to be built from eight hand-picked alphas of
+     --inverse-ink — /15 /20 /25 for rules and /60 /65 /70 /75 /80 /85 for type —
+     chosen file by file for the same three jobs, so "muted text on forest" was a
+     different colour in four sections. The band now gets the same three-rung ink
+     ladder and two-rung hairline ladder as paper. The two hairline alphas are
+     solved to match the PAPER hairlines' measured ratios (1.29:1 and 1.85:1)
+     rather than picked by eye, so a rule reads as the same weight of rule on
+     either ground. `node tools/palette.mjs` prints all of it. */
+  --inverse-ink: #eef0e6;
+  --inverse-ink-2: color-mix(in srgb, var(--inverse-ink) 78%, transparent);
+  --inverse-ink-3: color-mix(in srgb, var(--inverse-ink) 62%, transparent);
+  --inverse-hairline: color-mix(in srgb, var(--inverse-ink) 10%, transparent);
+  --inverse-hairline-strong: color-mix(in srgb, var(--inverse-ink) 22%, transparent);
+  /* The band's stand-in for lichen. Lichen itself measures 1.24:1 on forest, so
+     the "not yet in production" dashed rule had been hand-set at /30 — visibly
+     fainter than the same rule on paper, which meant the page's one device
+     changed weight when it crossed into the band. Solved for parity with
+     lichen's own 2.92:1 instead. */
+  --inverse-inactive: color-mix(in srgb, var(--inverse-ink) 38%, transparent);
+
+  /* Structure ------------------------------------------------------------ */
+  --hairline: light-dark(#dddcd2, #252b26);
+  --hairline-strong: light-dark(#b9b9ac, #3a423b);
+
+  /* The plane a floating control opens onto — the locale list, and anything
+     that joins it. There are no shadows in this system, so "above the page" has
+     to be said tonally: the overlay is lifted away from --ground in both themes
+     and closed with --hairline-strong. Dark stops at #191f1b precisely because
+     --ink-3 measures 4.74:1 there and 4.47:1 one step lighter. */
+  --overlay: light-dark(#fdfcfa, #191f1b);
+
+  /* The same plane inside a forest band. Without it the locale list opened as a
+     near-white card floating on the band — the one construction the drawer
+     above it exists to avoid. Built as the hover wash made opaque rather than
+     as a fourth green, so the band has one idea about being lifted. Like the
+     wash, it carries the --inverse-ink and --inverse-ink-2 rungs only:
+     --inverse-ink-3 measures 4.71:1 on the flat band and there is no headroom
+     left to lift it onto. */
+  --inverse-overlay: color-mix(in srgb, var(--inverse-ink) 6%, var(--inverse));
+
+  /* Meaning -------------------------------------------------------------- */
+  /* Moss — the only accent allowed to touch type or stroke.
+     In light, moss and sun are the same hue (58 vs 57) and separate by
+     LUMINANCE: moss is dark, sun is light, 7.32:1 apart. In dark the accent
+     has to be light to survive on a near-black ground, so that separation is
+     not available — and the old #c9c574 sat at the same hue as sun, 1.53:1
+     apart, degrading the moss/sun distinction the whole system rests on to
+     "slightly less bright yellow". Dark moss therefore separates by HUE
+     instead, shifted to 86 against sun's 57. Same role, same family, still
+     legibly not the signal. */
+  --accent: light-dark(#504e18, #9fb87e);
+
+  /* Sun — fill only, never type.
+     Identical in both themes on purpose: a light does not change colour when
+     the sky does. Budget on PAPER grounds is three solids per page (the gap
+     crossing, the contact terminus, one deliberate third) plus the mascot's
+     lamp. Count them here, not in component comments — two of those each
+     claimed to be "the third and last" and neither could see the other.
+     On [data-tone='inverse'] bands sun is NOT a budget spend: it is the
+     inverse-mode stand-in for moss, which measures 1.40:1 on forest. */
+  --signal: #f6f279;
+
+  /* Lichen — the "not yet in production" state. Strokes and dashed rules
+     only: at label sizes it does not clear AA, so text uses the ink ramp. */
+  --inactive: light-dark(#88967e, #5d6a55);
+
+  --selection: light-dark(#e8e6a8, #2f3a1f);
+
+  /* State ---------------------------------------------------------------- */
+  /* Hover and pressed were previously hand-written at the call site, twice as
+     a raw `hover:bg-[#e9e45f]` in two files that could not see each other, and
+     pressed did not exist at all. A filled control with no :active state feels
+     dead under the finger on touch, where there is no hover to fall back on. */
+  /* Was --accent-soft, a name describing a tone. Its only consumer was the
+     hover state, and the utility the theme bridge generated from it
+     (text-accent-soft) was never used once — so the palette carried an extra
+     name for a colour that only ever did one job. It is that job now. */
+  --accent-hover: light-dark(#6f6c2a, #b3c795);
+  --accent-press: light-dark(#3c3a10, #8aa36a);
+  --signal-hover: #ebe565;
+  --signal-press: #ddd74d;
+
+  /* The wash that fills a rounded control on hover.
+     This is what the radius is FOR: before it, hovering a nav item shifted grey
+     type to black inside a 72px bar and was close to imperceptible. A control
+     wash is only ever read against the --ink and --ink-2 rungs — --ink-3 on the
+     light wash measures 4.53:1, which is a pass with no margin, so labels inside
+     controls use --ink-2. Tuned per theme rather than shared: 6% of moss reads
+     on paper, 6% of the dark accent does not read on near-black. */
+  /* light-dark() takes colours, not percentages, so the branch is the whole
+     mix rather than the alpha inside it. */
+  --tint: light-dark(
+    color-mix(in srgb, var(--accent) 6%, transparent),
+    color-mix(in srgb, var(--accent) 8%, transparent)
+  );
+  --inverse-tint: color-mix(in srgb, var(--inverse-ink) 8%, transparent);
+}
+
+/* ==========================================================================
+   RADIUS
+   --------------------------------------------------------------------------
+   The system shipped at 0 / 2px, which is to say at nothing: 2px on a 50px
+   button is a rasterising artefact, not a shape. The scale below is not a
+   softening pass over everything — it is a distinction, and the distinction is
+   the point:
+
+     RADIUS MEANS YOU CAN TOUCH IT.
+
+   Structure stays square. Hairlines separate rather than contain, and a rule
+   has no corners; the production line, the eyebrow rules, the ruled tables, the
+   section bands, the timeline nodes and the sun terminus are all unchanged. So
+   the only rounded shapes on the page are the ones that respond, and the eye
+   finds every action without anything having to be coloured louder. That is
+   what makes this subtractive rather than decorative.
+
+   The geometry is the mark's own. Fyr's float is `rect w=3.6 rx=1.8` — a
+   capsule, fully rounded — and its mast cap is a softly rounded stroke. So the
+   page borrows the buoy's two radii rather than inventing a house rounding:
+
+     --radius-action   the float. Reserved for the solid call to action and the
+                       ghost that pairs with it. One shape, four instances, the
+                       silhouette of the thing the whole page is about.
+     --radius-control  the mast cap. Anything pressable that is not the action:
+                       nav items, the locale trigger, menu options, skip link.
+     --radius-panel    anything that opens or frames: the locale list, the
+                       Thinking rungs.
+
+   Not rounded, deliberately: the nav drawer. It is the header temporarily
+   getting taller — it shares the bar's ground and takes the bar's own border as
+   its top edge — and a radius would turn it into a floating card, which is the
+   one thing its construction exists to avoid.
+   ========================================================================== */
+
+/* The explicit override. `color-scheme` is the only thing that needs to change
+   — every token above follows it. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Tailwind theme bridge — exposes the semantic tokens as utilities
+   (bg-ground, text-ink-2, border-hairline …). Kept deliberately small:
+   if a colour isn't here, it isn't in the system.
+   ========================================================================== */
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-inverse: var(--inverse);
+  --color-inverse-ink: var(--inverse-ink);
+  --color-inverse-ink-2: var(--inverse-ink-2);
+  --color-inverse-ink-3: var(--inverse-ink-3);
+  --color-inverse-hairline: var(--inverse-hairline);
+  --color-inverse-hairline-strong: var(--inverse-hairline-strong);
+  --color-inverse-inactive: var(--inverse-inactive);
+  --color-overlay: var(--overlay);
+  --color-inverse-overlay: var(--inverse-overlay);
+
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+
+  --color-accent: var(--accent);
+  --color-signal: var(--signal);
+  --color-inactive: var(--inactive);
+  --color-tint: var(--tint);
+  --color-inverse-tint: var(--inverse-tint);
+
+  /* Exposed as utilities (rounded-control, rounded-panel, rounded-action) so a
+     radius cannot be typed as an arbitrary value at a call site — which is
+     exactly how the old scale drifted to `rounded-[2px]` in six files. */
+  --radius-control: 8px;
+  --radius-panel: 14px;
+  --radius-action: 999px;
+
+  --font-sans:
+    'Schibsted Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Newsreader Variable', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Motion. Three easings, on purpose. */
+  --ease-entrance: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-ui: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Layout */
+  --spacing-gutter: clamp(1.5rem, 1rem + 2vw, 3rem);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.58;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Schibsted Grotesk ships contextual alternates that tidy the flat-sided
+       grotesque joins; leaving them on is closer to the designer's intent. */
+    font-feature-settings: 'calt' 1;
+  }
+
+  ::selection {
+    background-color: var(--selection);
+    color: var(--ink);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote {
+    margin: 0;
+  }
+
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  /* Visible only for keyboard users, but unmissable when it appears. */
+  /* No border-radius here. This rule used to set `border-radius: 1px` on the
+     focused element itself — not on the ring — so focusing a control RESHAPED
+     it, and with a radius scale in place that would have squared the pill CTA
+     the moment it was tabbed to. An outline already follows its element's own
+     border-radius, so the ring now takes the shape of whatever it is ringing
+     and nothing has to be told twice. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* Moss on forest is 1.40:1 — on the inverse bands the ring effectively
+     disappears, and one of those bands holds the page's only conversion action.
+     Sun clears ~10:1 there. A stroke is not a surface, so this costs nothing
+     from the three-solid-uses budget, and "the signal fires" is the right
+     meaning for a focus ring. axe does not automate focus-indicator contrast,
+     so a clean axe run was never evidence about this. */
+  [data-tone='inverse'] :focus-visible {
+    outline-color: var(--signal);
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* The header is fixed, so anchor jumps must clear it or they land with the
+     section's own eyebrow hidden underneath. */
+  section[id],
+  footer[id] {
+    scroll-margin-top: 96px;
+  }
+
+  /* Numerals line up in tables, metrics and timelines. */
+  .tnum,
+  time,
+  [data-metric] {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ==========================================================================
+   Typographic roles
+   Fluid sizes are clamped against a 360 → 1512px viewport range.
+   ========================================================================== */
+
+@layer components {
+  .display-1 {
+    font-family: var(--font-sans);
+    font-size: clamp(2.75rem, 1.55rem + 6.6vw, 7.5rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 0.94;
+    text-wrap: balance;
+  }
+
+  .display-2 {
+    font-family: var(--font-sans);
+    font-size: clamp(2.125rem, 1.5rem + 3.6vw, 4.5rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    text-wrap: balance;
+  }
+
+  .display-3 {
+    font-family: var(--font-sans);
+    font-size: clamp(1.625rem, 1.3rem + 2vw, 3rem);
+    font-weight: 500;
+    letter-spacing: -0.022em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  /* The rung between display-3 and body that five files were each hand-rolling
+     a clamp for, landing on 28 / 28 / 30 / 32 / 34px. Two of them applied
+     `.display-3` and then overrode its font-size, keeping only the tracking —
+     which silently coupled those files to a role they were not using. */
+  .display-4 {
+    font-family: var(--font-sans);
+    font-size: clamp(1.375rem, 1.15rem + 0.9vw, 2rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  /* The wordmark lockup. Identical in the bar and the footer, so it is a role
+     rather than the same three arbitrary values written out twice. */
+  .wordmark {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  /* The de-facto UI size: every button, nav link, row name and list item.
+     It shipped 14 times as an arbitrary value with no name, so the next person
+     to add a button had to guess. */
+  .ui {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .metric {
+    font-family: var(--font-sans);
+    font-size: clamp(2.5rem, 1.9rem + 4.2vw, 6rem);
+    font-weight: 400;
+    letter-spacing: -0.045em;
+    line-height: 0.88;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The serif display voice. Its floor used to be 1.5rem, which resolved to
+     27.8px at 390 against display-3's 28.6px — one rung apart at desktop and
+     INVERTED on phones, so the two display voices swapped rank at the width
+     most people use. The floor now clears display-3 at every width. */
+  .thesis {
+    font-family: var(--font-serif);
+    font-size: clamp(1.875rem, 1.35rem + 2.2vw, 3.25rem);
+    font-weight: 300;
+    letter-spacing: -0.012em;
+    line-height: 1.24;
+    text-wrap: balance;
+  }
+
+  /* Deck. Against a fixed 18px body-serif the ratio used to fall from 1.33 at
+     desktop to 1.10 at 390 — the deck and the body it introduces converged to
+     nearly the same size exactly where the hierarchy is needed most. */
+  .lead {
+    font-family: var(--font-serif);
+    font-size: clamp(1.3125rem, 1.08rem + 0.65vw, 1.5rem);
+    font-weight: 400;
+    letter-spacing: -0.006em;
+    line-height: 1.48;
+    text-wrap: pretty;
+  }
+
+  .body-serif {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    line-height: 1.62;
+    text-wrap: pretty;
+  }
+
+  /* No baked colour: ten of its fourteen uses immediately overrode it, and a
+     type role has no business deciding ink. Callers set it. */
+  .caption {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+
+  /* The "production" voice: indices, units, addresses, telemetry. */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+  }
+
+  /* Sun is a fixed colour in both themes, so anything sitting on it must be
+     fixed dark ink too. Inheriting --ink puts near-white type on yellow in
+     dark mode, which is illegible. */
+  .on-signal {
+    color: #14170f;
+  }
+
+  .measure-serif {
+    max-width: 62ch;
+  }
+
+  /* ------------------------------------------------------------------------
+     Controls
+
+     There was no button in this system. There were four hand-assembled ones —
+     hero, nav, closing CTA, mobile sheet — that had already drifted to three
+     paddings (px-6 py-3.5, px-5 py-2.5, px-6 py-4), two transition durations,
+     and two different ways of writing the same sun hover, one of them a raw hex
+     in a file that could not see the other raw hex. `.ui` was extracted for
+     exactly this reason and stopped one rung short of the thing using it.
+
+     `.btn` is geometry and behaviour; the variant is colour only. Every button
+     on the page is one of two shapes and nothing else is a button.
+     ------------------------------------------------------------------------ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    border-radius: var(--radius-action);
+    /* Wider than a rounded rect would need. A pill's caps curve back into the
+       label, so 1.5rem measured at the widest point leaves the first and last
+       glyph sitting in the arc. */
+    padding: 0.875rem 1.75rem;
+    font-size: 0.9375rem; /* .ui */
+    line-height: 1.5;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s var(--ease-ui),
+      color 0.2s var(--ease-ui);
+  }
+
+  /* The bar's copy. A 72px header cannot carry a 51px button and still look
+     like a header. */
+  .btn-sm {
+    padding: 0.625rem 1.375rem;
+  }
+
+  .btn-block {
+    display: flex;
+    width: 100%;
+    padding-block: 1rem;
+  }
+
+  .btn-solid {
+    background-color: var(--accent);
+    color: var(--ground);
+  }
+
+  .btn-solid:hover {
+    background-color: var(--accent-hover);
+  }
+
+  .btn-solid:active {
+    background-color: var(--accent-press);
+  }
+
+  /* On the forest bands the solid action is sun, not moss: moss on forest is
+     1.40:1, so a moss button would lose its shape entirely inside the band.
+     Sun is the inverse-mode stand-in for moss there, which is why this is not a
+     spend from the three-solid-uses budget — that budget is on paper grounds. */
+  .btn-signal {
+    background-color: var(--signal);
+    color: #14170f; /* fixed: sun does not change with the theme, so its ink cannot */
+  }
+
+  .btn-signal:hover {
+    background-color: var(--signal-hover);
+  }
+
+  .btn-signal:active {
+    background-color: var(--signal-press);
+  }
+
+  /* The secondary action. Same silhouette as the solid one, no fill until you
+     reach for it — so the pair reads as one control group without a second
+     outlined pill, which is the shape everyone else uses here. */
+  .btn-ghost {
+    color: var(--ink-2);
+  }
+
+  .btn-ghost:hover {
+    background-color: var(--tint);
+    color: var(--ink);
+  }
+
+  [data-tone='inverse'] .btn-ghost {
+    color: var(--inverse-ink-2);
+  }
+
+  [data-tone='inverse'] .btn-ghost:hover {
+    background-color: var(--inverse-tint);
+    color: var(--inverse-ink);
+  }
+
+  /* Pressable, but not the action: nav items, the locale trigger, menu options.
+     Mast-cap radius, and the wash is the whole reason it has one. */
+  .control {
+    border-radius: var(--radius-control);
+    transition:
+      background-color 0.2s var(--ease-ui),
+      color 0.2s var(--ease-ui);
+  }
+
+  .control:hover {
+    background-color: var(--tint);
+  }
+
+  [data-tone='inverse'] .control:hover {
+    background-color: var(--inverse-tint);
+  }
+
+  /* Something that opens. No shadow — the lift is --overlay against --ground,
+     closed by the stronger of the two hairlines. */
+  .panel {
+    border-radius: var(--radius-panel);
+    border: 1px solid var(--hairline-strong);
+    background-color: var(--overlay);
+  }
+
+  [data-tone='inverse'] .panel {
+    border-color: var(--inverse-hairline-strong);
+    background-color: var(--inverse-overlay);
+  }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+@layer utilities {
+  /* Skip link — present in the DOM, only visible when focused. */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+  }
+
+  .skip-link:focus-visible {
+    left: 1rem;
+    top: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-control);
+    background: var(--accent);
+    color: var(--ground);
+  }
+
+  /* Screen-reader-only, but focusable if it needs to be. */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* ==========================================================================
+   Reveal
+   The hidden state is scoped to `html.js`, which is only set once React has
+   mounted. Without JS — or if the bundle fails — nothing is ever hidden.
+   ========================================================================== */
+
+html.js [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+html.js [data-reveal='stagger']:not([data-revealed]) > * {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+[data-reveal],
+[data-reveal='stagger'] > * {
+  transition:
+    opacity 0.72s var(--ease-entrance) var(--reveal-delay, 0s),
+    transform 0.72s var(--ease-entrance) var(--reveal-delay, 0s);
+}
+
+/* ==========================================================================
+   Reduced motion
+   We stop movement, but never hide content: every reveal resets to its
+   resting state rather than staying at opacity 0.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html.js [data-reveal]:not([data-revealed]),
+  html.js [data-reveal='stagger']:not([data-revealed]) > *,
+  [data-reveal],
+  [data-reveal='stagger'] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
