@@ -109,8 +109,22 @@ export function Footer() {
           </nav>
         </Grid>
 
+        {/* Nori asleep at the end of the page. The one place on the site where
+            the mascot is not doing anything, which is the joke: the work is
+            finished and the lights are still on. */}
+        <div className="mt-16 flex justify-end">
+          {/* data-scroll goes on a wrapper, not on <Nori>: the component takes
+              an explicit prop list and does not spread the rest, so an unknown
+              attribute passed to it is silently dropped and the drift would
+              never apply. TypeScript accepts data-* on a component, which is
+              exactly why this one would have shipped unnoticed. */}
+          <span data-scroll="drift-slow" className="block">
+            <Nori pose="sleep" size={124} className="opacity-90" />
+          </span>
+        </div>
+
         {/* Legal */}
-        <div className="mt-16 flex flex-col gap-4 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-4 flex flex-col gap-4 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="label text-ink-3">© {new Date().getFullYear()} Norrin</p>
           {/* Was `.label` — an 18-word sentence in 11px uppercase mono at 0.14em,
               wrapping to three lines, while the addresses above it are set in sans.

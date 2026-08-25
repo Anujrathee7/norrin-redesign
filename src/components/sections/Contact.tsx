@@ -51,7 +51,7 @@ export function Contact() {
         </svg>
         {/* Held back until the rule has actually arrived — otherwise it reads
             as an orphaned square floating in the corner. */}
-        <Reveal delay={1.15}>
+        <Reveal delay={1.15} variant="rise">
           {/* Sits fully inside the band — a negative translate put half of it
               above the section edge, where overflow-hidden clipped it. */}
           <div className="absolute top-[3px] right-0 h-2.5 w-2.5 bg-signal" />

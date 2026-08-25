@@ -42,7 +42,7 @@ export function Proof() {
             "Real" is drawn in moss here, as it is in the hero and the nav. It
             used to be `hairline-strong`, making this the one implementation of
             four that said "solid" in a different colour. */}
-        <Reveal className="mt-20 md:mt-28" delay={0.1}>
+        <Reveal className="mt-20 md:mt-28" delay={0.1} variant="rise">
           <ol className="grid grid-cols-1 lg:grid-cols-4">
             {timeline.map((t) => {
               const ahead = 'future' in t && t.future

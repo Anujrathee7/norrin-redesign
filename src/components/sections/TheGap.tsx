@@ -76,7 +76,7 @@ export function TheGap() {
             <Eyebrow index="01" label="The gap" tone="inverse" />
           </div>
 
-          <Reveal className="col-span-4 mt-8 md:col-span-6 md:mt-12">
+          <Reveal className="col-span-4 mt-8 md:col-span-6 md:mt-12" variant="left">
             <h2 id="gap-heading" className="thesis">
               {positioning.thesisOpening}
             </h2>

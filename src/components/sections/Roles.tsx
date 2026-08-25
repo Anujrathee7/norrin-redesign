@@ -52,7 +52,9 @@ export function Roles() {
           <p className="caption max-w-[34ch] text-ink-2">Four roles, not eleven service lines.</p>
         </div>
 
-        <Reveal stagger={0.08}>
+        {/* From the left, in reading order — these are four things read as a
+            sequence, not four cards that happen to sit in a row. */}
+        <Reveal stagger={0.08} variant="left">
           <ul className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10">
             {roles.map((r) => (
               <li key={r.id} className="border-t border-hairline pt-5">

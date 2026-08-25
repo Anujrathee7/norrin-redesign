@@ -71,7 +71,10 @@ export function Thinking() {
           <Nori pose="idea" size={150} className="hidden shrink-0 md:block" />
         </div>
 
-        <Reveal stagger={0.08}>
+        {/* Wiped rather than faded: the three rungs are one framed object, and
+            a wipe crossing it reads as one gesture where three fades read as
+            three separate arrivals. */}
+        <Reveal stagger={0.08} variant="wipe">
           {/* One frame with three cells, not three cards.
               The rungs are hairline-separated already, so the radius goes on the
               OUTER edge and the interior stays ruled — twelve rounded corners

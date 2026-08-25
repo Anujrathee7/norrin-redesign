@@ -39,7 +39,9 @@ export function Work() {
         </Grid>
 
         {/* The roster, as type. */}
-        <Reveal stagger={0.04}>
+        {/* A fast tick across the roster — this is a list of names being read
+            out, so the stagger is tight and the travel is small. */}
+        <Reveal stagger={0.04} variant="left">
           {/* A grid, not flex-wrap: the old wrap produced nine names then a
               lone orphan at desktop, and 3/4/2/1 at 390px. */}
           <ul className="grid grid-cols-2 items-baseline gap-x-8 gap-y-3 border-t border-hairline py-10 sm:grid-cols-3 md:grid-cols-5 md:gap-x-12">
@@ -54,8 +56,10 @@ export function Work() {
           </ul>
         </Reveal>
 
-        {/* Cases, as full-width rows. */}
-        <ol className="mt-12 md:mt-16">
+        {/* Cases, as full-width rows. Each row is uncovered left to right, in
+            sequence — a wipe suits a ruled row better than a fade, because the
+            rule above it is already a horizontal gesture. */}
+        <Reveal as="ol" stagger={0.12} variant="wipe" className="mt-12 md:mt-16">
           {cases.map((c, i) => (
             <li key={c.id}>
               <article className="block border-t border-hairline py-9 last:border-b md:py-11">
@@ -88,7 +92,7 @@ export function Work() {
               </article>
             </li>
           ))}
-        </ol>
+        </Reveal>
 
         <p className="caption mt-8 text-ink-3">
           Case summaries quoted from Norrin&rsquo;s published customer cases.
