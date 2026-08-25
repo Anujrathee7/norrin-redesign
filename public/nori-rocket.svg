@@ -5,12 +5,6 @@
       <stop offset="0" stop-color="#2E3354"/>
       <stop offset="1" stop-color="#12152A"/>
     </linearGradient>
-    <clipPath id="clipHead">
-      <path d="M134 176 C134 108 186 82 256 82 C326 82 378 108 378 176 C378 244 352 318 256 318 C160 318 134 244 134 176 Z"/>
-    </clipPath>
-    <clipPath id="clipBody">
-      <rect x="178" y="288" width="156" height="118" rx="54"/>
-    </clipPath>
   </defs>
   <g transform="rotate(-20 380 392)">  <path d="M312 392 C358 426 420 424 444 380 C456 362 446 342 432 347 C420 351 422 366 430 370 C410 404 358 404 306 378 Z" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5" stroke-linejoin="round"/>
   <ellipse cx="437" cy="360" rx="12" ry="10" fill="#AEB6E8" opacity=".5"/></g>
@@ -20,17 +14,23 @@
   <path d="M338 162 C372 104 386 56 378 34 C336 52 296 74 268 100 C294 112 318 132 338 162 Z" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5" stroke-linejoin="round"/>
   <path d="M332 144 C358 102 370 68 365 52 C334 66 306 82 286 100 C306 110 320 124 332 144 Z" fill="#AEB6E8"/>
   <path d="M336 130 C354 100 364 76 360 60 C342 74 326 86 312 98 Z" fill="#FFFFFF" opacity=".35"/>
-  <path d="M186 314 Q120 288 100 232" stroke="#26283F" stroke-width="41" stroke-linecap="round" fill="none"/>
-  <path d="M186 314 Q120 288 100 232" stroke="#FFFFFF" stroke-width="30" stroke-linecap="round" fill="none"/>
-  <path d="M85.8 215.0 Q96 227.0 106.2 215.0" stroke="#26283F" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-  <path d="M326 314 Q392 288 412 232" stroke="#26283F" stroke-width="41" stroke-linecap="round" fill="none"/>
-  <path d="M326 314 Q392 288 412 232" stroke="#FFFFFF" stroke-width="30" stroke-linecap="round" fill="none"/>
-  <path d="M405.8 215.0 Q416 227.0 426.2 215.0" stroke="#26283F" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-  <rect id="clipBody-anchor" x="178" y="288" width="156" height="118" rx="54" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5"/>
+  <rect x="178" y="288" width="156" height="118" rx="54" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5"/>
   <path d="M214 314 Q256 344 298 314" stroke="#B9BFD2" stroke-width="3.5" stroke-linecap="round" fill="none"/>
   <rect x="216" y="320" width="80" height="52" rx="18" fill="#FFFFFF" stroke="#26283F" stroke-width="5"/>
   <path d="M238 358 V334 L274 358 V334" stroke="#8B95D6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M134 176 C134 108 186 82 256 82 C326 82 378 108 378 176 C378 244 352 318 256 318 C160 318 134 244 134 176 Z" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M200 312 L150 274 L116 230" fill="none" stroke="#26283F" stroke-width="39" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M200 312 L150 274 L116 230" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="116" cy="230" r="22.5" fill="#26283F"/>
+  <circle cx="116" cy="230" r="17.0" fill="#FFFFFF"/>
+  <path d="M104.8 233.4 Q113.3 245.6 120.1 241.2" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M120.1 241.2 Q126.2 243.3 129.3 233.7" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M312 312 L362 274 L396 230" fill="none" stroke="#26283F" stroke-width="39" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M312 312 L362 274 L396 230" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="396" cy="230" r="22.5" fill="#26283F"/>
+  <circle cx="396" cy="230" r="17.0" fill="#FFFFFF"/>
+  <path d="M384.8 233.4 Q393.3 245.6 400.1 241.2" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M400.1 241.2 Q406.2 243.3 409.3 233.7" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path id="head-anchor" d="M134 176 C134 108 186 82 256 82 C326 82 378 108 378 176 C378 244 352 318 256 318 C160 318 134 244 134 176 Z" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5" stroke-linejoin="round"/>
   <ellipse cx="188" cy="210" rx="36" ry="40" fill="url(#eye)"/>
   <ellipse cx="186" cy="189.2" rx="25.9" ry="12.0" fill="#FFFFFF" opacity=".13"/>
   <circle cx="178" cy="196.4" r="11.5" fill="#FFFFFF"/>

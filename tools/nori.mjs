@@ -85,28 +85,28 @@ const MID = 256
 const BODY = { x: 178, y: 288, w: 156, h: 118, r: 54 }
 const FEET_Y = 414
 const EYE = { y: 226, dx: 68, rx: 36, ry: 40 }
-const SHOULDER = { l: 186, r: 326, y: 320 }
+// Fixed anchors. Arms may only pivot from these — a pose moves the elbow and
+// the wrist, never the shoulder. That constraint is what keeps twelve poses
+// looking like twelve poses of one character instead of twelve characters.
+const SHOULDER = { l: 200, r: 312, y: 312 }
 
-// Sentinels. `limb` wraps its output so `pose` can find the arms and move them
-// behind the torso; `BODY_MARK` is a string the torso is guaranteed to contain.
+// Sentinels. `arm` wraps its output so `pose` can find the limbs and move them
+// into the slot before the head; `HEAD_MARK` is a string the head is
+// guaranteed to contain.
 const ARM_TAG = '\u0001'
-const BODY_MARK = 'clipBody-anchor'
+const HEAD_MARK = 'head-anchor'
 
 const W = 5.5 // outer contour weight
 const W_IN = 3.5 // interior seam weight
 
 /** Shared defs. Every file carries its own copy; they are standalone assets. */
+// The eye gradient is all that is left in here: the head and body clip paths
+// went with the shading masses they used to clip.
 const defs = `  <defs>
     <linearGradient id="eye" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${EYE_TOP}"/>
       <stop offset="1" stop-color="${EYE_BOT}"/>
     </linearGradient>
-    <clipPath id="clipHead">
-      <path d="${HEAD_PATH}"/>
-    </clipPath>
-    <clipPath id="clipBody">
-      <rect x="${BODY.x}" y="${BODY.y}" width="${BODY.w}" height="${BODY.h}" rx="${BODY.r}"/>
-    </clipPath>
   </defs>`
 
 // No ground shadow either. It was the same blue and it pooled under every pose.
@@ -146,10 +146,10 @@ function catEars(tilt = 0) {
 const ears = ''
 
 /** The head, with its volume shaded in rather than left flat. */
-const head = `  <path d="${HEAD_PATH}" fill="${WHITE}" stroke="${LINE}" stroke-width="${W}" stroke-linejoin="round"/>`
+const head = `  <path id="head-anchor" d="${HEAD_PATH}" fill="${WHITE}" stroke="${LINE}" stroke-width="${W}" stroke-linejoin="round"/>`
 
 const body = [
-  `  <rect id="clipBody-anchor" x="${BODY.x}" y="${BODY.y}" width="${BODY.w}" height="${BODY.h}" rx="${BODY.r}" fill="${WHITE}" stroke="${LINE}" stroke-width="${W}"/>`,
+  `  <rect x="${BODY.x}" y="${BODY.y}" width="${BODY.w}" height="${BODY.h}" rx="${BODY.r}" fill="${WHITE}" stroke="${LINE}" stroke-width="${W}"/>`,
   // The belly seam, at interior weight. At contour weight it reads as a crack
   // across the body rather than as a soft fold.
   `  <path d="M214 314 Q256 344 298 314" stroke="${LINE_SOFT}" stroke-width="${W_IN}" stroke-linecap="round" fill="none"/>`,
@@ -251,54 +251,73 @@ const openMouth = (cy = 286, r = 10) =>
   ].join('\n')
 
 /**
- * A limb.
+ * A limb: shoulder -> elbow -> wrist, stroked twice, with a hand at the end.
  *
- * ONE design. Whether a pose has both paws down, one up, or none is a property
- * of the POSE — it is not a different arm.
+ * ONE design. Whether a pose has both paws down, one raised, or none is a
+ * property of the POSE — it is not a different arm.
  *
- * Three things make it read as part of the animal rather than as something
- * attached to it:
+ * The construction, which is the standard flat-mascot rig:
  *
- *   1. IT IS DRAWN BEHIND THE BODY. `pose()` hoists every limb to just before
- *      the torso, so the arm's root is covered and only the part that extends
- *      past the outline is visible. Drawn on top — which is what every earlier
- *      version did — the rounded shoulder end sits on the belly like a sticker,
- *      and no amount of reshaping fixes that.
- *   2. NO SEPARATE PAW. The limb thickens toward the tip and stops. A paw
- *      attached as its own outlined ellipse adds a join, and a join goes
- *      ambiguous as soon as the outline weight approaches the gap it crosses.
- *   3. ONE SPLIT NEAR THE TIP. A short curve inside the shape, standing in for
- *      a thumb. That curve is the whole hand, and being interior it simply gets
- *      shorter as the drawing shrinks instead of breaking up.
+ *   1. TWO SEGMENTS, NOT A CURVE. A polyline through an elbow reads as a limb
+ *      with a joint; a single smooth curve reads as a tube. Both segments stay
+ *      within ~15% of each other in length or the arm looks stretched.
+ *   2. DOUBLE STROKE. The same path drawn wide in the contour colour, then
+ *      narrow in white — an outlined limb with no path complexity at all.
+ *   3. THE HAND IS SIZED INTO THE SILHOUETTE. A circle only three units wider
+ *      than the arm's half-width, set at the wrist. Big enough to read as a
+ *      hand, close enough in width that the join disappears — a bigger circle
+ *      is the "bead on a wire" that made every earlier version read as a tail.
+ *   4. THE ROOT IS UNDER THE HEAD. `pose()` hoists limbs into the slot between
+ *      the torso and the head — the same slot the standard flat-mascot rig uses
+ *      for "far arm / held prop / near arm". The arm therefore crosses the
+ *      belly with its outline visible, as it does in the reference, while its
+ *      shoulder end is covered by the chin. Drawn after the head that end sits
+ *      on the chest like a sticker; drawn before the body it loses the overlap
+ *      that puts it in front.
  */
-function limb(d, { w = 30, hand = null, handR = 0, hoist = true } = {}) {
-  void handR
+function arm(elbow, wrist, { side = 'l', w = 28, hand = true, fx = '', shoulder = null, hoist = true } = {}) {
+  // Two escape hatches, both for the seated pose. It scales its torso to 0.8
+  // about the seat line, which moves the shoulders to (211,255) and (301,255) —
+  // an arm drawn from the standing anchor there starts halfway down the belly.
+  // And its head lives INSIDE that scaled group, so an arm hoisted to sit
+  // before the head would be scaled along with it.
+  const [sx, sy] = shoulder ?? [side === 'l' ? SHOULDER.l : SHOULDER.r, SHOULDER.y]
+  const d = `M${sx} ${sy} L${elbow[0]} ${elbow[1]} L${wrist[0]} ${wrist[1]}`
   const out = [
-    `  <path d="${d}" stroke="${LINE}" stroke-width="${w + 2 * W}" stroke-linecap="round" fill="none"/>`,
-    `  <path d="${d}" stroke="${WHITE}" stroke-width="${w}" stroke-linecap="round" fill="none"/>`,
+    `  <path d="${d}" fill="none" stroke="${LINE}" stroke-width="${w + 2 * W}" stroke-linecap="round" stroke-linejoin="round"/>`,
+    `  <path d="${d}" fill="none" stroke="${WHITE}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`,
   ]
   if (hand) {
-    // The split, set across the tip and perpendicular-ish to the limb.
-    const [hx, hy] = hand
+    const r = w / 2 + 3
     out.push(
-      `  <path d="M${(hx - w * 0.34).toFixed(1)} ${(hy - w * 0.1).toFixed(1)} Q${hx} ${(hy + w * 0.3).toFixed(1)} ${(hx + w * 0.34).toFixed(1)} ${(hy - w * 0.1).toFixed(1)}" stroke="${LINE}" stroke-width="4.5" stroke-linecap="round" fill="none"/>`,
+      `  <circle cx="${wrist[0]}" cy="${wrist[1]}" r="${(r + W).toFixed(1)}" fill="${LINE}"/>`,
+      `  <circle cx="${wrist[0]}" cy="${wrist[1]}" r="${r.toFixed(1)}" fill="${WHITE}"/>`,
+      // Two finger notches. The one detail the hand gets, and being interior it
+      // shortens as the drawing shrinks instead of breaking apart.
+      `  <path d="M${(wrist[0] - r * 0.66).toFixed(1)} ${(wrist[1] + r * 0.2).toFixed(1)} Q${(wrist[0] - r * 0.16).toFixed(1)} ${(wrist[1] + r * 0.92).toFixed(1)} ${(wrist[0] + r * 0.24).toFixed(1)} ${(wrist[1] + r * 0.66).toFixed(1)}" fill="none" stroke="${LINE}" stroke-width="3.5" stroke-linecap="round"/>`,
+      `  <path d="M${(wrist[0] + r * 0.24).toFixed(1)} ${(wrist[1] + r * 0.66).toFixed(1)} Q${(wrist[0] + r * 0.6).toFixed(1)} ${(wrist[1] + r * 0.78).toFixed(1)} ${(wrist[0] + r * 0.78).toFixed(1)} ${(wrist[1] + r * 0.22).toFixed(1)}" fill="none" stroke="${LINE}" stroke-width="3.5" stroke-linecap="round"/>`,
     )
   }
+  if (fx) out.push(fx)
   const drawn = out.join('\n')
-  // `hoist: false` for anything that is not an arm attached to the torso. The
-  // seated pose draws its legs with this helper, and they belong in front of the
-  // figure in the order the pose lists them — hoisting them behind the body
-  // left the feet orphaned below a detached torso.
   return hoist ? ARM_TAG + drawn + ARM_TAG : drawn
 }
 
+/** A limb that is not an arm — the seated pose's dangling legs. */
+function leg(d, { w = 34 } = {}) {
+  return [
+    `  <path d="${d}" fill="none" stroke="${LINE}" stroke-width="${w + 2 * W}" stroke-linecap="round" stroke-linejoin="round"/>`,
+    `  <path d="${d}" fill="none" stroke="${WHITE}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`,
+  ].join('\n')
+}
+
 const armsRest = [
-  limb(`M${SHOULDER.l} ${SHOULDER.y} Q158 344 154 368`, { hand: [152, 377] }),
-  limb(`M${SHOULDER.r} ${SHOULDER.y} Q354 344 358 368`, { hand: [360, 377] }),
+  arm([172, 344], [162, 380], { side: 'l' }),
+  arm([340, 344], [350, 380], { side: 'r' }),
 ].join('\n')
 
 /** One resting arm, for the poses whose other arm is busy. */
-const armRestL = limb(`M${SHOULDER.l} ${SHOULDER.y} Q158 344 154 368`, { hand: [152, 377] })
+const armRestL = arm([172, 344], [162, 380], { side: 'l' })
 
 /* ---------------------------------------------------------------------- */
 /* Poses                                                                   */
@@ -307,10 +326,9 @@ const armRestL = limb(`M${SHOULDER.l} ${SHOULDER.y} Q158 344 154 368`, { hand: [
 /**
  * Assemble a pose.
  *
- * Limbs are hoisted to sit immediately before the torso, wherever the pose
- * happens to list them. That is what makes an arm part of the body instead of
- * an object resting on it — see the note on `limb`. A pose with no torso in it
- * (peek is only a head) keeps its limbs where they are.
+ * Limbs are hoisted into the slot between the torso and the head, wherever the
+ * pose happens to list them — see the note on `arm` for why that slot. A pose
+ * with no head keeps its limbs where they are.
  */
 function pose(parts, { box = '0 0 512 512', note = '' } = {}) {
   const flat = parts.filter(Boolean)
@@ -323,7 +341,7 @@ function pose(parts, { box = '0 0 512 512', note = '' } = {}) {
       rest.push(part)
     }
   }
-  const at = rest.findIndex((part) => typeof part === 'string' && part.includes(BODY_MARK))
+  const at = rest.findIndex((part) => typeof part === 'string' && part.includes(HEAD_MARK))
   if (arms.length) rest.splice(at < 0 ? rest.length : at, 0, ...arms)
   parts = rest
 
@@ -355,7 +373,7 @@ const POSES = {
       armRestL,
       // Clear of the ear box (x370-412, y178-254). Drawn any lower and the hand
       // lands inside the ear and Nori appears to be scratching it.
-      limb('M330 316 Q404 300 428 250', { hand: [434, 236] }),
+      arm([380, 292], [418, 244], { side: 'r' }),
       `  <path d="M462 216 A34 34 0 0 1 476 254" stroke="${ACCENT}" stroke-width="6" stroke-linecap="round" fill="none"/>`,
       `  <path d="M482 194 A58 58 0 0 1 502 242" stroke="${ACCENT}" stroke-width="6" stroke-linecap="round" fill="none"/>`,
     ],
@@ -377,7 +395,7 @@ const POSES = {
       nose(),
       openMouth(286, 11),
       armRestL,
-      limb('M330 316 Q400 306 424 274', { hand: [430, 262] }),
+      arm([374, 300], [414, 268], { side: 'r' }),
       `  <circle cx="438" cy="168" r="44" fill="${MOON}" stroke="${LINE}" stroke-width="${W}"/>`,
       `  <ellipse cx="450" cy="184" rx="26" ry="26" fill="#F2D98A" opacity=".5"/>`,
       `  <path d="M422 200 h32" stroke="${LINE}" stroke-width="7" stroke-linecap="round"/>`,
@@ -400,8 +418,8 @@ const POSES = {
       blush,
       nose(),
       smile(284, 11, 8),
-      limb('M190 328 Q182 352 190 374', { w: 28 }),
-      limb('M322 328 Q330 352 322 374', { w: 28 }),
+      arm([176, 344], [190, 372], { side: 'l', hand: false }),
+      arm([336, 344], [322, 372], { side: 'r', hand: false }),
       `  <rect x="186" y="338" width="140" height="56" rx="14" fill="${PANEL}" stroke="${LINE}" stroke-width="${W}"/>`,
       `  <path d="M206 358 Q220 349 234 358 T262 358" stroke="${ACCENT_DEEP}" stroke-width="4.5" stroke-linecap="round" fill="none"/>`,
       `  <path d="M212 376 Q226 368 240 376 T268 376" stroke="${ACCENT}" stroke-width="4.5" stroke-linecap="round" fill="none"/>`,
@@ -425,8 +443,8 @@ const POSES = {
       blush,
       nose(),
       smile(284, 11, 8),
-      limb('M188 326 Q180 352 188 374', { w: 28 }),
-      limb('M324 326 Q332 352 324 374', { w: 28 }),
+      arm([174, 344], [190, 374], { side: 'l', hand: false }),
+      arm([338, 344], [322, 374], { side: 'r', hand: false }),
       `  <rect x="192" y="336" width="128" height="84" rx="16" fill="${WHITE}" stroke="${LINE}" stroke-width="${W}"/>`,
       `  <rect x="210" y="382" width="18" height="24" rx="5" fill="#CDD3F0" stroke="${LINE}" stroke-width="4"/>`,
       `  <rect x="238" y="368" width="18" height="38" rx="5" fill="${ACCENT}" stroke="${LINE}" stroke-width="4"/>`,
@@ -451,8 +469,8 @@ const POSES = {
       blush,
       nose(),
       openMouth(286, 12),
-      limb('M186 314 Q120 288 100 232', { hand: [96, 218] }),
-      limb('M326 314 Q392 288 412 232', { hand: [416, 218] }),
+      arm([150, 274], [116, 230], { side: 'l' }),
+      arm([362, 274], [396, 230], { side: 'r' }),
       // The flame, then the exhaust bloom. Drawn big: a small flame on a figure
       // this round reads as a stray shape rather than as thrust.
       `  <path d="M214 400 Q256 500 298 400 Z" fill="${MOON}" stroke="${LINE}" stroke-width="${W}" stroke-linejoin="round"/>`,
@@ -503,8 +521,8 @@ const POSES = {
       blush,
       nose(),
       smile(284, 13, 9),
-      limb('M188 326 Q152 352 148 384', { hand: [147, 394] }),
-      limb('M326 322 Q368 344 340 372', { hand: [332, 378] }),
+      arm([170, 348], [156, 388], { side: 'l' }),
+      arm([352, 346], [330, 376], { side: 'r' }),
       `  </g>`,
     ],
     {
@@ -517,11 +535,13 @@ const POSES = {
     [
       `  <ellipse cx="256" cy="330" rx="86" ry="9" fill="${SHADE_DEEP}" opacity=".8"/>`,
       // Seated: the tail hangs off the edge rather than curling up behind.
-      `  <g transform="translate(-30 -96) scale(0.86)">${tail(-40)}</g>`,
-      limb('M224 336 Q216 372 220 398', { w: 38, hoist: false }),
-      limb('M288 336 Q296 372 292 398', { w: 38, hoist: false }),
-      foot(216, 414),
-      foot(296, 414),
+      // The transform scales BEFORE it translates, so the offset is in scaled
+      // units — the first attempt used -96 and parked the tail at chest height.
+      `  <g transform="translate(34 10) scale(0.84)">${tail(-30)}</g>`,
+      leg('M226 338 Q220 362 224 380', { w: 34 }),
+      leg('M286 338 Q292 362 288 380', { w: 34 }),
+      foot(220, 394),
+      foot(292, 394),
       // Scaled 0.8 about the seat. Any larger and the antenna runs off the top
       // of the box: the figure is 400 units crown to hem and the seat sits 330
       // down, so 330/400 is the ceiling.
@@ -536,8 +556,8 @@ const POSES = {
       nose(),
       smile(),
       `  </g>`,
-      limb('M186 262 Q146 296 150 322', { hand: [150, 332], handR: 16 }),
-      limb('M326 262 Q366 296 362 322', { hand: [362, 332], handR: 16 }),
+      arm([186, 290], [172, 330], { side: 'l', w: 26, shoulder: [211, 255], hoist: false }),
+      arm([326, 290], [340, 330], { side: 'r', w: 26, shoulder: [301, 255], hoist: false }),
     ],
     {
       note:
@@ -581,7 +601,7 @@ const POSES = {
       nose(),
       smile(284, 13, 9),
       armRestL,
-      limb('M328 324 Q378 320 408 312', { hand: [418, 310], handR: 20 }),
+      arm([362, 322], [408, 314], { side: 'r' }),
       `  <path d="M438 306 L468 302" stroke="${LINE}" stroke-width="12" stroke-linecap="round"/>`,
       `  <circle cx="488" cy="299" r="6" fill="${ACCENT_DEEP}"/>`,
     ],
@@ -604,8 +624,8 @@ const POSES = {
       blush,
       nose(),
       smile(284, 13, 9),
-      limb('M188 326 Q152 340 128 348', { w: 28 }),
-      limb('M324 326 Q360 340 384 348', { w: 28 }),
+      arm([166, 336], [134, 348], { side: 'l', hand: false }),
+      arm([346, 336], [378, 348], { side: 'r', hand: false }),
       `  <path d="M14 348 H498" stroke="${ACCENT}" stroke-width="9" stroke-linecap="round"/>`,
       `  <circle cx="120" cy="349" r="19" fill="${WHITE}" stroke="${LINE}" stroke-width="${W}"/>`,
       `  <circle cx="392" cy="349" r="19" fill="${WHITE}" stroke="${LINE}" stroke-width="${W}"/>`,
@@ -631,14 +651,12 @@ const POSES = {
       blush,
       nose(),
       smile(286, 10, 6),
-      limb('M188 326 Q182 350 190 372', { w: 28 }),
-      limb('M324 326 Q330 350 322 372', { w: 28 }),
+      arm([176, 344], [198, 384], { side: 'l' }),
+      arm([336, 344], [314, 384], { side: 'r' }),
       `  <rect x="190" y="338" width="132" height="72" rx="14" fill="${PANEL}" stroke="${LINE}" stroke-width="${W}"/>`,
       `  <path d="M210 360 H288" stroke="${ACCENT_DEEP}" stroke-width="4.5" stroke-linecap="round"/>`,
       `  <path d="M210 378 H298" stroke="${ACCENT}" stroke-width="4.5" stroke-linecap="round"/>`,
       `  <path d="M210 396 H268" stroke="${ACCENT}" stroke-width="4.5" stroke-linecap="round" opacity=".7"/>`,
-      `  <circle cx="190" cy="398" r="14" fill="${WHITE}" stroke="${LINE}" stroke-width="${W}"/>`,
-      `  <circle cx="322" cy="398" r="14" fill="${WHITE}" stroke="${LINE}" stroke-width="${W}"/>`,
     ],
     { note: 'READ — eyes down on a held page. The one pose not looking at you.' },
   ),

@@ -5,12 +5,6 @@
       <stop offset="0" stop-color="#2E3354"/>
       <stop offset="1" stop-color="#12152A"/>
     </linearGradient>
-    <clipPath id="clipHead">
-      <path d="M134 176 C134 108 186 82 256 82 C326 82 378 108 378 176 C378 244 352 318 256 318 C160 318 134 244 134 176 Z"/>
-    </clipPath>
-    <clipPath id="clipBody">
-      <rect x="178" y="288" width="156" height="118" rx="54"/>
-    </clipPath>
   </defs>
   <path d="M174 159.06 C140 109.88 126 70.7 134 54.58 C176 66.7 216 74 244 100 C218 112 194 132 174 162 Z" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5" stroke-linejoin="round"/>
   <path d="M180 141.06 C154 107.88 142 82.7 147 72.58 C178 80.7 206 82 226 100 C206 110 192 124 180 144 Z" fill="#AEB6E8"/>
@@ -24,17 +18,23 @@
   <path d="M197 419 Q214 427 231 419" stroke="#B9BFD2" stroke-width="3.5" stroke-linecap="round" fill="none"/>
   <ellipse cx="298" cy="414" rx="32" ry="17" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5"/>
   <path d="M281 419 Q298 427 315 419" stroke="#B9BFD2" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-  <path d="M186 320 Q158 344 154 368" stroke="#26283F" stroke-width="41" stroke-linecap="round" fill="none"/>
-  <path d="M186 320 Q158 344 154 368" stroke="#FFFFFF" stroke-width="30" stroke-linecap="round" fill="none"/>
-  <path d="M141.8 374.0 Q152 386.0 162.2 374.0" stroke="#26283F" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-  <path d="M326 320 Q354 344 358 368" stroke="#26283F" stroke-width="41" stroke-linecap="round" fill="none"/>
-  <path d="M326 320 Q354 344 358 368" stroke="#FFFFFF" stroke-width="30" stroke-linecap="round" fill="none"/>
-  <path d="M349.8 374.0 Q360 386.0 370.2 374.0" stroke="#26283F" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-  <rect id="clipBody-anchor" x="178" y="288" width="156" height="118" rx="54" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5"/>
+  <rect x="178" y="288" width="156" height="118" rx="54" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5"/>
   <path d="M214 314 Q256 344 298 314" stroke="#B9BFD2" stroke-width="3.5" stroke-linecap="round" fill="none"/>
   <rect x="216" y="320" width="80" height="52" rx="18" fill="#FFFFFF" stroke="#26283F" stroke-width="5"/>
   <path d="M238 358 V334 L274 358 V334" stroke="#8B95D6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M134 176 C134 108 186 82 256 82 C326 82 378 108 378 176 C378 244 352 318 256 318 C160 318 134 244 134 176 Z" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M200 312 L172 344 L162 380" fill="none" stroke="#26283F" stroke-width="39" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M200 312 L172 344 L162 380" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="162" cy="380" r="22.5" fill="#26283F"/>
+  <circle cx="162" cy="380" r="17.0" fill="#FFFFFF"/>
+  <path d="M150.8 383.4 Q159.3 395.6 166.1 391.2" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M166.1 391.2 Q172.2 393.3 175.3 383.7" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M312 312 L340 344 L350 380" fill="none" stroke="#26283F" stroke-width="39" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M312 312 L340 344 L350 380" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="350" cy="380" r="22.5" fill="#26283F"/>
+  <circle cx="350" cy="380" r="17.0" fill="#FFFFFF"/>
+  <path d="M338.8 383.4 Q347.3 395.6 354.1 391.2" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M354.1 391.2 Q360.2 393.3 363.3 383.7" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path id="head-anchor" d="M134 176 C134 108 186 82 256 82 C326 82 378 108 378 176 C378 244 352 318 256 318 C160 318 134 244 134 176 Z" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5" stroke-linejoin="round"/>
   <path d="M158 222 Q188 252 218 222" stroke="#12152A" stroke-width="9" stroke-linecap="round" fill="none"/>
   <path d="M294 222 Q324 252 354 222" stroke="#12152A" stroke-width="9" stroke-linecap="round" fill="none"/>
   <ellipse cx="166" cy="278" rx="21" ry="11" fill="#F7D6E6" opacity=".8"/>

@@ -5,12 +5,6 @@
       <stop offset="0" stop-color="#2E3354"/>
       <stop offset="1" stop-color="#12152A"/>
     </linearGradient>
-    <clipPath id="clipHead">
-      <path d="M134 176 C134 108 186 82 256 82 C326 82 378 108 378 176 C378 244 352 318 256 318 C160 318 134 244 134 176 Z"/>
-    </clipPath>
-    <clipPath id="clipBody">
-      <rect x="178" y="288" width="156" height="118" rx="54"/>
-    </clipPath>
   </defs>
   <path d="M174 162 C140 104 126 56 134 34 C176 52 216 74 244 100 C218 112 194 132 174 162 Z" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5" stroke-linejoin="round"/>
   <path d="M180 144 C154 102 142 68 147 52 C178 66 206 82 226 100 C206 110 192 124 180 144 Z" fill="#AEB6E8"/>
@@ -24,17 +18,23 @@
   <path d="M197 419 Q214 427 231 419" stroke="#B9BFD2" stroke-width="3.5" stroke-linecap="round" fill="none"/>
   <ellipse cx="298" cy="414" rx="32" ry="17" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5"/>
   <path d="M281 419 Q298 427 315 419" stroke="#B9BFD2" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-  <path d="M186 320 Q158 344 154 368" stroke="#26283F" stroke-width="41" stroke-linecap="round" fill="none"/>
-  <path d="M186 320 Q158 344 154 368" stroke="#FFFFFF" stroke-width="30" stroke-linecap="round" fill="none"/>
-  <path d="M141.8 374.0 Q152 386.0 162.2 374.0" stroke="#26283F" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-  <path d="M330 316 Q400 306 424 274" stroke="#26283F" stroke-width="41" stroke-linecap="round" fill="none"/>
-  <path d="M330 316 Q400 306 424 274" stroke="#FFFFFF" stroke-width="30" stroke-linecap="round" fill="none"/>
-  <path d="M419.8 259.0 Q430 271.0 440.2 259.0" stroke="#26283F" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-  <rect id="clipBody-anchor" x="178" y="288" width="156" height="118" rx="54" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5"/>
+  <rect x="178" y="288" width="156" height="118" rx="54" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5"/>
   <path d="M214 314 Q256 344 298 314" stroke="#B9BFD2" stroke-width="3.5" stroke-linecap="round" fill="none"/>
   <rect x="216" y="320" width="80" height="52" rx="18" fill="#FFFFFF" stroke="#26283F" stroke-width="5"/>
   <path d="M238 358 V334 L274 358 V334" stroke="#8B95D6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M134 176 C134 108 186 82 256 82 C326 82 378 108 378 176 C378 244 352 318 256 318 C160 318 134 244 134 176 Z" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M200 312 L172 344 L162 380" fill="none" stroke="#26283F" stroke-width="39" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M200 312 L172 344 L162 380" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="162" cy="380" r="22.5" fill="#26283F"/>
+  <circle cx="162" cy="380" r="17.0" fill="#FFFFFF"/>
+  <path d="M150.8 383.4 Q159.3 395.6 166.1 391.2" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M166.1 391.2 Q172.2 393.3 175.3 383.7" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M312 312 L374 300 L414 268" fill="none" stroke="#26283F" stroke-width="39" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M312 312 L374 300 L414 268" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="414" cy="268" r="22.5" fill="#26283F"/>
+  <circle cx="414" cy="268" r="17.0" fill="#FFFFFF"/>
+  <path d="M402.8 271.4 Q411.3 283.6 418.1 279.2" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M418.1 279.2 Q424.2 281.3 427.3 271.7" fill="none" stroke="#26283F" stroke-width="3.5" stroke-linecap="round"/>
+  <path id="head-anchor" d="M134 176 C134 108 186 82 256 82 C326 82 378 108 378 176 C378 244 352 318 256 318 C160 318 134 244 134 176 Z" fill="#FFFFFF" stroke="#26283F" stroke-width="5.5" stroke-linejoin="round"/>
   <ellipse cx="188" cy="210" rx="36" ry="40" fill="url(#eye)"/>
   <ellipse cx="186" cy="189.2" rx="25.9" ry="12.0" fill="#FFFFFF" opacity=".13"/>
   <circle cx="178" cy="196.4" r="11.5" fill="#FFFFFF"/>
