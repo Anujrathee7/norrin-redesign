@@ -11,7 +11,12 @@ npm run lint     # oxlint — must be zero
 node tools/palette.mjs # every rendered colour pair, measured (must be 61/61)
 node tools/audit.mjs   # axe-core (light + dark) + structure audit
 node tools/shot.mjs --vp=desktop --sections   # visual QA harness
+node tools/mascots.mjs # export the character set to standalone animated SVGs
 ```
+
+The mascot workbench is at `/#mascots` — the four characters against both
+grounds, down to 24px, with motion on and off. It is not in the nav and not in
+the page flow on purpose.
 
 ---
 
