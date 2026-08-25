@@ -3,6 +3,7 @@ import { metrics, offices, positioning, story } from '@/data/norrin'
 import { Nori } from '@/components/mascot/nori/Nori'
 import { Line } from '@/components/primitives/SplitLines'
 import { Reveal } from '@/components/primitives/Reveal'
+import { Counter } from '@/components/primitives/Counter'
 
 /**
  * Hero.
@@ -31,13 +32,30 @@ import { Reveal } from '@/components/primitives/Reveal'
  * number can be wrong — and a station log is a more distinctive container for
  * them than a stat strip is.
  */
-const STATION: [string, string][] = [
-  ['On station since', String(story.since)],
-  ...metrics.map((m): [string, string] => [m.label, `${m.value}${m.suffix}`]),
-  [
-    'Offices',
-    `${offices.length} / ${new Set(offices.map((o) => o.country)).size} countries`,
-  ],
+/**
+ * `num` marks the rows that are a QUANTITY and can therefore count up.
+ *
+ * "On station since" is deliberately not one of them: 2012 is a date, and
+ * counting a date up from zero races through eleven centuries to say nothing.
+ * Offices is a composite string, so it stays put too. Four rows animate, two
+ * do not, and the difference is the point rather than an oversight.
+ */
+type StationRow = { term: string; value: string; num?: number; suffix?: string }
+
+const STATION: StationRow[] = [
+  { term: 'On station since', value: String(story.since) },
+  ...metrics.map(
+    (m): StationRow => ({
+      term: m.label,
+      value: `${m.value}${m.suffix}`,
+      num: m.value,
+      suffix: m.suffix,
+    }),
+  ),
+  {
+    term: 'Offices',
+    value: `${offices.length} / ${new Set(offices.map((o) => o.country)).size} countries`,
+  },
 ]
 
 export function Hero() {
@@ -113,13 +131,22 @@ export function Hero() {
               highest-leverage change available. Every figure is published. */}
           <aside className="col-span-4 mt-14 self-start md:col-span-4 md:col-start-9 md:mt-2 md:self-center lg:col-span-3 lg:col-start-10">
             <Reveal as="dl" stagger={0.06} variant="right" delay={0.2} className="border-t border-hairline">
-              {STATION.map(([term, value]) => (
+              {STATION.map((row) => (
                 <div
-                  key={term}
+                  key={row.term}
                   className="flex items-baseline justify-between gap-4 border-b border-hairline py-2.5"
                 >
-                  <dt className="label text-ink-3">{term}</dt>
-                  <dd className="label tabular-nums text-ink">{value}</dd>
+                  <dt className="label text-ink-3">{row.term}</dt>
+                  <dd className="label tabular-nums text-ink">
+                    {row.num !== undefined ? (
+                      <>
+                        <Counter value={row.num} />
+                        {row.suffix}
+                      </>
+                    ) : (
+                      row.value
+                    )}
+                  </dd>
                 </div>
               ))}
             </Reveal>
