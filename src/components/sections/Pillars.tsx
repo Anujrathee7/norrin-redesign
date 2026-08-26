@@ -165,16 +165,68 @@ export function Pillars() {
 
           <div className="col-span-4 md:col-span-7 md:col-start-6 lg:col-span-8 lg:col-start-5">
             {pillars.map((p, i) => (
+              // Each article is its own scene, so the beats below are staged
+              // against ITS arrival rather than against the column's. The column
+              // is 1368px of content and the three articles reach the reader
+              // minutes apart in scroll terms; one shared range would have the
+              // last one's slot open while it was still far below the fold.
+              //
+              // Declaring `--scene` here shadows the Grid's for anything inside
+              // this article, which is exactly what is wanted. The Grid's own
+              // scene still serves the index rail, because the rail lives in the
+              // sibling <nav> and never looks in here.
               <article
                 key={p.id}
                 id={`pillar-${p.id}`}
+                data-scene
                 ref={(el) => {
                   refs.current[i] = el
                 }}
-                className="scroll-mt-32 border-t border-hairline py-10 first:border-t-0 first:pt-0 md:py-14"
+                className="relative scroll-mt-32 border-t border-hairline py-10 first:border-t-0 first:pt-0 md:py-14"
               >
-                <h3 className="display-3">{p.name}</h3>
-                <p className="body-serif measure-serif mt-6 text-ink-2">{p.body}</p>
+                {/* The article's own rule goes moss as you reach it — drawn, not
+                    switched. This is the same gesture the index rail beside it
+                    already makes when a pillar becomes active (`border-accent`
+                    on the current row), so the two halves of the section agree
+                    about what "you are here" looks like instead of each having
+                    its own idea. It draws OVER the static hairline rather than
+                    replacing it, so a browser that cannot run it still sees a
+                    ruled column.
+
+                    Not on the first article: it carries `first:border-t-0`
+                    because it sits directly under the section header, and a rule
+                    drawing across nothing is a line with no job. */}
+                {i > 0 ? (
+                  <span
+                    aria-hidden="true"
+                    data-scene-part="rule"
+                    style={{
+                      ['--scene-from' as string]: 'cover 12%',
+                      ['--scene-to' as string]: 'cover 32%',
+                    }}
+                    className="pointer-events-none absolute inset-x-0 top-0 h-px bg-accent"
+                  />
+                ) : null}
+                <h3
+                  data-scene-part="enter"
+                  style={{
+                    ['--scene-from' as string]: 'cover 18%',
+                    ['--scene-to' as string]: 'cover 42%',
+                  }}
+                  className="display-3"
+                >
+                  {p.name}
+                </h3>
+                <p
+                  data-scene-part="enter"
+                  style={{
+                    ['--scene-from' as string]: 'cover 22%',
+                    ['--scene-to' as string]: 'cover 46%',
+                  }}
+                  className="body-serif measure-serif mt-6 text-ink-2"
+                >
+                  {p.body}
+                </p>
                 {/* Was thirteen bordered, padded, radiused chips. In a system
                     where hairlines separate, a box around each item makes the
                     hairline start CONTAINING instead — and a row of them reads
@@ -190,9 +242,20 @@ export function Pillars() {
                 <dl className="mt-8 border-t border-hairline">
                   {services
                     .filter((sv) => sv.pillar === p.id)
-                    .map((sv) => (
+                    .map((sv, j) => (
                       <div
                         key={sv.name}
+                        data-scene-part="enter"
+                        style={{
+                          // The service rows arrive after the claim they belong
+                          // to, one behind the next. 3% apart rather than the
+                          // wider steps used elsewhere: there are up to five of
+                          // them and a generous stagger would still be running
+                          // when the next article's rule starts drawing.
+                          ['--enter-y' as string]: '22px',
+                          ['--scene-from' as string]: `cover ${28 + j * 3}%`,
+                          ['--scene-to' as string]: `cover ${28 + j * 3 + 22}%`,
+                        }}
                         className="flex flex-wrap items-baseline gap-x-6 gap-y-1 border-b border-hairline py-3"
                       >
                         <dt className="ui w-full text-ink sm:w-[13rem]">{sv.name}</dt>

@@ -68,19 +68,46 @@ export function Hero() {
     >
       <Container>
         <Grid>
-          {/* `recede` runs on this column's own `exit` — the range is spent
-              entirely while the column is still on screen, so leaving the
-              hero reads as the copy pulling back and fading rather than a
-              hard cut to the next section. It sits on the column itself, not
-              on a `[data-reveal]` element or a child of one: `Reveal` already
-              owns transform/opacity on the eyebrow, heading and lead, and an
-              animation beats an inline transform outright when both land on
-              the same element — this column has no `Reveal` of its own, only
-              `Reveal`s nested inside it, so the two never fight. */}
+          {/* THE CURTAIN RUNWAY. The padding IS the hold: the pin inside is
+              sticky, so it stays put while this column's own bottom padding
+              scrolls past underneath it, and only then releases. 26svh is about
+              a quarter-screen of holding — enough that the page reads as moving
+              on from the statement rather than dragging it away, and not so
+              much that the reader is kept waiting at the door.
+
+              The pin carries the recede as well as the hold, and the two do not
+              fight: `sticky` is a position, the animation is a transform, and
+              the transform applies on top of wherever sticky has put the box.
+              What DOES kill stickiness is a transform on an ANCESTOR, which is
+              why the animation is on the pin itself and why nothing between
+              here and the section is allowed to animate.
+
+              `overflow-clip` on the section is safe for this — verified in a
+              browser rather than assumed, because it is exactly the kind of
+              thing that silently does not work. A `clip` ancestor keeps sticky
+              alive (15 of 15 sampled frames pinned, identical to a plain
+              ancestor); `overflow: hidden` kills it outright (0 frames), since
+              hidden makes itself the scrollport.
+
+              The `Reveal`s nested inside are untouched, and should stay that
+              way. They are a PAGE-LOAD entrance, and the hero is above the
+              fold: a scroll-driven entrance for content already in view when
+              the page opens arrives pre-finished, which is no entrance at all.
+              Sections 02–07 were converted precisely because they are NOT above
+              the fold. */}
           <div
-            data-scroll="recede"
+            data-curtain-runway
             className="col-span-4 md:col-span-8 lg:col-span-7"
           >
+            <div
+              data-scroll="curtain"
+              data-curtain-pin
+              // `md:` and up. On a phone the hero copy already fills most of
+              // the screen, so holding it spends a fifth of a viewport of
+              // scrolling to hold something the reader cannot see past anyway.
+              // The recede still runs there — it costs no layout.
+              className="md:sticky md:top-[max(88px,11svh)]"
+            >
             <Eyebrow label="Nordic partner for enterprise AI" className="mb-7" />
 
             {/* No highlighter behind the money word — that gesture is on
@@ -213,6 +240,35 @@ export function Hero() {
                 </svg>
               </a>
             </Reveal>
+            </div>
+
+            {/* THE HOLD, AS A REAL BOX. This was `pb-[26svh]` on the runway and
+                it did nothing at all — the column was 247px taller and the pin
+                never held for a single frame.
+
+                Padding does not extend a sticky element's travel. The sticky
+                constraint rectangle behaves as the containing block's CONTENT
+                box, so bottom padding buys the pin nothing to move within,
+                however much of it there is: tested at 247, 400, 700 and 1200px
+                and the pin tracked the scroll one-to-one at every size. A
+                sibling box and a `min-height` both DO give travel (17 pinned
+                frames each in an isolated test, against 1 for padding).
+
+                So the hold is stated as an actual element. It also reads better
+                than a magic number on the parent: this box IS the hold, its
+                height IS how long the statement stays up, and there is nothing
+                to work out from a padding value that looks like spacing. */}
+            {/* 18svh. Measured against the one thing this must not cost: the
+                production line, which is the page's own device and carries the
+                PILOT / PRODUCTION labels that frame the whole argument. At
+                26svh the line was pushed 48px below the fold on a 950px
+                laptop; at 18svh it sits at ~920 and stays on the first screen,
+                and the hold is still ~160px — a beat, not a wait.
+
+                Below 800px of viewport the line was already under the fold
+                before any of this existed, so that constraint was never a
+                guarantee and is not treated as one. */}
+            <div aria-hidden="true" data-curtain-spacer className="h-0 md:h-[18svh]" />
           </div>
 
           {/* Station log.
@@ -225,7 +281,7 @@ export function Hero() {
               highest-leverage change available. Every figure is published. */}
           <aside
             data-scroll="drift-slow"
-            className="col-span-4 mt-14 self-start md:col-span-4 md:col-start-9 md:mt-2 md:self-center lg:col-span-3 lg:col-start-10"
+            className="col-span-4 mt-14 self-start md:col-span-4 md:col-start-9 md:mt-2 lg:col-span-3 lg:col-start-10"
           >
             <Reveal as="dl" stagger={0.06} variant="right" delay={0.2} className="border-t border-hairline">
               {STATION.map((row) => (

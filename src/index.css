@@ -906,6 +906,18 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   [data-scene-pin] {
     position: static !important;
   }
+
+  /* Same argument for the hero curtain. Its hold is a real spacer box rather
+     than padding — padding does not extend a sticky element's travel at all,
+     which cost an afternoon to find — and with the pin unstuck that box is just
+     a hole under the opening statement with nothing left to reveal. */
+  [data-curtain-spacer] {
+    height: 0 !important;
+  }
+
+  [data-curtain-pin] {
+    position: static !important;
+  }
 }
 
 /* ==========================================================================
@@ -1496,33 +1508,55 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       animation-range: var(--scrub-from, cover 12%) var(--scrub-to, cover 40%);
     }
 
-    /* The hero does not cut to the next section, it recedes behind it. Runs on
-       the copy column's own exit, so it is spent entirely on screen.
+    /* THE CURTAIN. Leaving the hero is a movement, not a cut.
+       -------------------------------------------------------------------
+       The copy HOLDS while the rest of the hero scrolls up past it, receding
+       as it holds, so the page reads as moving on from underneath the opening
+       statement rather than dragging it off the top of the screen.
 
-       NO OPACITY HERE EITHER, for the same reason `stage` has none. This faded
-       the copy to 0.3 on the way out and axe failed the page on it in six
-       places — the eyebrow at 1.64:1, the headline at 1.94:1, the lead at
-       1.63:1 — because axe samples a scroll position and measures what is
-       actually painted, and cannot know the text was on its way off screen.
-       "It is leaving anyway" is an argument to a person, not to a contrast
-       check, and this project's gate is a clean audit.
+       TWO MECHANISMS, AND THEY ARE DIFFERENT THINGS. The hold is
+       `position: sticky` on a pin inside a padded runway — plain layout, no
+       animation — so it survives a browser with no scroll timelines and a
+       reader who asked for less motion. The recede is this animation. Lose the
+       second and a hero that holds is left, which is still a good hero.
 
-       Transform alone still makes leaving the hero a movement rather than a
-       cut, which was the whole point: the travel and the scale went up to
-       carry the gesture that the fade used to. */
-    [data-scroll='recede'] {
-      animation: scroll-recede linear both;
-      animation-timeline: view();
-      animation-range: exit 0% exit 100%;
+       `scroll(root)`, NOT `view()`, and that is forced rather than preferred. A
+       stuck element does not move in the viewport, so its own view timeline
+       stops advancing the instant it sticks — the animation would freeze at
+       exactly the moment the effect is meant to be happening. TheGap works
+       around this by declaring a named timeline on its runway for the pin to
+       read. The hero does not have to: it is the one thing on the page whose
+       scroll band is known absolutely, because it begins at zero. Document
+       scroll is the simplest correct clock here, which is why `condense`
+       already uses it.
+
+       Linear, deliberately, against this file's own rule that entrances get
+       `--ease-entrance`. This is not an arrival that should settle — it is a
+       layer moving away at the rate the reader is moving, which is the parallax
+       argument, and easing it would put the hero out of step with the section
+       rising over it.
+
+       NO OPACITY, for the same reason `stage` has none. This faded the copy to
+       0.3 on the way out and axe failed the page on it in six places — the
+       eyebrow at 1.64:1, the headline at 1.94:1, the lead at 1.63:1 — because
+       axe samples a scroll position and measures what is actually painted, and
+       cannot know the text was on its way off screen. "It is leaving anyway" is
+       an argument to a person, not to a contrast check. The reference this is
+       modelled on fades its headline to nothing; here the dark section riding
+       up over the hero does that work instead, and does it opaquely. */
+    [data-scroll='curtain'] {
+      animation: scroll-curtain linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 var(--curtain-span, 34svh);
       transform-origin: left top;
     }
 
-    @keyframes scroll-recede {
+    @keyframes scroll-curtain {
       from {
         transform: none;
       }
       to {
-        transform: translateY(-76px) scale(0.94);
+        transform: translateY(-40px) scale(0.93);
       }
     }
   }
