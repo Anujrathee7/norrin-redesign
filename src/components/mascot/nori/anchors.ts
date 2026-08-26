@@ -16,6 +16,21 @@
  *   `y` — distance from the drawing's TOP to the contact line.
  *   `x` — distance from the drawing's LEFT to the contact edge.
  */
+/**
+ * ANCHORED POSES MUST NOT IDLE — pass `animated={false}`.
+ *
+ * `.nori--float` translates the drawing vertically forever. A pose placed by
+ * one of these anchors is placed to TOUCH something, and a drawing that is
+ * bobbing is a drawing that spends most of its time not touching it: measured
+ * at ~8px off the rule it was sitting on, which at a 112px mascot is most of
+ * the contact. Anchored poses get their motion from the section moving around
+ * them, not from moving on their own.
+ *
+ * `hold` carries one further restriction: the drawing contains its OWN rule, in
+ * periwinkle, at this anchor height. It composes only against a rule drawn to
+ * meet its ends — run against a page hairline it produces one line in two
+ * colours. `sit` has no prop and rests on anything.
+ */
 export const NORI_ANCHOR = {
   /** Shoulder against a vertical edge. */
   lean: { x: '10.67%' },

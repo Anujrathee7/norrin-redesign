@@ -61,21 +61,29 @@ export function Thinking() {
       className="bg-surface py-24 md:py-36"
     >
       <Container>
-        {/* Nori beside the header rather than above the list: the pose is
-            the section's own verb, and floating it over the rungs would make
-            it decoration competing with three things you can click. */}
-        <div className="flex items-end justify-between gap-8">
-          <SectionHeader index="05" label="Thinking" id="thinking-heading" className="grow">
-            Start anywhere you like.
-          </SectionHeader>
-          <span data-scroll="tilt" className="hidden shrink-0 md:block">
-            <Nori pose="idea" size={150} />
-          </span>
-        </div>
+        <SectionHeader index="05" label="Thinking" id="thinking-heading">
+          Start anywhere you like.
+        </SectionHeader>
 
         {/* Wiped rather than faded: the three rungs are one framed object, and
             a wipe crossing it reads as one gesture where three fades read as
             three separate arrivals. */}
+        {/* The frame gets a `relative` wrapper for one reason: Nori peeks over
+            its top border, and the border is on the <ul> two levels down inside
+            an `overflow-hidden` frame — anything positioned in there would be
+            clipped away. Anchored out here, `bottom-full` is all the placement
+            it needs, because the bottom of the peek drawing IS the edge being
+            peeked over. No offset, no magic number.
+
+            This replaces a 150px `idea` parked beside the header. Same
+            character, but touching something instead of floating next to it. */}
+        <div className="relative">
+          <div className="absolute right-10 bottom-full hidden md:flex lg:right-20">
+            {/* Still, for the same reason `sit` is still in Work: the idle
+                float would lift it off the border it is peeking over. */}
+            <Nori pose="peek" size={124} animated={false} />
+          </div>
+
         <Reveal stagger={0.08} variant="wipe">
           {/* One frame with three cells, not three cards.
               The rungs are hairline-separated already, so the radius goes on the
@@ -101,6 +109,7 @@ export function Thinking() {
             ))}
           </ul>
         </Reveal>
+        </div>
 
         <p className="caption mt-8 text-ink-3">
           All three are published on norrin.com. This speculative rebuild does not reproduce

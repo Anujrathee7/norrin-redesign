@@ -533,15 +533,14 @@ const POSES = {
 
   sit: pose(
     [
-      `  <ellipse cx="256" cy="330" rx="86" ry="9" fill="${SHADE_DEEP}" opacity=".8"/>`,
       // Seated: the tail hangs off the edge rather than curling up behind.
       // The transform scales BEFORE it translates, so the offset is in scaled
       // units — the first attempt used -96 and parked the tail at chest height.
       `  <g transform="translate(34 10) scale(0.84)">${tail(-30)}</g>`,
-      leg('M226 338 Q220 362 224 380', { w: 34 }),
-      leg('M286 338 Q292 362 288 380', { w: 34 }),
-      foot(220, 394),
-      foot(292, 394),
+      leg('M226 338 Q218 368 222 392', { w: 32 }),
+      leg('M286 338 Q294 368 290 392', { w: 32 }),
+      foot(220, 404),
+      foot(292, 404),
       // Scaled 0.8 about the seat. Any larger and the antenna runs off the top
       // of the box: the figure is 400 units crown to hem and the seat sits 330
       // down, so 330/400 is the ceiling.

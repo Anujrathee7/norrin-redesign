@@ -82,36 +82,17 @@ export function TheGap() {
             </h2>
           </Reveal>
 
-          {/* The isolated-danger mark. In IALA buoyage, two cones point-to-point
-              mark a hazard with navigable water all round it — which is exactly
-              what the pilot-to-production gap is. */}
-          <Reveal
-            className="col-span-4 mt-12 flex items-start gap-6 border-t border-inverse-hairline-strong pt-7 md:col-span-5 md:col-start-8 md:gap-7"
-            delay={0.08}
-          >
-            <div className="w-14 shrink-0 text-inverse-ink md:w-[132px]">
-              <Fyr
-                size={132}
-                state="gap"
-                className="h-auto w-full"
-                showWater={false}
-                showMooring={false}
-                title="Isolated danger mark — the pilot-to-production gap"
-              />
-            </div>
-            <div>
-              <p className="label text-inverse-ink-2">Isolated danger</p>
-              {/* The second sentence — "It is the shape this whole section is
-                  about." — is gone. That is the design annotating itself,
-                  telling the reader the metaphor is a metaphor, which is the
-                  one move that makes a device look decorative. The mark, the
-                  label and the three stations below already say it. */}
-              <p className="body-serif mt-3 max-w-[34ch] text-inverse-ink-2">
-                In sea marking, two cones point-to-point mark a hazard with open water all
-                round it.
-              </p>
-            </div>
-          </Reveal>
+          {/* The isolated-danger aside used to sit here: a lone cone mark and a
+              sentence of IALA buoyage — "two cones point-to-point mark a hazard
+              with open water all round it". It is gone.
+
+              It asked the reader to learn a maritime convention BEFORE the
+              metaphor could pay off, which is the wrong order and more work
+              than any decorative device is worth. A device that needs a
+              footnote is a device that is not working. The three stations below
+              make the same argument without teaching anything: unlit and
+              drifting, then marked, then on station — and the rule under them
+              going solid is the moment being described. */}
         </div>
       </Container>
 

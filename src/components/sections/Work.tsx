@@ -1,4 +1,6 @@
 import { Container, Grid, SectionHeader } from '@/components/primitives/Layout'
+import { Nori } from '@/components/mascot/nori/Nori'
+import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
 import { Reveal } from '@/components/primitives/Reveal'
 import { cases, customers, customersIntro } from '@/data/norrin'
 
@@ -41,6 +43,30 @@ export function Work() {
         {/* The roster, as type. */}
         {/* A fast tick across the roster — this is a list of names being read
             out, so the stagger is tight and the travel is small. */}
+        {/* Nori sits ON the roster's top rule — the one long uninterrupted
+            horizontal in this section, with the intro paragraph's bottom margin
+            clear above it.
+
+            Placed by `NORI_ANCHOR.sit`, the measured height of the seat line
+            within the drawing, so the hips land on the rule and the legs hang
+            below it at any size. A hand-tuned `-translate-y-[58%]` would go
+            quietly wrong the next time the pose file is edited.
+
+            The wrapper is OUTSIDE the panning div on purpose: that div slides
+            horizontally on scroll, and a mascot sitting on a rule should not
+            slide with the names. */}
+        <div className="relative">
+          <div
+            className="absolute top-0 right-[6%] z-10 hidden md:block"
+            style={{ transform: 'translateY(calc(-1 * ' + NORI_ANCHOR.sit.y + '))' }}
+          >
+            {/* `animated={false}` is not a style preference — see the note in
+                anchors.ts. The idle float translates the drawing vertically, and
+                a pose whose entire job is touching a rule cannot also be moving
+                away from it. This one gets its motion from the section. */}
+            <Nori pose="sit" size={112} animated={false} />
+          </div>
+
         <div data-scroll="pan" style={{ ["--pan" as string]: "38px" }}>
         <Reveal stagger={0.04} variant="left">
           {/* A grid, not flex-wrap: the old wrap produced nine names then a
@@ -56,6 +82,7 @@ export function Work() {
             ))}
           </ul>
         </Reveal>
+        </div>
         </div>
 
         {/* Cases, as full-width rows. Each row is uncovered left to right, in

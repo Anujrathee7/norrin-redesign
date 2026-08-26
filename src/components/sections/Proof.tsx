@@ -1,4 +1,5 @@
 import { Container, Eyebrow } from '@/components/primitives/Layout'
+import { Nori } from '@/components/mascot/nori/Nori'
 import { Reveal } from '@/components/primitives/Reveal'
 import { story, timeline } from '@/data/norrin'
 
@@ -29,9 +30,20 @@ export function Proof() {
     >
       <Container>
         <Eyebrow index="06" label="Track record" className="mb-8" />
-        <h2 id="proof-heading" className="display-2 max-w-[22ch]">
-          {story.recognition}
-        </h2>
+
+        {/* `read` sits at the end of the heading row rather than beside it: the
+            heading is 22ch and stops well short of the column, so this is empty
+            space being used rather than a figure pushing type around. The pose
+            is the only one looking DOWN at something, and what is below it is
+            the timeline the heading introduces. */}
+        <div className="flex items-end justify-between gap-10">
+          <h2 id="proof-heading" className="display-2 max-w-[22ch]">
+            {story.recognition}
+          </h2>
+          <span data-scroll="drift-slow" className="hidden shrink-0 lg:block">
+            <Nori pose="read" size={116} />
+          </span>
+        </div>
 
         {/* How it got here — on the same rule as everything else. */}
         {/* One rail, rotated — not a grid of separate rules.
