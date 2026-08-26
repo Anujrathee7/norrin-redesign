@@ -103,7 +103,9 @@ export function Thinking() {
                 ['--sway' as string]: '3.2deg',
               }}
             >
-              <Nori pose="peek" size={124} animated={false} />
+              <div className="nori-idle">
+                <Nori pose="peek" size={124} animated={false} />
+              </div>
             </div>
           </div>
 

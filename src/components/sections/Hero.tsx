@@ -201,7 +201,19 @@ export function Hero() {
                       'translateY(calc(100% - ' + NORI_ANCHOR.stand.y + '))',
                   }}
                 >
-                  <Nori pose="lean" size={240} animated={false} />
+                  {/* `breathe`, not the rock the other anchored poses get.
+                      This one is held at two points at once — feet on the
+                      heading's baseline, shoulder against the letter — and a
+                      rotation keeps whichever it pivots on and breaks the
+                      other. A vertical scale about the sole keeps the feet
+                      planted and slides the shoulder along the letter's edge,
+                      which is near-vertical where it touches, so both survive. */}
+                  <div
+                    className="nori-breathe"
+                    style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}` }}
+                  >
+                    <Nori pose="lean" size={240} animated={false} />
+                  </div>
                 </div>
               </div>
             </div>

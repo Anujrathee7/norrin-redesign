@@ -49,6 +49,71 @@
   }
 }
 
+/* ==========================================================================
+   ANCHOR-SAFE IDLES
+   --------------------------------------------------------------------------
+   The float above is the reason every mascot that touches something on this
+   page was rendered `animated={false}`: it TRANSLATES, so a figure placed to
+   rest on a rule spends most of its cycle off it — measured at ~8px, which on a
+   112px drawing is most of the contact.
+
+   These two do not translate. They pivot on the contact point itself, which is
+   fixed under both a rotation and a scale, so the figure can breathe while its
+   feet, hips or fingers stay exactly where the placement put them. `--pivot`
+   takes the same measured anchor from `anchors.ts` that positioned it.
+
+   WHY BOTH THIS AND THE SCROLL SWAY. `[data-scroll='nori-sway']` in index.css
+   rocks these same figures as you scroll past, and this is the idle underneath
+   it: without one, a mascot is perfectly still whenever the page is, which is
+   most of the time a reader spends actually looking at it. They live on
+   separate boxes because two animations on one element do not compose — the
+   later `transform` wins outright rather than adding.
+
+   `display: flex` is not decoration here. `<Nori>` renders an inline-block, a
+   block parent adds the line box's descender to its own height, and a
+   PERCENTAGE `transform-origin` resolves against that inflated box — which
+   moves the pivot off the anchor without changing anything you can see in the
+   markup. Same trap that put the Gap stations' feet 7px above their rail.
+   ========================================================================== */
+
+.nori-idle {
+  display: flex;
+  animation: nori-idle 5.6s ease-in-out infinite;
+  transform-origin: var(--pivot, 50% 100%);
+}
+
+@keyframes nori-idle {
+  0%,
+  100% {
+    transform: rotate(var(--idle, 1.3deg));
+  }
+  50% {
+    transform: rotate(calc(var(--idle, 1.3deg) * -1));
+  }
+}
+
+/* For a figure held at TWO points at once. `lean` rests its feet on the
+   heading's baseline and its shoulder against the letter, and any rotation
+   keeps one and breaks the other. A vertical scale about the sole keeps the
+   feet planted and slides the shoulder ALONG the letter's edge, which is
+   near-vertical there — so the contact survives a gesture that would otherwise
+   have to be given up entirely. */
+.nori-breathe {
+  display: flex;
+  animation: nori-breathe 6.4s ease-in-out infinite;
+  transform-origin: var(--pivot, 50% 100%);
+}
+
+@keyframes nori-breathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(var(--breathe, 1.022));
+  }
+}
+
 /* The sleeping pose gets a longer, gentler cycle. A sleeping character that
    bobs at waking speed reads as restless, which is the opposite of the pose. */
 .nori[data-pose='sleep'].nori--float {
@@ -79,7 +144,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nori--float {
+  .nori--float,
+  .nori-idle,
+  .nori-breathe {
     animation: none !important;
     transform: none !important;
   }

@@ -112,7 +112,9 @@ export function Work() {
               className="flex"
               style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.sit.y}` }}
             >
-              <Nori pose="sit" size={112} animated={false} />
+              <div className="nori-idle">
+                <Nori pose="sit" size={112} animated={false} />
+              </div>
             </div>
           </div>
 

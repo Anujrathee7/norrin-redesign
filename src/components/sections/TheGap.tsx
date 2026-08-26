@@ -424,7 +424,19 @@ export function TheGap() {
                             ['--scene-to' as string]: STEP_RANGE[i][1],
                           }}
                         >
-                          <Nori pose={s.pose} size={220} animated={false} />
+                          {/* The stations landed and then froze. A time-based
+                              idle rather than a scroll-driven one, because
+                              these live inside the pin: a stuck element does
+                              not move in the viewport, so its own `view()`
+                              timeline stops advancing the moment the scene
+                              pins — which is precisely when they are on
+                              screen and being looked at. */}
+                          <div
+                            className="nori-idle"
+                            style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}` }}
+                          >
+                            <Nori pose={s.pose} size={220} animated={false} />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -519,7 +531,17 @@ export function TheGap() {
                     not a reason to move it. */}
                 <div className="relative flex w-14 shrink-0 justify-center">
                   <div className="w-14">
-                    <Nori pose={s.pose} size={56} animated={false} />
+                    <div
+                      className="nori-idle"
+                      style={{
+                        ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}`,
+                        // Smaller drawings need a wider angle to read at all:
+                        // 1.3deg on a 56px figure is under a pixel of travel.
+                        ['--idle' as string]: '2.2deg',
+                      }}
+                    >
+                      <Nori pose={s.pose} size={56} animated={false} />
+                    </div>
                   </div>
                 </div>
                 <div className="pt-1">
