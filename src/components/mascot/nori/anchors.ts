@@ -32,6 +32,14 @@
  * colours. `sit` has no prop and rests on anything.
  */
 export const NORI_ANCHOR = {
+  /**
+   * The ground. Every upright pose puts its feet on the same line — `feet()`
+   * at y=414 in the drawings' 512 box, plus the foot ellipse's 17 radius and
+   * half of the 5.5 contour, so the painted sole bottoms out at 433.75.
+   *
+   * Use it to stand a pose ON a rule instead of floating it above one.
+   */
+  stand: { y: '84.72%' },
   /** Shoulder against a vertical edge. */
   lean: { x: '10.67%' },
   /** Hips on a horizontal rule; legs dangle below it. */

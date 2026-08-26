@@ -836,9 +836,22 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     transition: none !important;
   }
 
-  [data-scroll] {
+  [data-scroll],
+  [data-scene-part] {
     animation: none !important;
     transform: none !important;
+    opacity: 1 !important;
+  }
+
+  /* A pinned scene is a tall box holding a sticky child. With the motion off
+     there is nothing for that height to reveal, so it collapses back into
+     normal flow and the section is its own size again. */
+  [data-scene-runway] {
+    height: auto !important;
+  }
+
+  [data-scene-pin] {
+    position: static !important;
   }
 }
 
@@ -1042,6 +1055,145 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     @keyframes scroll-condense {
       to {
         --header-shrink: 1;
+      }
+    }
+
+    /* ======================================================================
+       SCENES — one section's scroll range driving several of its elements.
+
+       `view()` measures an element against its OWN entry and exit, which
+       cannot express "this rule completes while THAT section is on screen".
+       A named view timeline can: the scene declares `view-timeline-name`, and
+       any descendant asking for `animation-timeline: --scene` finds it by
+       walking up the tree. That is the whole mechanism, and it is why this
+       project still needs no scroll library and no rAF loop — the earlier plan
+       for a JS driver was written before this was checked, and it was wrong.
+
+       Verified in-browser before anything was built on it: named lookup
+       resolves through the sticky child, `calc()` works inside
+       `animation-range` (which is what staggers the stations), and `var()`
+       works there too (which is what lets one part class serve both a pinned
+       scene and an in-flow one).
+
+       The two shapes:
+
+         PINNED   a tall `[data-scene-runway]` holding a `[data-scene-pin]`
+                  sticky child. The scene holds still while its contents
+                  advance. `contain` — the period the runway covers the
+                  viewport — is exactly the period the child is stuck.
+         IN FLOW  no runway. The section is its own height and parts read the
+                  same timeline over `entry`/`cover`.
+
+       FAIL-SAFE, same contract as `Reveal` and the rest of this file: every
+       part animates FROM a diminished state TO the finished one, so a browser
+       without scroll timelines never enters the block at all and renders the
+       page complete and still. There is no state in which content is hidden
+       by something that failed to run.
+       ====================================================================== */
+
+    [data-scene] {
+      view-timeline-name: --scene;
+    }
+
+    [data-scene-part] {
+      animation-timeline: --scene;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      /* Overridable per instance: set `--scene-from` / `--scene-to` inline to
+         retime one part without inventing a new part name. */
+      animation-range: var(--scene-from, contain 0%) var(--scene-to, contain 100%);
+    }
+
+    /* A rule that completes itself, left to right. `transform-origin` is on the
+       part rather than in the keyframes so a mirrored instance can flip it. */
+    [data-scene-part='rule'] {
+      animation-name: scene-rule;
+      transform-origin: left center;
+    }
+
+    @keyframes scene-rule {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    /* The same, turned ninety degrees — for the rails that go vertical below
+       the breakpoint where they are horizontal. */
+    [data-scene-part='rule-v'] {
+      animation-name: scene-rule-v;
+      transform-origin: center top;
+    }
+
+    @keyframes scene-rule-v {
+      from {
+        transform: scaleY(0);
+      }
+      to {
+        transform: scaleY(1);
+      }
+    }
+
+    /* Something that arrives once the rule has reached it. Narrow range: this
+       is an arrival, not a drift. */
+    [data-scene-part='land'] {
+      animation-name: scene-land;
+      animation-range: var(--scene-from, contain 55%) var(--scene-to, contain 72%);
+    }
+
+    @keyframes scene-land {
+      from {
+        opacity: 0;
+        transform: translateY(-16px) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* One item in a sequence that advances through the scene. `--stage` is the
+       item's index; the ranges overlap so the group moves as one gesture
+       rather than as three separate arrivals.
+
+       Never fades below 0.3: these are readable paragraphs, and a scroll
+       position where the copy is illegible is a scroll position where the
+       reader has been given nothing. */
+    [data-scene-part='stage'] {
+      animation-name: scene-stage;
+      animation-range: contain calc(var(--stage, 0) * 18%) contain calc(var(--stage, 0) * 18% + 36%);
+    }
+
+    @keyframes scene-stage {
+      from {
+        opacity: 0.3;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* The hero does not cut to the next section, it recedes behind it. Runs on
+       the copy column's own exit, so it is spent entirely on screen. */
+    [data-scroll='recede'] {
+      animation: scroll-recede linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+      transform-origin: left top;
+    }
+
+    @keyframes scroll-recede {
+      from {
+        transform: none;
+        opacity: 1;
+      }
+      to {
+        transform: translateY(-56px) scale(0.965);
+        opacity: 0.3;
       }
     }
   }

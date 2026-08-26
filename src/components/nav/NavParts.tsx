@@ -3,7 +3,6 @@ import { Container } from '@/components/primitives/Layout'
 import { LocaleMenu } from '@/components/primitives/LocaleMenu'
 import { cx } from '@/lib/cx'
 import { NAV, type NavItem } from './navData'
-import { Nori } from '@/components/mascot/nori/Nori'
 
 /** Wordmark. Held at `production` — the mark must read at 26px in every state. */
 export function Wordmark({ inverted }: { inverted: boolean }) {
@@ -15,7 +14,6 @@ export function Wordmark({ inverted }: { inverted: boolean }) {
         inverted ? 'text-signal' : 'text-accent',
       )}
     >
-      <Nori pose="wave" size={26} crop="head" animated={false} />
       <span
         className={cx(
           'wordmark transition-colors duration-500',

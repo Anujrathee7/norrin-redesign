@@ -1,6 +1,7 @@
 import { Container, Eyebrow, Grid } from '@/components/primitives/Layout'
 import { metrics, offices, positioning, story } from '@/data/norrin'
 import { Nori } from '@/components/mascot/nori/Nori'
+import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
 import { Line } from '@/components/primitives/SplitLines'
 import { Reveal } from '@/components/primitives/Reveal'
 import { Counter } from '@/components/primitives/Counter'
@@ -78,12 +79,47 @@ export function Hero() {
                 The two lines rise out from behind their own edges, in sequence.
                 The split is stated in the markup rather than measured, so it
                 cannot disagree with what actually renders. */}
-            <Reveal as="h1" lines className="display-1" stagger={0.11}>
-              <Line>Enterprise AI is won in</Line>
-              <Line className="relative block w-fit pb-[0.14em] text-accent after:absolute after:right-0 after:bottom-0 after:left-0 after:h-px after:bg-accent after:content-['']">
-                production.
-              </Line>
-            </Reveal>
+            {/* `w-fit` so the wrapper's right edge is the TYPE's right edge and
+                not the column's. That edge is what Nori leans on, so it has to
+                be the edge the reader can see. */}
+            <div className="relative w-fit">
+              <Reveal as="h1" lines className="display-1" stagger={0.11}>
+                <Line>Enterprise AI is won in</Line>
+                <Line className="relative block w-fit pb-[0.14em] text-accent after:absolute after:right-0 after:bottom-0 after:left-0 after:h-px after:bg-accent after:content-['']">
+                  production.
+                </Line>
+              </Reveal>
+
+              {/* The pose the character was drawn for: shoulder flush to a
+                  vertical edge, weight on it. It cannot live INSIDE the heading
+                  — `.line-mask` is `overflow: hidden`, which is what lets the
+                  lines rise out from behind themselves, and it would clip the
+                  mascot away. So it hangs off the wrapper instead.
+
+                  `lg` and up only. Below that the station log sits directly
+                  against the headline column and there is no space to the right
+                  of the type to lean into; a mascot forced in there would
+                  overlap the figures. */}
+              {/* `w-max` is load-bearing, not tidiness. `left-full` puts this box
+                  at the containing block's right edge, so its AVAILABLE width is
+                  zero — and a shrink-to-fit box with zero available width takes
+                  its min-content size, which for an image carrying
+                  `max-width: 100%` is zero. The mascot rendered at 0x0 and the
+                  hero simply had no mascot. Same percentage-circularity that
+                  once made every mascot on the site ignore its `size` prop. */}
+              <div className="absolute bottom-0 left-full hidden w-max lg:block">
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-y-6 left-0 w-px bg-hairline-strong"
+                />
+                {/* Placed by the measured shoulder, not by eye — see anchors.ts.
+                    A percentage translate resolves against the ELEMENT's own
+                    width, which is why this holds at any `size`. */}
+                <div style={{ transform: 'translateX(calc(-1 * ' + NORI_ANCHOR.lean.x + '))' }}>
+                  <Nori pose="lean" size={150} animated={false} />
+                </div>
+              </div>
+            </div>
 
             <Reveal as="p" delay={0.34} className="lead measure-serif mt-7 text-ink-2">
               We turn AI ambition into production — co-creating the solutions, infrastructure and
@@ -182,21 +218,12 @@ export function Hero() {
             />
             <span aria-hidden="true" className="absolute top-0 right-0 left-1/2 h-px bg-accent" />
 
-            {/* Nori sits at the crossing point, where dashed becomes solid.
-                Lifted by 92% of its own box rather than by a magic number:
-                the rocket pose's lowest mark (the flame, cy 486 of a 512
-                viewBox) has to land ON the rule, not below it. */}
-            {/* The mascot drifts faster than the rule it stands on, which is
-                what separates the two into layers. `data-scroll` is inert
-                unless the browser supports scroll timelines. */}
-            <div data-scroll="drift" className="absolute inset-x-0 top-0 -translate-y-[92%]">
-              <Nori
-                pose="rocket"
-                size={300}
-                className="mx-auto block w-[72%]"
-                title="Nori, at the point where a pilot becomes production"
-              />
-            </div>
+            {/* The rocket pose used to stand here, on the crossing. It is gone:
+                the mascot now leans on the headline, and one hero cannot carry
+                two of the same character without the pair reading as a mistake.
+                The crossing itself is unchanged — the state change in the rule
+                IS the object, and it never needed a figure standing on it to be
+                legible. */}
           </div>
 
           {/* The tail is measured from the CONTAINER's right edge, not in raw

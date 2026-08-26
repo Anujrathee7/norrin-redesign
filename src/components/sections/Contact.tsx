@@ -3,6 +3,7 @@ import { Reveal } from '@/components/primitives/Reveal'
 import { useDrawLine } from '@/hooks/useDrawLine'
 import { contactEmail, contacts } from '@/data/norrin'
 import { Nori } from '@/components/mascot/nori/Nori'
+import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
 
 /**
  * Closing CTA.
@@ -88,10 +89,23 @@ export function Contact() {
 
           {/* Named humans. No headshots — we hold no rights to their images. */}
           <div className="col-span-4 mt-16 self-end md:col-span-4 md:col-start-9 md:mt-0">
-            <span data-scroll="drift" className="mb-8 block">
-              <Nori pose="wave" size={132} />
-            </span>
-            <p className="label mb-6 text-inverse-ink-3">Who you&rsquo;ll reach</p>
+            {/* The label rides the pointing hand. `NORI_ANCHOR.point.y` is
+                where the finger ends up inside the drawing, so setting the
+                label at that height puts the gesture ON the words rather than
+                near them — and the label shares the mascot's row instead of
+                sitting under a block of empty column. */}
+            <div className="relative mb-5 hidden md:block">
+              <Nori pose="point" size={124} animated={false} />
+              <p
+                className="label absolute left-[74%] whitespace-nowrap text-inverse-ink-3"
+                style={{ top: NORI_ANCHOR.point.y, transform: 'translateY(-50%)' }}
+              >
+                Who you&rsquo;ll reach
+              </p>
+            </div>
+            {/* Narrow screens get the label on its own, as before: at phone
+                width there is no room beside a mascot for it to point at. */}
+            <p className="label mb-6 text-inverse-ink-3 md:hidden">Who you&rsquo;ll reach</p>
             <ul className="border-t border-inverse-hairline-strong">
               {contacts.map((c) => (
                 <li
