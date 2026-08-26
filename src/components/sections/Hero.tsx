@@ -68,7 +68,19 @@ export function Hero() {
     >
       <Container>
         <Grid>
-          <div className="col-span-4 md:col-span-8 lg:col-span-7">
+          {/* `recede` runs on this column's own `exit` — the range is spent
+              entirely while the column is still on screen, so leaving the
+              hero reads as the copy pulling back and fading rather than a
+              hard cut to the next section. It sits on the column itself, not
+              on a `[data-reveal]` element or a child of one: `Reveal` already
+              owns transform/opacity on the eyebrow, heading and lead, and an
+              animation beats an inline transform outright when both land on
+              the same element — this column has no `Reveal` of its own, only
+              `Reveal`s nested inside it, so the two never fight. */}
+          <div
+            data-scroll="recede"
+            className="col-span-4 md:col-span-8 lg:col-span-7"
+          >
             <Eyebrow label="Nordic partner for enterprise AI" className="mb-7" />
 
             {/* No highlighter behind the money word — that gesture is on
@@ -79,10 +91,11 @@ export function Hero() {
                 The two lines rise out from behind their own edges, in sequence.
                 The split is stated in the markup rather than measured, so it
                 cannot disagree with what actually renders. */}
-            {/* `w-fit` so the wrapper's right edge is the TYPE's right edge and
-                not the column's. That edge is what Nori leans on, so it has to
-                be the edge the reader can see. */}
-            <div className="relative w-fit">
+            {/* `relative` so the mascot below can be positioned against the
+                heading. NOT `w-fit` any more — see the note on the mascot for
+                why the wrapper's own width turned out to be useless as an
+                anchor. */}
+            <div className="relative">
               <Reveal as="h1" lines className="display-1" stagger={0.11}>
                 <Line>Enterprise AI is won in</Line>
                 <Line className="relative block w-fit pb-[0.14em] text-accent after:absolute after:right-0 after:bottom-0 after:left-0 after:h-px after:bg-accent after:content-['']">
@@ -90,33 +103,66 @@ export function Hero() {
                 </Line>
               </Reveal>
 
-              {/* The pose the character was drawn for: shoulder flush to a
-                  vertical edge, weight on it. It cannot live INSIDE the heading
-                  — `.line-mask` is `overflow: hidden`, which is what lets the
-                  lines rise out from behind themselves, and it would clip the
-                  mascot away. So it hangs off the wrapper instead.
+              {/* Nori leans on the last "e" of "Enterprise", standing on that
+                  line's baseline and scaled to the type. `lean` is tilted with
+                  its LEFT shoulder forward, so it leans onto an edge that sits
+                  to ITS left — which is exactly what the end of a word is. The
+                  pose works unmirrored, the way it was drawn.
 
-                  `lg` and up only. Below that the station log sits directly
-                  against the headline column and there is no space to the right
-                  of the type to lean into; a mascot forced in there would
-                  overlap the figures. */}
-              {/* `w-max` is load-bearing, not tidiness. `left-full` puts this box
-                  at the containing block's right edge, so its AVAILABLE width is
-                  zero — and a shrink-to-fit box with zero available width takes
-                  its min-content size, which for an image carrying
-                  `max-width: 100%` is zero. The mascot rendered at 0x0 and the
-                  hero simply had no mascot. Same percentage-circularity that
-                  once made every mascot on the site ignore its `size` prop. */}
-              <div className="absolute bottom-0 left-full hidden w-max lg:block">
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-y-6 left-0 w-px bg-hairline-strong"
-                />
-                {/* Placed by the measured shoulder, not by eye — see anchors.ts.
-                    A percentage translate resolves against the ELEMENT's own
-                    width, which is why this holds at any `size`. */}
-                <div style={{ transform: 'translateX(calc(-1 * ' + NORI_ANCHOR.lean.x + '))' }}>
-                  <Nori pose="lean" size={150} animated={false} />
+                  It cannot live INSIDE the heading: `.line-mask` is
+                  `overflow: hidden`, which is what lets the lines rise out from
+                  behind themselves, and it would clip the mascot away. So it is
+                  positioned against the wrapper instead.
+
+                  EVERY NUMBER HERE IS IN THE HEADING'S OWN em, and that is the
+                  whole point. The obvious anchor — hang the mascot off the
+                  wrapper's right edge — does not work, because the headline
+                  WRAPS: at every width it renders as three visual lines, not
+                  the two the markup states, and a wrapped text block's box is
+                  always wider than its ragged ink. Measured, the ink stops at
+                  74% of the wrapper at 1512px and 86% at 1024px, so there is no
+                  fixed percentage to anchor to either. Hung off the box edge
+                  the mascot floated 206px clear of the type, leaning on
+                  nothing.
+
+                  What IS stable is the width of the word itself: "Enterprise"
+                  at `display-1` measures 4.475em at 1024, 1280, 1512 AND 1920 —
+                  the same number to three decimals at every width, because it
+                  scales with the font rather than with the column. (Derive it
+                  by measuring, not by dividing by an assumed font-size: the
+                  first attempt guessed 124px where the computed value is 120,
+                  and landed the shoulder 19px inside the letter.)
+
+                  `h-[1lh]` is exactly one line of the heading, so `items-end`
+                  drops the figure onto the FIRST line's baseline rather than
+                  the heading's. That matters: the shoulder sits only about a
+                  quarter of the drawing's height above the sole, so a mascot
+                  standing at the bottom of a three-line block could never reach
+                  the top line's ink — the geometry rules it out, not taste.
+
+                  The size is on the inner box, in em, and the image's own
+                  `max-width: 100%` takes it from there, so the mascot tracks
+                  the type instead of being pinned to a px value that is right
+                  at one viewport and wrong at the next.
+
+                  `lg` and up only: below that the station log sits against the
+                  headline column and a mascot placed here would overlap the
+                  figures. */}
+              <div className="display-1 absolute top-0 left-[4.475em] hidden h-[1lh] items-end lg:flex">
+                <div
+                  className="w-[1.15em]"
+                  style={{
+                    // X: the measured shoulder (anchors.ts) onto the letter's
+                    // edge, then a hair past flush — daylight between a leaning
+                    // figure and what it leans on reads as floating.
+                    // Y: the painted sole is at 84.72% of the box, not at its
+                    // bottom edge, so without this it hovers above the baseline.
+                    transform:
+                      'translateX(calc(-1 * ' + NORI_ANCHOR.lean.x + ' - 0.03em)) ' +
+                      'translateY(calc(100% - ' + NORI_ANCHOR.stand.y + '))',
+                  }}
+                >
+                  <Nori pose="lean" size={240} animated={false} />
                 </div>
               </div>
             </div>

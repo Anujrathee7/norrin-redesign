@@ -1158,9 +1158,20 @@ html.js [data-reveal='lines']:not([data-revealed]) {
        item's index; the ranges overlap so the group moves as one gesture
        rather than as three separate arrivals.
 
-       Never fades below 0.3: these are readable paragraphs, and a scroll
-       position where the copy is illegible is a scroll position where the
-       reader has been given nothing. */
+       IT DOES NOT TOUCH OPACITY, and that is not a stylistic preference. This
+       started at `opacity: 0.3` and axe failed the page on it: six colour
+       -contrast nodes on load, thirteen with the drawer open, all of them the
+       station captions sitting at a third of their ink while they waited to
+       arrive. axe accounts for ancestor opacity in its contrast maths, so a
+       body paragraph faded for effect is a body paragraph that fails, and a
+       scroll position where the copy is illegible is a scroll position where
+       the reader has been given nothing.
+
+       Movement alone carries the arrival perfectly well — 30px of travel is
+       plainly visible — and it is contrast-safe by construction rather than by
+       a floor value someone has to keep re-checking against every ground the
+       part is used on. `land` may still fade because it only ever animates
+       decorative, `aria-hidden` marks, never text. */
     [data-scene-part='stage'] {
       animation-name: scene-stage;
       animation-range: contain calc(var(--stage, 0) * 18%) contain calc(var(--stage, 0) * 18% + 36%);
@@ -1168,17 +1179,27 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 
     @keyframes scene-stage {
       from {
-        opacity: 0.3;
         transform: translateY(30px);
       }
       to {
-        opacity: 1;
         transform: none;
       }
     }
 
     /* The hero does not cut to the next section, it recedes behind it. Runs on
-       the copy column's own exit, so it is spent entirely on screen. */
+       the copy column's own exit, so it is spent entirely on screen.
+
+       NO OPACITY HERE EITHER, for the same reason `stage` has none. This faded
+       the copy to 0.3 on the way out and axe failed the page on it in six
+       places — the eyebrow at 1.64:1, the headline at 1.94:1, the lead at
+       1.63:1 — because axe samples a scroll position and measures what is
+       actually painted, and cannot know the text was on its way off screen.
+       "It is leaving anyway" is an argument to a person, not to a contrast
+       check, and this project's gate is a clean audit.
+
+       Transform alone still makes leaving the hero a movement rather than a
+       cut, which was the whole point: the travel and the scale went up to
+       carry the gesture that the fade used to. */
     [data-scroll='recede'] {
       animation: scroll-recede linear both;
       animation-timeline: view();
@@ -1189,11 +1210,9 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     @keyframes scroll-recede {
       from {
         transform: none;
-        opacity: 1;
       }
       to {
-        transform: translateY(-56px) scale(0.965);
-        opacity: 0.3;
+        transform: translateY(-76px) scale(0.94);
       }
     }
   }

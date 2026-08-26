@@ -59,6 +59,13 @@ export function Nav() {
       // to say no ring at all. axe does not automate focus-indicator contrast,
       // so every clean audit run to date was silent about it.
       data-tone={inverted ? 'inverse' : undefined}
+      // `condense` reads `--header-shrink` from 0 to 1 over the first 220px of
+      // root scroll (see `[data-scroll='condense']` in index.css) and leaves
+      // the bar's own bottom rule alone — that rule already encodes which
+      // section is current, and this bar is not allowed to also encode scroll
+      // depth on it. Every consumer of the variable below falls back to `0`
+      // (full size) so a browser without scroll timelines just never shrinks.
+      data-scroll="condense"
       className="fixed inset-x-0 top-0 z-50"
     >
       <div
@@ -74,11 +81,26 @@ export function Nav() {
         )}
       >
         <Container>
-          <div className="grid h-[72px] grid-cols-[auto_1fr_auto] items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
+          {/* The row's height is the thing that actually condenses. It cannot be
+              a Tailwind `h-[72px]` any more because that has no room for a
+              variable: `calc()` against `var(--header-shrink, 0)` in an inline
+              style is what lets 72px run down to 56px as the page scrolls, and
+              back up again on the way up, with zero JS in the path. The `ul`
+              below carries the identical expression rather than `h-full`,
+              because this row uses `items-center` (aligns each grid item to
+              the row's midline) and not `items-stretch` — a `h-full` child
+              would stay 72px tall regardless of the row shrinking around it. */}
+          <div
+            style={{ height: 'calc(72px - 16px * var(--header-shrink, 0))' }}
+            className="grid grid-cols-[auto_1fr_auto] items-center gap-6 lg:grid-cols-[1fr_auto_1fr]"
+          >
             <Wordmark inverted={inverted} />
 
             <nav aria-label="Primary" className="hidden justify-self-center lg:block">
-              <ul className="flex h-[72px] items-center gap-1">
+              <ul
+                style={{ height: 'calc(72px - 16px * var(--header-shrink, 0))' }}
+                className="flex items-center gap-1"
+              >
                 {NAV.map((item) => {
                   const isCurrent = !!currentSection && item.owns.includes(currentSection)
                   const isOpen = openItem === item.label

@@ -53,18 +53,26 @@ export function Proof() {
               transform and doesn't compose with or fight it, so the rail can
               keep drifting AND hand its scroll range down to its own
               children at the same time. */}
-          <ol
-            data-scroll="drift-slow"
-            data-scene
-            className="relative grid grid-cols-1 lg:grid-cols-4"
-          >
+          {/* `drift-slow` sits on this wrapper rather than on the <ol> so the
+              rail and the figure standing on it move as ONE layer — see the
+              note on the mascot. `data-scene` stays on the <ol>, whose scroll
+              range is what the segments below read: `view-timeline-name` is
+              not a transform, so it neither composes with nor fights the drift
+              on the wrapper above it. */}
+          <div data-scroll="drift-slow" className="relative">
             {/* Standing ON the rail, at the far end of it — over the one entry
                 that has not happened yet, reading about it.
 
                 `NORI_ANCHOR.stand` is the sole of the drawing, so the feet land
                 on the line instead of the box's bottom edge floating above it.
-                Inside the <ol> on purpose: the rail drifts, and a figure
-                standing on a rule has to drift with it or it walks off.
+
+                It used to sit INSIDE the <ol>, to ride the rail's drift. axe
+                caught that: the content model there is <li>, <script>,
+                <template> and nothing else, so a positioned <div> among the
+                items is a genuine validity error, not a nitpick — the same one
+                that kept the Pillars progress fill out of its own list. The
+                drift moved out to the shared wrapper instead, so the rail and
+                the figure standing on it still travel as one layer.
 
                 lg only — below that the rail is vertical and there is no
                 horizontal line to stand on. This box carries only the
@@ -78,6 +86,8 @@ export function Proof() {
             >
               <Nori pose="read" size={112} animated={false} />
             </div>
+            <ol data-scene className="grid grid-cols-1 lg:grid-cols-4">
+
 
             {timeline.map((t, i) => {
               const ahead = 'future' in t && t.future
@@ -155,7 +165,8 @@ export function Proof() {
                 </li>
               )
             })}
-          </ol>
+            </ol>
+          </div>
         </Reveal>
       </Container>
     </section>

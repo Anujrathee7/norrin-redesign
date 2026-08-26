@@ -27,7 +27,25 @@ import { cases, customers, customersIntro } from '@/data/norrin'
  */
 export function Work() {
   return (
-    <section id="work" data-shot="work" aria-labelledby="work-heading" className="py-24 md:py-36">
+    // `overflow-clip`, not `overflow-hidden`. The roster row below pans
+    // horizontally on scroll and its travel has to go somewhere: unclipped it
+    // pushed the document 74px wider than the viewport at 1512 and 96px at 390,
+    // which is a horizontal scrollbar on every page — measured with
+    // `scrollWidth - clientWidth`, which is the check the pan value was
+    // originally set without. Clipping at the section edge lets the names run
+    // off the side of the page like the roster being read out, which is the
+    // effect that was wanted.
+    //
+    // It must be `clip` rather than `hidden`: `hidden` creates a scroll
+    // container, and a `view()` timeline measured against a scroll container it
+    // is itself inside freezes at 0% forever — the pan would simply stop
+    // moving. `clip` clips identically without creating one.
+    <section
+      id="work"
+      data-shot="work"
+      aria-labelledby="work-heading"
+      className="overflow-clip py-24 md:py-36"
+    >
       <Container>
         <Grid>
           <div className="col-span-4 md:col-span-6">
@@ -41,8 +59,15 @@ export function Work() {
         </Grid>
 
         {/* The roster, as type. */}
-        {/* A fast tick across the roster — this is a list of names being read
-            out, so the stagger is tight and the travel is small. */}
+        {/* A list of names being read out, so the whole row visibly travels
+            as the section is scrolled — 38px was barely perceptible against a
+            roster this wide. 120px is chosen against the narrowest customer
+            grid (the 390px, two-column layout): at that width a name's own
+            column is close to half the viewport, and 120px of total pan (60px
+            each way from centre) still leaves the first and last columns'
+            text clear of the container edge — checked in the browser, not
+            assumed. Wider grids (3/5-column) have far more slack than that,
+            so the two-column case is the one that governs the number. */}
         {/* Nori sits ON the roster's top rule — the one long uninterrupted
             horizontal in this section, with the intro paragraph's bottom margin
             clear above it.
@@ -67,7 +92,7 @@ export function Work() {
             <Nori pose="sit" size={112} animated={false} />
           </div>
 
-        <div data-scroll="pan" style={{ ["--pan" as string]: "38px" }}>
+        <div data-scroll="pan" style={{ ["--pan" as string]: "120px" }}>
         <Reveal stagger={0.04} variant="left">
           {/* A grid, not flex-wrap: the old wrap produced nine names then a
               lone orphan at desktop, and 3/4/2/1 at 390px. */}
