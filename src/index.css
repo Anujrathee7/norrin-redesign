@@ -907,16 +907,164 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     position: static !important;
   }
 
-  /* Same argument for the hero curtain. Its hold is a real spacer box rather
-     than padding — padding does not extend a sticky element's travel at all,
-     which cost an afternoon to find — and with the pin unstuck that box is just
-     a hole under the opening statement with nothing left to reveal. */
-  [data-curtain-spacer] {
-    height: 0 !important;
+  /* Same argument for the deck. A section sliding over another section is
+     motion, and the precedent above is to kill the pin rather than only the
+     animation on top of it — an unpinned card just scrolls, which is the page
+     this reader asked for.
+
+     This replaces the two `[data-curtain-*]` escapes that used to live here.
+     They were the hero's own internal hold, which the deck supersedes: the
+     whole section holds now, so a sticky column inside a section that is
+     already still had nothing left to do. Their attributes are gone from
+     Hero.tsx, and a reset for an attribute that no longer exists is a lie in
+     a stylesheet that other people read. */
+  [data-deck] > [data-deck-card] {
+    position: static !important;
   }
 
-  [data-curtain-pin] {
-    position: static !important;
+  /* And the hold with it. Both halves of the overlap read this one property,
+     so zeroing it here collapses the spacer and the next section's negative
+     margin together — they cannot come apart and leave the page a screen
+     taller or shorter than it should be. */
+  :root {
+    --deck-hold: 0px !important;
+  }
+}
+
+/* ==========================================================================
+   THE DECK — the page's first seam
+   --------------------------------------------------------------------------
+   The lower section holds still while the upper one rides up over it. Crossing
+   from the hero into `01 The gap` stops being the page running out and becomes
+   the page turning.
+
+   THE DECK HOLDS THE CARD AND A SPACER, NOT BOTH SECTIONS. Wrapping the two
+   sections together was the obvious shape and it pins the hero for the whole
+   of `01 The gap` — three thousand pixels of a full-viewport layer that is
+   painted, composited and, worse, still in the tab order underneath an opaque
+   section. Measured: Shift+Tab backwards out of `03` landed on the hero's
+   "Why pilots stall" link, the browser declined to scroll because a stuck
+   element is already "in view", and the focus ring was drawn behind the forest
+   block. That is WCAG 2.4.11, and it was introduced by the seam rather than
+   found in the page.
+
+   So the deck is the card plus a one-screen hold, and the next section is
+   pulled back up over that hold by the same amount. The hero is pinned for
+   exactly as long as something is crossing it and not one pixel longer; after
+   that it is an ordinary block that scrolls away, and focus that lands on it
+   scrolls to it the way it always did.
+
+   THIS IS LAYOUT, NOT ANIMATION, AND THAT IS THE POINT. It sits outside the
+   `@supports` gate below, so the seam still happens in an engine with no
+   scroll timelines at all — the same argument the hero's recede already makes
+   about its own hold. The recede on top of it is polish; this is the mechanism.
+   It is also why the attribute is `[data-deck-card]` and not a `[data-scroll]`
+   value: `.shots/anim.mjs` fails the build if that string appears outside
+   `@supports`, and rightly so.
+
+   A NEGATIVE `top`, NOT `top: 0`. A card pinned at `top: 0` must fit the
+   viewport or everything below the fold becomes permanently unreachable, and
+   the hero does not fit — measured, not estimated: 947px at 1512x950, 876px at
+   1280x780, 888px at 1912x660. One of those three, by three pixels. The height
+   is mostly type, so it barely shrinks with the screen; at 660px of viewport
+   it is still 888.
+
+   So the pin is offset by exactly the SHORTFALL — how much taller than the
+   screen the card is, and nothing more:
+
+       top: min(0px, 100svh - <card height>)
+
+   which is 0 wherever the hero already fits (it holds whole, nothing cropped)
+   and exactly `heroH - 100svh` where it does not. Fixing the offset at the
+   hero's bottom padding instead was the first attempt and it is worse in a way
+   a screenshot shows immediately: at 1512x950 the hero is 947 tall in a 950
+   screen — it needs no offset at all — and a flat -161px pin held it there with
+   the first word of the headline sliced in half for the entire seam.
+
+   `<card height>` cannot be measured in CSS, so it is MODELLED, from the
+   stylesheet the hero is built out of rather than from taste:
+
+       max(94svh, <type block> + 6vh + clamp(120px, 17vh, 190px))
+              |         |          |            |
+        its min-height  |     its pt's vh part  its pb
+                   three lines of display-1, which steps at the type breakpoints
+
+   Checked against the real thing at fifteen viewport combinations — 768/1024/
+   1280/1512/1912 wide by 660/780/800/900/950 tall — and it agrees within a
+   pixel at every one, because every term in it is a term the hero actually
+   has. The four constants are the only measured numbers; they step where
+   `display-1`'s clamp steps.
+
+   `bottom: 0` was tried before either of these and is wrong, which is worth
+   writing down because it sounds right. Sticky-BOTTOM holds a box UP from
+   below — it keeps something at the bottom of the screen while its container
+   scrolls past underneath. Scrolling down, its constraint is satisfied from
+   the first frame and never engages: 0 held frames out of 15 at all three
+   viewports, with `position: sticky` and `bottom: 0px` both confirmed in the
+   computed style. It is the footer pattern, not the card pattern.
+
+   `min-height: 800px` is the gate, and it is not a round number. The crop is
+   `heroH - 100svh`, and the hero's own top padding is `72px + 6vh`. At 800px
+   of screen the crop is 112px against 120px of padding — so nothing but
+   padding leaves. At 780 the crop is 127px against 119px and the eyebrow
+   starts going. 800 is exactly where the seam stops costing ink. Below it the
+   page behaves as it always did: no pin, no seam, nothing to degrade. `md:`
+   for the width half, because a phone hero already fills the screen and
+   pinning against a collapsing URL bar is a fight this does not need to pick.
+   ========================================================================== */
+/* One number, read in two places that must never disagree. The hold is a real
+   box after the card, and the next section is pulled back up by exactly the
+   same amount — so the document is the same height it was, the seam is bought
+   entirely out of the deck's own runway, and there is no arithmetic anywhere
+   for someone to get wrong later. Outside the gate it is 0px and both rules
+   collapse to nothing on their own.
+
+   100svh exactly, and that is derived rather than picked. The card is pinned
+   showing its bottom 100svh, so the incoming block has to climb one full
+   screen to cover it — and the pin has to last precisely that long. Longer
+   would keep a fully hidden section pinned for no reason (and focusable
+   underneath an opaque one, which is a real accessibility fault, not a
+   theoretical one); shorter would let the card slip out from under the block
+   still crossing it. */
+:root {
+  --deck-hold: 0px;
+}
+
+[data-deck-hold] {
+  height: var(--deck-hold);
+}
+
+[data-deck-next] {
+  margin-top: calc(-1 * var(--deck-hold));
+}
+
+@media (min-width: 768px) and (min-height: 800px) {
+  :root {
+    --deck-hold: 100svh;
+  }
+
+  [data-deck] > [data-deck-card] {
+    position: sticky;
+    --deck-card-h: max(94svh, calc(624px + 6vh + clamp(120px, 17vh, 190px)));
+    top: min(0px, calc(100svh - var(--deck-card-h)));
+  }
+}
+
+@media (min-width: 1024px) and (min-height: 800px) {
+  [data-deck] > [data-deck-card] {
+    --deck-card-h: max(94svh, calc(682px + 6vh + clamp(120px, 17vh, 190px)));
+  }
+}
+
+@media (min-width: 1280px) and (min-height: 800px) {
+  [data-deck] > [data-deck-card] {
+    --deck-card-h: max(94svh, calc(696px + 6vh + clamp(120px, 17vh, 190px)));
+  }
+}
+
+@media (min-width: 1440px) and (min-height: 800px) {
+  [data-deck] > [data-deck-card] {
+    --deck-card-h: max(94svh, calc(728px + 6vh + clamp(120px, 17vh, 190px)));
   }
 }
 
@@ -1495,6 +1643,47 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       25%,
       75% {
         transform: rotate(calc(var(--sway, 3deg) * -1));
+      }
+    }
+
+    /* SEAM 2 — the dark block leaving.
+       -------------------------------------------------------------------
+       `01 The gap` cannot be a deck card. It is 300svh+ tall because of the
+       pinned diagram inside it, and pinning something taller than the screen
+       strands the rest of it. So the second seam is the mirror of the first:
+       instead of the incoming block ARRIVING over the outgoing one, the
+       outgoing one DEPARTS — it leaves slightly faster than you are
+       scrolling, and paper grows up from the bottom edge of the screen behind
+       it. `02 Scope` then arrives on the same paper with no visible join.
+
+       THE RANGE IS THE TAIL, NOT `exit 0%`. `exit` begins the instant the
+       subject's top edge crosses the top of the viewport, which for a block
+       this tall is somewhere around its opening heading — thousands of pixels
+       before the pinned scene has even engaged. Timed that way the whole
+       section would start lifting while station 01 was still landing.
+
+       NAMED `recede` DELIBERATELY. `.shots/timing.mjs` skips continuous
+       effects by matching the kind against a fixed list, and `recede` is on
+       it. A new token would not be, and a continuous effect checked as though
+       it were an arrival reports FINISHES off the bottom on every run — which
+       costs nothing except the meaning of a clean run, i.e. everything.
+
+       `from { transform: none }` is not stylistic. If the timeline never
+       resolves — unsupported engine, a scrollport ancestor, a name typed
+       wrong — the block renders exactly where it belongs. Every effect in
+       this layer is written from its resting state outward for that reason. */
+    [data-scroll='recede'] {
+      animation: scroll-recede linear both;
+      animation-timeline: view();
+      animation-range: var(--recede-from, exit 62%) var(--recede-to, exit 94%);
+    }
+
+    @keyframes scroll-recede {
+      from {
+        transform: none;
+      }
+      to {
+        transform: translateY(var(--recede, -12svh));
       }
     }
 

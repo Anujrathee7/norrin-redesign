@@ -62,7 +62,32 @@ export default function App() {
       </a>
       <Nav />
       <main id="main">
-        <Hero />
+        {/* SEAM 1. The deck: two cards in one containing block, the lower one
+            pinned, the upper one riding up over it. The wrapper is what makes
+            it possible — `position: sticky` is clamped to its containing
+            block, so this div is both what lets the hero hold and what
+            guarantees it stops holding. It ends at TheGap's bottom, which is
+            why nothing is ever left pinned behind `Roles`.
+
+            The order matters and is doing real work: both sections are
+            positioned with `z-index: auto`, so they paint in tree order and
+            TheGap covers the hero with no z-index anywhere. Never give TheGap
+            a negative one — it would drop behind the hero's own plate. */}
+        <div data-deck>
+          <Hero />
+          {/* The hold. A real box, because `position: sticky` is clamped to its
+              containing block and this is what gives the card something to
+              travel against — the same lesson the hero's own curtain learned
+              the expensive way: padding does not extend sticky travel at all.
+
+              TheGap is OUTSIDE the deck and pulled back up over this box by
+              exactly its height, so the page is not one pixel taller than it
+              was and TheGap starts exactly where it always started. It still
+              covers the pinned hero: both are positioned, neither sets a
+              z-index, and TheGap is later in tree order. Never give it a
+              negative one — it would drop behind the hero's own plate. */}
+          <div aria-hidden="true" data-deck-hold />
+        </div>
         <TheGap />
         <Roles />
         <Pillars />

@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 import { Container, Eyebrow, Grid } from '@/components/primitives/Layout'
 import { metrics, offices, positioning, story } from '@/data/norrin'
 import { Nori } from '@/components/mascot/nori/Nori'
@@ -59,35 +61,165 @@ const STATION: StationRow[] = [
   },
 ]
 
+/* Take the hero out of the tab order once the forest block is over its
+ * controls, and put it back the moment it is not.
+ *
+ * WHY THIS EXISTS. The seam works by overlap, and overlap is what breaks
+ * WCAG 2.4.11: Shift+Tab backwards from further down the page lands on "Contact
+ * us" or "Why pilots stall", the browser declines to scroll because the hero's
+ * box is technically in view, and the focus ring is drawn behind an opaque
+ * section. Measured, not theorised — see `.shots/probe/deckcheck2.mjs`. There
+ * is no CSS answer: `pointer-events` does not affect focus, and animating
+ * `visibility` to hidden would put the whole hero one misfire away from
+ * disappearing, which is exactly the failure mode this project removed GSAP to
+ * avoid.
+ *
+ * IT TOUCHES THE TAB ORDER AND NOTHING ELSE. `inert` on the section was the
+ * first attempt and axe caught it immediately: inert takes the subtree out of
+ * the accessibility tree, and the subtree contains the page's only <h1>, so
+ * the whole document lost its level-one heading the moment the forest covered
+ * the hero — `page-has-heading-one`, at four of five sampled seam positions.
+ * That is a fair trade to refuse. "Covered" is a visual state; a screen reader
+ * reads in document order and has no idea anything is on top of anything. The
+ * only people affected by the overlap are the ones who can see it AND are
+ * moving by keyboard, so the only thing that should change for them is where
+ * Tab goes.
+ *
+ * IT IS NOT IN THE MOTION PATH, and that distinction is the whole argument for
+ * allowing it. No animation depends on it. If the effect never runs — no
+ * IntersectionObserver, a thrown error, the bundle never loading — the hero is
+ * simply focusable while covered, which is the page exactly as it shipped
+ * before the seam existed. It can only ever improve on the fallback.
+ *
+ * WHERE THE LINE IS, it measures rather than guesses. -55% was the first
+ * attempt and it fired 200px of scroll too late: a probe stepping the page in
+ * 40px increments found five frames at 1512x950, four at 1280x800 and five at
+ * 1912x900 where both hero buttons were entirely behind the forest and still
+ * in the tab order. The threshold is not a fraction of the viewport, it is the
+ * top edge of the hero's highest control — above that line something is still
+ * visible and the hero must stay reachable, below it nothing is and it must
+ * not — so that is what gets measured, and re-measured on resize.
+ *
+ * `offsetTop` rather than `getBoundingClientRect`, deliberately. The recede is
+ * a transform on a box between here and the controls, so a rect read while the
+ * page is scrolled (a restored scroll position, a resize mid-page) is skewed by
+ * however far the recede has run. `offsetTop` is layout, and layout does not
+ * move.
+ */
+function useCoveredByNext(ref: React.RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const hero = ref.current
+    const next = document.querySelector('[data-deck-next]')
+    if (!hero || !next || typeof IntersectionObserver === 'undefined') return
+
+    let io: IntersectionObserver | null = null
+
+    const localTop = (el: HTMLElement) => {
+      let y = 0
+      let e: HTMLElement | null = el
+      while (e && e !== hero) {
+        y += e.offsetTop
+        e = e.offsetParent as HTMLElement | null
+      }
+      return y
+    }
+
+    const build = () => {
+      io?.disconnect()
+      io = null
+      const controls = [...hero.querySelectorAll<HTMLElement>('a[href],button')]
+      if (!controls.length) return
+      // Where the card sits once pinned — see the `--deck-card-h` model in
+      // index.css. Nothing is covered before that, because nothing is over it.
+      const pinned = Math.min(0, window.innerHeight - hero.offsetHeight)
+      const line = pinned + Math.min(...controls.map(localTop))
+      const below = Math.max(0, Math.round(window.innerHeight - line))
+      io = new IntersectionObserver(
+        ([entry]) => {
+          for (const el of controls) {
+            if (entry.isIntersecting) el.setAttribute('tabindex', '-1')
+            else el.removeAttribute('tabindex')
+          }
+        },
+        { rootMargin: `0px 0px -${below}px 0px` }
+      )
+      io.observe(next)
+    }
+
+    build()
+    window.addEventListener('resize', build)
+    return () => {
+      window.removeEventListener('resize', build)
+      io?.disconnect()
+      // Never leave the hero out of the tab order on teardown. A hero nobody
+      // can reach is a worse bug than the one this fixes.
+      for (const el of hero.querySelectorAll('a[href],button')) el.removeAttribute('tabindex')
+    }
+  }, [ref])
+}
+
 export function Hero() {
+  const ref = useRef<HTMLElement>(null)
+  useCoveredByNext(ref)
+
   return (
     <section
+      ref={ref}
       id="top"
       data-shot="hero"
-      className="relative flex min-h-[94svh] flex-col justify-between overflow-clip pt-[calc(72px+6vh)] pb-[clamp(120px,17vh,190px)]"
+      // THE LOWER CARD OF THE DECK. This section holds still while `01 The
+      // gap` rides up over it — see the block comment on `[data-deck]` in
+      // index.css. Two classes here are load-bearing for that and look like
+      // ordinary styling, so they are worth naming.
+      //
+      // `bg-ground`: a pinned card has to be opaque. The hero has always
+      // inherited its ground from `body` and looked identical doing it, but
+      // the moment it stops moving, an inherited background means whatever is
+      // underneath shows straight through it.
+      //
+      // `pb-[clamp(120px,17vh,190px)]`: unchanged, but it is now read twice.
+      // The deck pins this card at MINUS that same expression, so the padding
+      // is no longer only spacing — it is exactly how much of the hero the pin
+      // is allowed to push off the top of the screen. Change one and the other
+      // has to change with it; see the `[data-deck]` comment in index.css.
+      data-deck-card
+      className="relative flex min-h-[94svh] flex-col justify-between overflow-clip bg-ground pt-[calc(72px+6vh)] pb-[clamp(120px,17vh,190px)]"
     >
-      <Container>
+      {/* THE RECEDE, and note what it is NOT on.
+          It used to sit on a sticky column inside this section. It cannot stay
+          there: with the whole hero holding, a sticky box inside it has nothing
+          left to hold against. So it moves out to the composition — copy and
+          station log together — which is what should recede as the dark card
+          takes the screen.
+
+          It stops here rather than going up to the <section> for a measured
+          reason. `scroll-curtain` ends on `scale(0.93)`, and the production
+          line below is full-bleed: its width is deliberately computed from the
+          container edge so it REACHES the edge of the screen at every width.
+          Scaled by 7% it would stop ~106px short at 1512 and visibly unhook
+          from the frame — the page's own device coming loose. The line is the
+          hero's foot; it does not need to recede, it needs to be the first
+          thing the forest swallows. Same argument keeps the section's own
+          `bg-ground` plate unscaled, and keeps `[data-shot="hero"]` on an
+          untransformed box so section screenshots are not captured skewed.
+
+          60svh, and biased long on purpose. The range wants to be "the hero's
+          height", but that is 100svh at 1512x950 and 134svh at 1912x660 —
+          mostly type, only about a quarter of it viewport-derived — so no
+          single svh value is right everywhere. Overshooting means the recede
+          is still creeping along under an opaque block, which nobody can see;
+          undershooting means it finishes in full view, which reads as a stall. */}
+      <Container data-scroll="curtain" style={{ ['--curtain-span' as string]: '60svh' }}>
         <Grid>
-          {/* THE CURTAIN RUNWAY. The padding IS the hold: the pin inside is
-              sticky, so it stays put while this column's own bottom padding
-              scrolls past underneath it, and only then releases. 26svh is about
-              a quarter-screen of holding — enough that the page reads as moving
-              on from the statement rather than dragging it away, and not so
-              much that the reader is kept waiting at the door.
+          {/* The copy column. It was a curtain runway holding a sticky pin and
+              an 18svh spacer box, and all three are gone — the deck holds the
+              whole section now, so a pin inside it was holding something that
+              was already still.
 
-              The pin carries the recede as well as the hold, and the two do not
-              fight: `sticky` is a position, the animation is a transform, and
-              the transform applies on top of wherever sticky has put the box.
-              What DOES kill stickiness is a transform on an ANCESTOR, which is
-              why the animation is on the pin itself and why nothing between
-              here and the section is allowed to animate.
-
-              `overflow-clip` on the section is safe for this — verified in a
-              browser rather than assumed, because it is exactly the kind of
-              thing that silently does not work. A `clip` ancestor keeps sticky
-              alive (15 of 15 sampled frames pinned, identical to a plain
-              ancestor); `overflow: hidden` kills it outright (0 frames), since
-              hidden makes itself the scrollport.
+              Deleting the spacer takes about 170px off the hero, which is what
+              puts the production line and its PILOT / PRODUCTION labels back on
+              the first screen. That was a real complaint and this is the fix
+              for it; it was never worth its own magic number.
 
               The `Reveal`s nested inside are untouched, and should stay that
               way. They are a PAGE-LOAD entrance, and the hero is above the
@@ -95,19 +227,7 @@ export function Hero() {
               the page opens arrives pre-finished, which is no entrance at all.
               Sections 02–07 were converted precisely because they are NOT above
               the fold. */}
-          <div
-            data-curtain-runway
-            className="col-span-4 md:col-span-8 lg:col-span-7"
-          >
-            <div
-              data-scroll="curtain"
-              data-curtain-pin
-              // `md:` and up. On a phone the hero copy already fills most of
-              // the screen, so holding it spends a fifth of a viewport of
-              // scrolling to hold something the reader cannot see past anyway.
-              // The recede still runs there — it costs no layout.
-              className="md:sticky md:top-[max(88px,11svh)]"
-            >
+          <div className="col-span-4 md:col-span-8 lg:col-span-7">
             <Eyebrow label="Nordic partner for enterprise AI" className="mb-7" />
 
             {/* No highlighter behind the money word — that gesture is on
@@ -252,35 +372,6 @@ export function Hero() {
                 </svg>
               </a>
             </Reveal>
-            </div>
-
-            {/* THE HOLD, AS A REAL BOX. This was `pb-[26svh]` on the runway and
-                it did nothing at all — the column was 247px taller and the pin
-                never held for a single frame.
-
-                Padding does not extend a sticky element's travel. The sticky
-                constraint rectangle behaves as the containing block's CONTENT
-                box, so bottom padding buys the pin nothing to move within,
-                however much of it there is: tested at 247, 400, 700 and 1200px
-                and the pin tracked the scroll one-to-one at every size. A
-                sibling box and a `min-height` both DO give travel (17 pinned
-                frames each in an isolated test, against 1 for padding).
-
-                So the hold is stated as an actual element. It also reads better
-                than a magic number on the parent: this box IS the hold, its
-                height IS how long the statement stays up, and there is nothing
-                to work out from a padding value that looks like spacing. */}
-            {/* 18svh. Measured against the one thing this must not cost: the
-                production line, which is the page's own device and carries the
-                PILOT / PRODUCTION labels that frame the whole argument. At
-                26svh the line was pushed 48px below the fold on a 950px
-                laptop; at 18svh it sits at ~920 and stays on the first screen,
-                and the hold is still ~160px — a beat, not a wait.
-
-                Below 800px of viewport the line was already under the fold
-                before any of this existed, so that constraint was never a
-                guarantee and is not treated as one. */}
-            <div aria-hidden="true" data-curtain-spacer className="h-0 md:h-[18svh]" />
           </div>
 
           {/* Station log.

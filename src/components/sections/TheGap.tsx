@@ -110,11 +110,45 @@ export function TheGap() {
   return (
     <section
       id="gap"
-      data-tone="inverse"
       data-shot="gap"
+      data-deck-next
       aria-labelledby="gap-heading"
-      className="relative overflow-clip bg-inverse py-28 text-inverse-ink md:py-40"
+      // The tone came OFF this element and moved to the wrapper below, which
+      // is the only reason seam 2 is safe. The wrapper is what translates
+      // away; if the forest were painted here instead, the band it vacates
+      // would be backed by whatever is behind the section — and inside the
+      // deck, that is the still-pinned hero. The hero's production line would
+      // slide back out from underneath the departing dark block, which is a
+      // sentence no one should have to read twice to know is wrong.
+      //
+      // Paper here means the vacated band is paper, at any distance, and
+      // `02 Scope` is already paper, so the join is invisible.
+      //
+      // `data-tone` went with it deliberately. The nav's overDark observer
+      // queries `[data-tone="inverse"]` and IntersectionObserver reports the
+      // TRANSFORMED rect, so keeping the attribute on the box that actually
+      // moves is what makes the bar flip back at the right moment for free.
+      //
+      // `overflow-clip`, never `hidden`: hidden would make this a scrollport,
+      // and a view() timeline measured inside a scroll container it is itself
+      // inside freezes at 0% forever.
+      className="relative overflow-clip bg-ground"
     >
+      {/* SEAM 2 — the block that leaves. See `[data-scroll='recede']` in
+          index.css for why the range is the tail rather than `exit 0%`, and
+          why it is called recede.
+
+          The sun hairline is the leading edge: it sweeps up the screen as this
+          block rides over the hero at seam 1, and goes out with it at the top
+          here. Sun is not a budget spend on an inverse band — it is the
+          inverse-mode stand-in for moss, which measures 1.40:1 on forest — and
+          this rule belongs to the band rather than to the paper it crosses. */}
+      <div
+        data-tone="inverse"
+        data-scroll="recede"
+        className="relative bg-inverse py-28 text-inverse-ink md:py-40"
+      >
+        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-signal" />
       <Container>
         <div className="grid grid-cols-4 items-end gap-x-6 md:grid-cols-12">
           {/* Desktop drops this eyebrow, not just visually: below, the pinned
@@ -562,6 +596,7 @@ export function TheGap() {
           {positioning.thesisClose}
         </p>
       </Container>
+      </div>
     </section>
   )
 }
