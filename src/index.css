@@ -204,9 +204,14 @@
    finds every action without anything having to be coloured louder. That is
    what makes this subtractive rather than decorative.
 
-   The geometry is the mark's own. Fyr's float is `rect w=3.6 rx=1.8` — a
-   capsule, fully rounded — and its mast cap is a softly rounded stroke. So the
-   page borrows the buoy's two radii rather than inventing a house rounding:
+   The geometry was taken from the sea mark this page used to carry: its float
+   was `rect w=3.6 rx=1.8` — a capsule, fully rounded — and its mast cap was a
+   softly rounded stroke, so the page borrowed those two radii rather than
+   inventing a house rounding. The mark itself has since been removed (the
+   nautical metaphor asked the reader to learn IALA buoyage before it paid off),
+   but the radii stay: they are load-bearing in the interface now, and two
+   values that already agree with each other everywhere are not worth
+   re-deriving from a different source just to refresh their paperwork.
 
      --radius-action   the float. Reserved for the solid call to action and the
                        ghost that pairs with it. One shape, four instances, the
@@ -841,6 +846,10 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     animation: none !important;
     transform: none !important;
     opacity: 1 !important;
+    /* `animation: none` already drops the keyframed clip, but the uncover
+       parts end on `inset(0 0 0 0)` and this states the resting value rather
+       than relying on that. Same belt-and-braces the Reveal block uses. */
+    clip-path: none !important;
   }
 
   /* A pinned scene is a tall box holding a sticky child. With the motion off
@@ -1097,7 +1106,9 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 
     [data-scene-part] {
       animation-timeline: --scene;
-      animation-timing-function: linear;
+      /* Defaults to linear and is overridden per part below. See the note on
+         WHICH PARTS GET AN EASE, above the entrance keyframes. */
+      animation-timing-function: var(--scrub-ease, linear);
       animation-fill-mode: both;
       /* Overridable per instance: set `--scene-from` / `--scene-to` inline to
          retime one part without inventing a new part name. */
@@ -1140,6 +1151,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
        is an arrival, not a drift. */
     [data-scene-part='land'] {
       animation-name: scene-land;
+      --scrub-ease: var(--ease-entrance);
       animation-range: var(--scene-from, contain 55%) var(--scene-to, contain 72%);
     }
 
@@ -1174,6 +1186,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
        decorative, `aria-hidden` marks, never text. */
     [data-scene-part='stage'] {
       animation-name: scene-stage;
+      --scrub-ease: var(--ease-entrance);
       /* `--stage` is the item's index and the formula is only the DEFAULT: the
          same `--scene-from` / `--scene-to` overrides every other part honours
          work here too, so a sequence whose beats are not evenly spaced can
@@ -1192,6 +1205,251 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       to {
         transform: none;
       }
+    }
+
+    /* ── Scrubbed entrances ───────────────────────────────────────────────
+       The continuous replacement for a one-shot `Reveal`.
+
+       `Reveal` is an IntersectionObserver that sets one attribute and then
+       calls `observer.disconnect()`. The motion is a CSS *transition*, so it
+       plays for 0.72s the first time a block is seen and is finished forever
+       after: scroll back up and down and nothing happens. That is fine for a
+       page you read once, top to bottom, and it is exactly what makes the page
+       feel dead the second time through.
+
+       These parts express the same arrivals as a function of scroll POSITION
+       instead, so they run backwards when you scroll back up and they are
+       never "already used up". Same vocabulary as `Reveal`'s variants — a
+       direction and a wipe — so a section converted from one to the other
+       looks the same on the way down and simply keeps working after that.
+
+       TRANSFORM AND CLIP-PATH ONLY. Never opacity. axe folds ancestor opacity
+       into its contrast maths, so text held at a fraction of its ink while it
+       waits to arrive is text that FAILS contrast — that is not a theory, it
+       failed this page on six nodes and then thirteen. `clip-path` is the one
+       non-transform property allowed here, for the same reason `Reveal`'s wipe
+       uses it: it costs no layout, no paint of its own, and it hides content
+       without touching a single colour value.
+
+       RANGES ARE IN `cover`, NOT `contain`. `contain` is the period an element
+       is fully inside the viewport, which means its length goes to ZERO as the
+       element's height approaches the viewport's — and a zero-length range does
+       not scrub, it snaps. Several blocks here are near enough a viewport tall
+       for that to bite on a laptop. `cover` spans the whole time any part of
+       the element is on screen, so it is well defined at every height.
+       Measured, not assumed: a 1800px element in an 800px viewport gives 20
+       distinct frames on `cover`, and `contain` gives it nothing to work with.
+
+       Two ways in, deliberately:
+
+         [data-scene-part]  reads the section's NAMED timeline, so a row of
+                            items that all enter together can still arrive in
+                            sequence — `--scene-from`/`--scene-to` per item.
+         [data-scroll]      reads the element's OWN `view()`, for items in a
+                            vertical stack where the stagger is already a fact
+                            of the layout and does not need staging.
+
+       Use the scene form when the items share a scroll fate, the self form
+       when they don't. Staging a tall stack against one container range means
+       recomputing the offsets every time the container's height changes; a
+       stacked item timed against itself is correct at any height forever. */
+
+    /* WHICH PARTS GET AN EASE, AND WHY IT IS NOT ALL OF THEM.
+       -------------------------------------------------------------------
+       Everything here was written `linear` first, and linear is what makes a
+       scrubbed page feel mechanical: an element creeps at a constant rate right
+       to the last pixel of its range and only then stops, so it never reads as
+       having ARRIVED anywhere.
+
+       `--ease-entrance` is this file's existing settle curve — the one the
+       `Reveal` transitions have always used — and it is `cubic-bezier(0.33, 1,
+       0.68, 1)`, an ease-out cubic. On a scroll range it puts an element ~27%
+       of the way home in the first 10% of the range and ~87% by halfway, so it
+       arrives early and holds while you keep scrolling. That is the difference
+       between motion that tracks your scrollbar and motion that answers it.
+       Reusing the token rather than inventing a curve is the point: the
+       observer-driven entrances and the scroll-driven ones are now the same
+       gesture, which is what keeps the page reading as one hand.
+
+       Deliberately still linear:
+
+         RULES AND DRAWS  (`scene-rule`, `scene-rule-v`, `scrub-draw-line`)
+           A line being drawn is mechanical motion, and a drawn line that
+           decelerates looks like the pen ran out. The production line is the
+           page's one argument; it should advance at the rate you advance.
+
+         PARALLAX  (`drift`, `pan`, `tilt`, `breathe`)
+           Depth is a LINEAR function of scroll — that is the whole illusion.
+           Easing a parallax layer makes it disagree with the layers around it
+           in a way the eye reads as sliding, not as distance. */
+    [data-scene-part='enter'] {
+      animation-name: scrub-enter;
+      animation-range: var(--scene-from, cover 12%) var(--scene-to, cover 40%);
+      --scrub-ease: var(--ease-entrance);
+    }
+
+    [data-scroll='enter'] {
+      animation-name: scrub-enter;
+    }
+
+    @keyframes scrub-enter {
+      from {
+        transform: translate(var(--enter-x, 0px), var(--enter-y, 38px));
+      }
+      to {
+        transform: none;
+      }
+    }
+
+    /* Uncovered left to right. Suits a ruled row or a framed block, where the
+       rule above it is already a horizontal gesture and a rise would fight it. */
+    [data-scene-part='uncover'] {
+      animation-name: scrub-uncover;
+      animation-range: var(--scene-from, cover 12%) var(--scene-to, cover 44%);
+      --scrub-ease: var(--ease-entrance);
+    }
+
+    [data-scroll='uncover'] {
+      animation-name: scrub-uncover;
+    }
+
+    @keyframes scrub-uncover {
+      from {
+        clip-path: inset(0 100% 0 0);
+      }
+      to {
+        clip-path: inset(0 0 0 0);
+      }
+    }
+
+    /* A line of type rising out from behind its own edge — the masked-line
+       gesture every section header already uses, driven by scroll instead of
+       by a transition.
+
+       This one has to be the SCENE form and can never be the self form: the
+       mask is `overflow: hidden`, which is a scroll container, and an element's
+       own `view()` timeline inside one is inert. A named timeline is looked up
+       by walking the tree rather than by finding a scrollport, so it reaches in
+       from the header above and works. Both halves verified in a browser before
+       this was written, because the failure mode is a heading stuck at
+       `translateY(110%)` — permanently invisible type, the single worst thing
+       this file could ship. */
+    [data-scene-part='line'] {
+      animation-name: scrub-line;
+      animation-range: var(--scene-from, cover 10%) var(--scene-to, cover 38%);
+      --scrub-ease: var(--ease-entrance);
+    }
+
+    @keyframes scrub-line {
+      from {
+        transform: translateY(110%);
+      }
+      to {
+        transform: none;
+      }
+    }
+
+    /* An arrival for decorative marks, and ONLY for decorative marks.
+
+       This is the one entrance in the file that touches opacity, which every
+       other one is forbidden from doing because axe folds ancestor opacity into
+       its contrast maths and text held at part of its ink fails. A mark inside
+       an `aria-hidden` container is not text, has no contrast requirement, and
+       is the one case where appearing is the point: a square that only slides
+       into place is visible the whole time it is sliding, so it cannot be held
+       back to arrive AFTER something else. That is not hypothetical — the sun
+       terminus on the closing band did exactly that, sitting in the corner
+       while the rule was still two-thirds of the way to it, which is the
+       "orphaned square" the markup there has warned about for a while.
+
+       If you are reaching for this for anything a screen reader would announce,
+       reach for `enter` instead and accept that it cannot hide. */
+    [data-scroll='pop'] {
+      animation: scrub-pop var(--ease-entrance) both;
+      animation-timeline: view();
+      animation-range: var(--scrub-from, cover 30%) var(--scrub-to, cover 38%);
+    }
+
+    @keyframes scrub-pop {
+      from {
+        opacity: 0;
+        transform: scale(0.4);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* A stroke that draws itself as you reach it.
+
+       The element must carry `pathLength="1"`, which restates its length as 1
+       for dash purposes. That is what lets the dash pattern be a constant in a
+       stylesheet: without it the length is a measured number in user units and
+       only script can know it, which is exactly why this used to be a hook —
+       an IntersectionObserver plus `getTotalLength()` plus a transition, all to
+       draw one line one time. Normalised, it is four declarations and it scrubs.
+
+       `stroke-dasharray` is set HERE rather than on the element, and that is
+       load-bearing: this whole block sits inside `@supports` and
+       `prefers-reduced-motion: no-preference`, so a browser without scroll
+       timelines — or a reader who asked for less motion — never sees the dash
+       at all and gets a solid, finished rule. Had the dasharray lived on the
+       element it would have applied unconditionally and the line would have
+       been permanently invisible for exactly those two audiences. */
+    [data-scroll='draw-line'] {
+      animation: scrub-draw-line linear both;
+      animation-timeline: view();
+      animation-range: var(--scrub-from, entry 0%) var(--scrub-to, cover 30%);
+      stroke-dasharray: 1;
+    }
+
+    @keyframes scrub-draw-line {
+      from {
+        stroke-dashoffset: 1;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    /* The self-timed pair.
+       -------------------------------------------------------------------
+       THE WINDOW DOES NOT OPEN AT `entry 0%`, AND THAT IS THE POINT. It used
+       to, and `entry 0%` is the instant an element's first pixel crosses the
+       viewport's bottom edge — so the entrance was spent in the strip of screen
+       nobody is looking at yet. Mapped against actual position for the Thinking
+       frame (302px tall, 900px viewport):
+
+           frame top at 924px (below the fold)   0% uncovered
+           frame top at 875px                   27%
+           frame top at 826px                   53%
+           frame top at 629px                   98%
+
+       By the time the block was somewhere you could read it, the animation had
+       already happened. Worse, it is not symmetric to a reader: scrolling down
+       you never see the reveal, but scrolling back up you watch the whole thing
+       wipe away, because on the way up your eye is already on the block when it
+       reaches that strip. It reads as an element that can only disappear.
+
+       An ease-out curve compounds it — more than half the motion is spent in
+       the first third of the range, which is the third nearest the bottom edge.
+
+       Opening at `cover 12%` costs roughly a tenth of a viewport of scroll and
+       buys the entire entrance somewhere visible. Closing at `cover 40%` puts
+       the finish near the middle of the screen rather than at the top, so the
+       reverse gesture on the way up starts while the block is still properly in
+       view instead of ambushing it at the bottom edge.
+
+       Still finishing inside `cover` rather than at `entry 100%`: a block
+       TALLER than the viewport is never "fully in view", so `entry 100%` is a
+       range that such a block can never complete. */
+    [data-scroll='enter'],
+    [data-scroll='uncover'] {
+      animation-timing-function: var(--ease-entrance);
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: var(--scrub-from, cover 12%) var(--scrub-to, cover 40%);
     }
 
     /* The hero does not cut to the next section, it recedes behind it. Runs on

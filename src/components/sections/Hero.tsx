@@ -145,10 +145,22 @@ export function Hero() {
                   the type instead of being pinned to a px value that is right
                   at one viewport and wrong at the next.
 
-                  `lg` and up only: below that the station log sits against the
-                  headline column and a mascot placed here would overlap the
-                  figures. */}
-              <div className="display-1 absolute top-0 left-[4.475em] hidden h-[1lh] items-end lg:flex">
+                  PRESENT AT EVERY WIDTH, and it needs no breakpoint to be. The
+                  offset is `4.475em` measured from the h1's own left edge, and
+                  "Enterprise" is the first word of the heading at every size, so
+                  that offset lands on the same letter whatever the type is doing
+                  — at 390 the line breaks after "Enterprise" and the lean simply
+                  has more room. The figure scales itself for the same reason:
+                  its box is `1.15em`, so it tracks the heading rather than a px
+                  value that is right once.
+
+                  This used to be `lg` and up, on the grounds that the station
+                  log sat against the headline column below that and a mascot
+                  here would overlap the figures. Measured at 390 / 480 / 640 /
+                  768 / 1024 / 1280: the only element its box ever intersects is
+                  the h1 it is leaning on, and its right edge stays inside the
+                  h1's at every one of them. */}
+              <div className="display-1 absolute top-0 left-[4.475em] flex h-[1lh] items-end">
                 <div
                   className="w-[1.15em]"
                   style={{

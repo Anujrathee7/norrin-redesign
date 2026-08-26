@@ -1,6 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 import { cx } from '@/lib/cx'
-import { Reveal } from './Reveal'
 
 /**
  * Layout primitives.
@@ -90,23 +89,50 @@ export function SectionHeader({
     // behind its own edge, then the heading follows. Doing this once here
     // rather than per section is what keeps the page feeling like one hand —
     // and it means a new section inherits the entrance for free.
-    <Reveal
-      as="header"
-      lines
-      stagger={0.1}
+    //
+    // Driven by the header's own scroll range rather than by an
+    // IntersectionObserver. It used to be a `Reveal`, which flips one attribute
+    // the first time the header is seen, disconnects, and is finished forever:
+    // the entrance was spent on the first pass and the header sat inert on
+    // every one after. Progress here is a function of scroll POSITION, so the
+    // lines run backwards on the way up and are never used up.
+    //
+    // `--scene` is declared on the header and read by the spans inside the
+    // masks. It has to be the named timeline and cannot be each span's own
+    // `view()`: `.line-mask` is `overflow: hidden`, that is a scroll container,
+    // and an element's own view timeline inside one never advances. A named
+    // timeline is resolved by walking up the tree instead of by finding a
+    // scrollport, so it reaches in through the mask. Verified in a browser
+    // first — the failure mode is a heading frozen at `translateY(110%)`, which
+    // is permanently invisible type.
+    //
+    // The two lines are offset rather than simultaneous, which is the same
+    // 0.1s stagger the transition used, restated as scroll distance.
+    <header
+      data-scene
       className={cx(gap === 'tight' ? 'mb-6 md:mb-7' : 'mb-12 md:mb-20', className)}
     >
       <span className="line-mask">
-        <Eyebrow index={index} label={label} tone={tone} />
+        <span data-scene-part="line" style={{ ['--scene-to' as string]: 'cover 27%' }}>
+          <Eyebrow index={index} label={label} tone={tone} />
+        </span>
       </span>
       {children ? (
         <h2 id={id} data-scroll="drift-slow" className="display-2 mt-8 max-w-[20ch]">
           <span className="line-mask">
-            <span>{children}</span>
+            <span
+              data-scene-part="line"
+              style={{
+                ['--scene-from' as string]: 'cover 7%',
+                ['--scene-to' as string]: 'cover 34%',
+              }}
+            >
+              {children}
+            </span>
           </span>
         </h2>
       ) : null}
-    </Reveal>
+    </header>
   )
 }
 

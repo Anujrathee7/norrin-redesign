@@ -231,25 +231,80 @@ export function Pillars() {
       >
         <Container>
           <Grid>
+            {/* The claim arrives a line at a time on the way down and unwinds on
+                the way back up. Each line is timed against its own scroll range
+                with an index offset for the cascade — these four sit within a
+                couple of hundred pixels of each other, so their own ranges are
+                nearly identical and the offset is what separates them.
+
+                `Eyebrow` renders a <p> and does not forward `data-*`, so the
+                part goes on a wrapper. Not worth widening that component's API
+                for one caller — and a wrapper here is honest about what is
+                being animated, which is the row, not the eyebrow's internals. */}
             <div className="col-span-4 md:col-span-5">
-              <Eyebrow label="Built on the stack you already run" tone="inverse" className="mb-7" />
-              <p className="display-4 max-w-[18ch]">
+              <div
+                data-scroll="enter"
+                style={{
+                  ['--scrub-from' as string]: 'cover 10%',
+                  ['--scrub-to' as string]: 'cover 36%',
+                }}
+              >
+                <Eyebrow
+                  label="Built on the stack you already run"
+                  tone="inverse"
+                  className="mb-7"
+                />
+              </div>
+              <p
+                data-scroll="enter"
+                style={{
+                  ['--scrub-from' as string]: 'cover 14%',
+                  ['--scrub-to' as string]: 'cover 40%',
+                }}
+                className="display-4 max-w-[18ch]"
+              >
                 Logic Apps in production since{' '}
                 <span className="text-signal">{productionSince.year}</span>.
               </p>
-              <p className="body-serif measure-serif mt-6 text-inverse-ink-2">
+              <p
+                data-scroll="enter"
+                style={{
+                  ['--scrub-from' as string]: 'cover 18%',
+                  ['--scrub-to' as string]: 'cover 44%',
+                }}
+                className="body-serif measure-serif mt-6 text-inverse-ink-2"
+              >
                 {productionSince.claim}
               </p>
-              <p className="caption mt-6 max-w-[44ch] text-inverse-ink-3">{partnership}</p>
+              <p
+                data-scroll="enter"
+                style={{
+                  ['--scrub-from' as string]: 'cover 22%',
+                  ['--scrub-to' as string]: 'cover 48%',
+                }}
+                className="caption mt-6 max-w-[44ch] text-inverse-ink-3"
+              >
+                {partnership}
+              </p>
             </div>
 
             <ul
               data-scroll="breathe"
               className="col-span-4 mt-12 grid grid-cols-1 self-start border-t border-inverse-hairline-strong sm:grid-cols-2 md:col-span-6 md:col-start-7 md:mt-0"
             >
-              {technologies.map((t) => (
+              {/* The stack list arrives row by row against the claim beside it.
+                  Staggered by index rather than by column: this is a two-column
+                  list read as one inventory, and the eye goes down it, so the
+                  cascade should too. */}
+              {technologies.map((t, i) => (
                 <li
                   key={t.name}
+                  data-scroll="enter"
+                  style={{
+                    ['--enter-y' as string]: '26px',
+                    ['--scrub-from' as string]: `cover ${10 + i * 3}%`,
+                    ['--scrub-to' as string]: `cover ${10 + i * 3 + 26}%`,
+                  }}
                   className="border-b border-inverse-hairline-strong py-3 sm:odd:pr-8 sm:even:pl-8 sm:last:odd:col-span-2 sm:last:odd:pr-0"
                 >
                   <span className="ui text-inverse-ink">{t.name}</span>

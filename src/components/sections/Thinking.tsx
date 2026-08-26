@@ -1,5 +1,4 @@
 import { Container, SectionHeader } from '@/components/primitives/Layout'
-import { Reveal } from '@/components/primitives/Reveal'
 import { publications } from '@/data/norrin'
 import { Nori } from '@/components/mascot/nori/Nori'
 
@@ -77,14 +76,50 @@ export function Thinking() {
 
             This replaces a 150px `idea` parked beside the header. Same
             character, but touching something instead of floating next to it. */}
-        <div className="relative">
-          <div className="absolute right-10 bottom-full hidden md:flex lg:right-20">
+        {/* The drift is on this shared wrapper, not on the frame below it: Nori
+            peeks over the frame's top border, and a figure resting on an edge
+            has to travel with that edge or it drifts off the thing it is
+            holding. One layer, two children. */}
+        <div data-scroll="drift-slow" className="relative">
+          {/* Present at every width now. The border it peeks over is the
+              frame's own top edge, which exists on a phone exactly as it does on
+              a desktop — this was hidden below `md` for size, not for want of
+              something to hold on to, so it gets a narrower box instead of a
+              breakpoint. Pulled in to `right-6` on small screens so it clears
+              the frame's rounded corner. */}
+          <div className="absolute right-6 bottom-full flex w-[84px] md:right-10 md:w-[124px] lg:right-20">
             {/* Still, for the same reason `sit` is still in Work: the idle
                 float would lift it off the border it is peeking over. */}
             <Nori pose="peek" size={124} animated={false} />
           </div>
 
-        <Reveal stagger={0.08} variant="wipe">
+        {/* Uncovered left to right against its own scroll range, so it runs
+            backwards when you scroll back up instead of being spent on the
+            first pass. Still ONE gesture across the whole frame and not three
+            staggered cells: the rungs are hairline-separated parts of a single
+            object, and three arrivals would argue they are three competing
+            boxes — which is the exact reading the frame was built to prevent.
+
+            The clip lives on a wrapper rather than on the <ul>, because the
+            <ul> is `overflow-hidden` (that is what clips the cells' square
+            grounds to the rounded frame) and `overflow: hidden` is a scroll
+            container — an element's own view timeline inside one never
+            advances. Out here it is measured against the page. */}
+        {/* Its own window, later and wider than the shared default. This is
+            the tallest single object that animates on the page, and how far a
+            block must travel before it is properly on screen scales with its
+            height — a 40px list row is readable almost as soon as it appears, a
+            302px frame is not. Measured at 900px viewport: the wipe now runs
+            from the frame having ~200px on screen to it sitting complete near
+            the middle, instead of finishing while it was still a sliver at the
+            bottom edge. */}
+        <div
+          data-scroll="uncover"
+          style={{
+            ['--scrub-from' as string]: 'cover 16%',
+            ['--scrub-to' as string]: 'cover 46%',
+          }}
+        >
           {/* One frame with three cells, not three cards.
               The rungs are hairline-separated already, so the radius goes on the
               OUTER edge and the interior stays ruled — twelve rounded corners
@@ -108,7 +143,7 @@ export function Thinking() {
               </li>
             ))}
           </ul>
-        </Reveal>
+        </div>
         </div>
 
         <p className="caption mt-8 text-ink-3">

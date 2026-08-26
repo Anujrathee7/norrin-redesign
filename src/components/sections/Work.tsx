@@ -1,7 +1,6 @@
 import { Container, Grid, SectionHeader } from '@/components/primitives/Layout'
 import { Nori } from '@/components/mascot/nori/Nori'
 import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
-import { Reveal } from '@/components/primitives/Reveal'
 import { cases, customers, customersIntro } from '@/data/norrin'
 
 /**
@@ -59,15 +58,24 @@ export function Work() {
         </Grid>
 
         {/* The roster, as type. */}
-        {/* A list of names being read out, so the whole row visibly travels
-            as the section is scrolled — 38px was barely perceptible against a
-            roster this wide. 120px is chosen against the narrowest customer
-            grid (the 390px, two-column layout): at that width a name's own
-            column is close to half the viewport, and 120px of total pan (60px
-            each way from centre) still leaves the first and last columns'
-            text clear of the container edge — checked in the browser, not
-            assumed. Wider grids (3/5-column) have far more slack than that,
-            so the two-column case is the one that governs the number. */}
+        {/* A list of names being read out, so the whole row visibly travels as
+            the section is scrolled — 38px was barely perceptible against a
+            roster this wide.
+
+            THE TRAVEL IS DERIVED FROM THE GUTTER, and the previous number was
+            wrong twice over. `--pan` is the HALF-amplitude: the keyframes run
+            from `+pan` to `-pan`, so `120px` was 240px of travel, not the
+            "120px of total pan (60px each way)" the note here used to claim. At
+            390px the gutter is 24px, so the row was sliding a hundred pixels
+            past the edge of the page and `overflow-clip` was cutting the
+            outermost names down to "vell", "onda" and "anska". Screenshotted,
+            not deduced — and the note it replaces said it had been checked in
+            the browser, which is a good reason to distrust a number that has no
+            derivation attached.
+
+            Nine tenths of the gutter is the most the row can move before type
+            reaches the container edge, and it holds at every width by
+            construction: 22px each way on a phone, 42px on a laptop. */}
         {/* Nori sits ON the roster's top rule — the one long uninterrupted
             horizontal in this section, with the intro paragraph's bottom margin
             clear above it.
@@ -81,8 +89,15 @@ export function Work() {
             horizontally on scroll, and a mascot sitting on a rule should not
             slide with the names. */}
         <div className="relative">
+          {/* Sized by a WRAPPER, not by the `size` prop. `size` sets the
+              image's intrinsic width; the image's own `max-width: 100%` then
+              lets a narrower box shrink it, which is how one placement serves
+              both widths without a second copy of the markup. The anchor
+              survives the resize for free because `NORI_ANCHOR.sit` is a
+              PERCENTAGE, resolved against the element's own height — the hips
+              land on the rule at 68px exactly as they do at 112px. */}
           <div
-            className="absolute top-0 right-[6%] z-10 hidden md:block"
+            className="absolute top-0 right-[6%] z-10 w-[68px] md:w-[112px]"
             style={{ transform: 'translateY(calc(-1 * ' + NORI_ANCHOR.sit.y + '))' }}
           >
             {/* `animated={false}` is not a style preference — see the note in
@@ -92,30 +107,70 @@ export function Work() {
             <Nori pose="sit" size={112} animated={false} />
           </div>
 
-        <div data-scroll="pan" style={{ ["--pan" as string]: "120px" }}>
-        <Reveal stagger={0.04} variant="left">
+        <div
+          data-scroll="pan"
+          style={{ ["--pan" as string]: "calc(var(--spacing-gutter, 24px) * 0.9)" }}
+        >
           {/* A grid, not flex-wrap: the old wrap produced nine names then a
               lone orphan at desktop, and 3/4/2/1 at 390px. */}
+          {/* The names used to arrive on a one-shot `Reveal` and then sit still
+              for good. Each now runs off its own scroll range, so the roster
+              keeps working on the way back up.
+
+              The travel is VERTICAL, which is not a stylistic choice: the row
+              these names sit in already pans 120px sideways, and that number was
+              picked against the narrowest grid as the most the outer columns can
+              move before their text leaves the container. A horizontal entrance
+              composes with an ancestor's horizontal transform and spends a
+              margin someone measured. Down the same axis is free.
+
+              Staggered by COLUMN (`i % 5`) rather than by index. The rows are
+              already offset from each other by the plain fact that they sit at
+              different heights, so an index stagger would compound with that
+              and turn a sweep into a slow cascade — by the last name the
+              opening ones would be long finished. Modulo the widest column
+              count gives a clean left-to-right sweep at `md`, and something
+              close to one at the narrower counts, which is as much as a
+              breakpoint-blind number can promise. */}
           <ul className="grid grid-cols-2 items-baseline gap-x-8 gap-y-3 border-t border-hairline py-10 sm:grid-cols-3 md:grid-cols-5 md:gap-x-12">
-            {customers.map((name) => (
+            {customers.map((name, i) => (
               <li
                 key={name}
+                data-scroll="enter"
+                style={{
+                  ['--enter-y' as string]: '24px',
+                  ['--scrub-from' as string]: `cover ${10 + (i % 5) * 4}%`,
+                  ['--scrub-to' as string]: `cover ${10 + (i % 5) * 4 + 28}%`,
+                }}
                 className="text-[clamp(1.125rem,0.9rem+0.9vw,1.75rem)] font-medium tracking-[-0.02em] text-ink-2"
               >
                 {name}
               </li>
             ))}
           </ul>
-        </Reveal>
         </div>
         </div>
 
         {/* Cases, as full-width rows. Each row is uncovered left to right, in
             sequence — a wipe suits a ruled row better than a fade, because the
             rule above it is already a horizontal gesture. */}
-        <Reveal as="ol" stagger={0.12} variant="wipe" className="mt-12 md:mt-16">
+        {/* Each row uncovers against its OWN scroll range rather than against a
+            shared one. These rows are tall — four of them run close to a
+            viewport and a half — and staging them inside one container range
+            would mean the last row's slot opens while it is still well below
+            the fold. Timed against itself, a row uncovers exactly as it is
+            reached, at any height and any viewport, and re-covers on the way
+            back up. */}
+        <ol className="mt-12 md:mt-16">
           {cases.map((c, i) => (
-            <li key={c.id}>
+            <li
+              key={c.id}
+              data-scroll="uncover"
+              style={{
+                ['--scrub-from' as string]: 'cover 14%',
+                ['--scrub-to' as string]: 'cover 44%',
+              }}
+            >
               <article className="block border-t border-hairline py-9 last:border-b md:py-11">
                 <div className="grid grid-cols-4 items-baseline gap-x-6 md:grid-cols-12">
                   <span
@@ -146,7 +201,7 @@ export function Work() {
               </article>
             </li>
           ))}
-        </Reveal>
+        </ol>
 
         <p className="caption mt-8 text-ink-3">
           Case summaries quoted from Norrin&rsquo;s published customer cases.

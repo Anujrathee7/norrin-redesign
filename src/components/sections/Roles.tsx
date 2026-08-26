@@ -1,5 +1,4 @@
 import { Container, SectionHeader } from '@/components/primitives/Layout'
-import { Reveal } from '@/components/primitives/Reveal'
 import { roles } from '@/data/norrin'
 
 /**
@@ -34,7 +33,7 @@ export function Roles() {
       id="roles"
       data-shot="roles"
       aria-labelledby="roles-heading"
-      className="py-24 md:py-36"
+      className="overflow-clip py-24 md:py-36"
     >
       <Container>
         {/* Stacked, not the heading-left / paragraph-top-right lockup used by
@@ -53,17 +52,52 @@ export function Roles() {
         </div>
 
         {/* From the left, in reading order — these are four things read as a
-            sequence, not four cards that happen to sit in a row. */}
-        <Reveal stagger={0.08} variant="left">
+            sequence, not four cards that happen to sit in a row.
+
+            Scroll-driven, not observer-driven. This was a `Reveal`, which fires
+            once and disconnects; the four columns slid in on first sight and
+            then the block was finished for the rest of the session. Each column
+            now runs off its own scroll range, so it arrives on the way down and
+            leaves on the way back up.
+
+            EACH ITEM IS TIMED AGAINST ITSELF, not against the list. Staging
+            four items inside one container range is the obvious way to do it
+            and it is wrong here: at `lg` the columns sit side by side and share
+            a scroll fate, but at phone width the list is a tall single column
+            and the last item's slot would come and go long before that item is
+            anywhere near the screen — an animation that plays to nobody. A
+            per-item timeline is correct at every width, and the stagger
+            survives because the offsets below shift each item's window relative
+            to its own arrival rather than relative to the list's. */}
+        <div data-scroll="drift-slow">
           <ul className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10">
-            {roles.map((r) => (
-              <li key={r.id} className="border-t border-hairline pt-5">
+            {roles.map((r, i) => (
+              <li
+                key={r.id}
+                data-scroll="enter"
+                style={{
+                  // Travel derived from the gutter, not picked. A fixed -42px
+                  // is fine at 1512, where the gutter is 46px, and slices the
+                  // type in half at 390, where it is 24px: `overflow-clip`
+                  // stops the page scrolling sideways but it does not stop the
+                  // viewport edge cutting "Infrastructure partner" down to
+                  // "nfrastructure artner", which is what it was doing. Nine
+                  // Four fifths of the gutter: at nine tenths the type came to
+                  // rest 2px off the viewport edge mid-travel, which reads as
+                  // about to be cut even though it never is.
+                  ['--enter-x' as string]: 'calc(var(--spacing-gutter, 24px) * -0.8)',
+                  ['--enter-y' as string]: '0px',
+                  ['--scrub-from' as string]: `cover ${10 + i * 6}%`,
+                  ['--scrub-to' as string]: `cover ${10 + i * 6 + 30}%`,
+                }}
+                className="border-t border-hairline pt-5"
+              >
                 <h3 className="display-4 max-w-[11ch] text-ink">{r.role}</h3>
                 <p className="body-serif mt-4 text-ink-2">{r.claim}</p>
               </li>
             ))}
           </ul>
-        </Reveal>
+        </div>
       </Container>
     </section>
   )
