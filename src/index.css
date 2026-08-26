@@ -1174,7 +1174,15 @@ html.js [data-reveal='lines']:not([data-revealed]) {
        decorative, `aria-hidden` marks, never text. */
     [data-scene-part='stage'] {
       animation-name: scene-stage;
-      animation-range: contain calc(var(--stage, 0) * 18%) contain calc(var(--stage, 0) * 18% + 36%);
+      /* `--stage` is the item's index and the formula is only the DEFAULT: the
+         same `--scene-from` / `--scene-to` overrides every other part honours
+         work here too, so a sequence whose beats are not evenly spaced can
+         state its own times without inventing a part name. The formula used to
+         be unconditional, which meant this was the one part in the layer that
+         silently ignored an override — a hole worth closing before someone
+         spends an afternoon on it. */
+      animation-range: var(--scene-from, contain calc(var(--stage, 0) * 18%))
+        var(--scene-to, contain calc(var(--stage, 0) * 18% + 36%));
     }
 
     @keyframes scene-stage {
