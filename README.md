@@ -3,6 +3,8 @@
 An independent, unsolicited redesign of [norrin.com](https://norrin.com/), built from
 publicly available information only. Not affiliated with or endorsed by Norrin.
 
+**Live:** https://norrin-redesign.vercel.app
+
 ```bash
 npm install
 npm run dev      # http://localhost:5173
