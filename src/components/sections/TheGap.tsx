@@ -201,37 +201,22 @@ export function TheGap() {
             shortening it changes pacing, not timing) while giving the hold a
             length that matches how much is actually happening during it.
 
-            `top-[27svh]`, not the 46svh an earlier pass used. That number
-            was chosen to centre the OLD composition — buoys and captions
-            only, no heading — in the space below the fixed header, and it
-            did that correctly for that composition. Adding the heading
-            above the stations made the composition roughly twice as tall,
-            and simply keeping the same top offset pushed the extra height
-            straight off the bottom of the viewport: a screenshot at 46svh
-            with the heading in place showed station 02's caption painting
-            past `y=950` in a 950px-tall viewport, invisible below the fold
-            for the entire time it sat at its pre-arrival dim state. 27svh
-            re-centres the TALLER composition the same way 46svh centred the
-            shorter one — measured again against the actual content height,
-            not carried over from before the content changed. It still
-            clears the header with room to spare (see the mark-translation
-            note below for why that clearance has to be checked by measuring
-            paint, not by reading the offset number) and now leaves the
-            bottom of the composition inside the viewport too, including the
-            few pixels a not-yet-arrived caption's `translateY(30px)`
-            pre-animation state paints below its resting position.
+            THE STICKY OFFSET IS A `max()`, NOT A ROUND `svh`. Every
+            earlier value here was tuned by centring the composition in one
+            viewport height and it kept going wrong in the other direction as
+            the composition changed underneath it — 16svh put the figures under
+            the fixed header, 46svh pushed a caption below the fold once the
+            heading moved into the pin, 20svh left the last line of station 01
+            clearing the bottom of a 740px laptop by 33px while 91px of
+            headroom sat unused above it.
 
-            `top-[27svh]` is not a typo for a smaller number: a first pass at
-            `top-[16svh]` put the sticky frame right under the site header,
-            and a screenshot caught the actual bug that finding by reading
-            the code would have missed — Fyr's mark is lifted out of flow and
-            translated *up* over its rail (`-translate-y-[60.83%]` etc.), so
-            its top edge painted well above the pinned box's own top and
-            landed under the fixed header, which sits later in paint order
-            and simply covered it. 27svh (177px in the 950px viewport this
-            was measured against) clears the header (which ends around 73px)
-            with a comfortable margin, same as 46svh did before the heading
-            made the composition taller.
+            The two constraints are asymmetric, which is why one percentage
+            cannot satisfy both. At the TOP the limit is absolute: the fixed
+            header ends around 57px and anything above that is simply painted
+            over, so the floor is a pixel value. At the BOTTOM the limit scales
+            with the viewport. `max(88px, 12svh)` states exactly that — never
+            tuck under the header, otherwise sit proportionally — and it was
+            checked at 740, 800 and 950 rather than at one height.
 
             `overflow-clip` up on the section (not `overflow-hidden`) is load
             -bearing here: `hidden` would create a scroll container, and a
@@ -239,7 +224,7 @@ export function TheGap() {
             itself inside freezes at 0% forever. Clip has already been
             confirmed not to. */}
         <div data-scene data-scene-runway className="hidden h-[300svh] md:block">
-          <div data-scene-pin className="sticky top-[20svh]">
+          <div data-scene-pin className="sticky top-[max(88px,12svh)]">
             <Container>
               {/* The claim, brought inside the hold.
 
@@ -461,7 +446,7 @@ export function TheGap() {
                         ['--scene-from' as string]: STEP_RANGE[i][0],
                         ['--scene-to' as string]: STEP_RANGE[i][1],
                       }}
-                      className="px-4 pt-14 text-center lg:px-10"
+                      className="px-4 pt-11 text-center lg:px-10"
                     >
                       <p className={i === 2 ? 'label text-signal' : 'label text-inverse-ink-3'}>
                         {s.index} — {s.name}
