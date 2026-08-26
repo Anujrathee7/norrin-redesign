@@ -1,6 +1,7 @@
 import { Container, SectionHeader } from '@/components/primitives/Layout'
 import { publications } from '@/data/norrin'
 import { Nori } from '@/components/mascot/nori/Nori'
+import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
 
 /**
  * Thinking — the commitment ladder.
@@ -88,9 +89,22 @@ export function Thinking() {
               breakpoint. Pulled in to `right-6` on small screens so it clears
               the frame's rounded corner. */}
           <div className="absolute right-6 bottom-full flex w-[84px] md:right-10 md:w-[124px] lg:right-20">
-            {/* Still, for the same reason `sit` is still in Work: the idle
-                float would lift it off the border it is peeking over. */}
-            <Nori pose="peek" size={124} animated={false} />
+            {/* The float is still off — it would lift the fingers off the
+                border being peeked over. The rock replaces it, pivoting on the
+                bottom edge of the drawing, which IS the edge it is gripping
+                (`NORI_ANCHOR.peek` is 100% for exactly that reason). Rotation
+                there keeps the grip and tips the head, which is what peeking
+                over something actually looks like. */}
+            <div
+              data-scroll="nori-sway"
+              className="flex"
+              style={{
+                ['--pivot' as string]: `50% ${NORI_ANCHOR.peek.y}`,
+                ['--sway' as string]: '3.2deg',
+              }}
+            >
+              <Nori pose="peek" size={124} animated={false} />
+            </div>
           </div>
 
         {/* Uncovered left to right against its own scroll range, so it runs

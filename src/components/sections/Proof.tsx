@@ -111,7 +111,13 @@ export function Proof() {
               className="absolute top-0 right-0 z-10 hidden w-[112px] lg:block"
               style={{ transform: 'translateY(calc(-1 * ' + NORI_ANCHOR.stand.y + '))' }}
             >
-              <Nori pose="read" size={112} animated={false} />
+              <div
+                data-scroll="nori-sway"
+                className="flex"
+                style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}` }}
+              >
+                <Nori pose="read" size={112} animated={false} />
+              </div>
             </div>
             {/* The same figure over the same entry, below `lg`, where the rail
                 is vertical and the entry it is reading about is the LAST one
@@ -122,7 +128,17 @@ export function Proof() {
                 instead, which is what standing at the end of the line means
                 when the line runs downwards. */}
             <div className="absolute right-0 bottom-0 z-10 w-[84px] lg:hidden">
-              <Nori pose="read" size={112} animated={false} />
+              {/* Pivoting on the sole here too, even though nothing is under it
+                  in this branch: a figure that rocks about its feet reads as
+                  standing whatever it is standing on, and rocking about its
+                  middle reads as floating. */}
+              <div
+                data-scroll="nori-sway"
+                className="flex"
+                style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}` }}
+              >
+                <Nori pose="read" size={112} animated={false} />
+              </div>
             </div>
             <ol data-scene className="grid grid-cols-1 lg:grid-cols-4">
 
@@ -198,26 +214,70 @@ export function Proof() {
                       />
                     </>
                   )}
+                  {/* The node arrives as its own rule reaches it. `pop` is the
+                      one entrance in the layer allowed to fade, and this
+                      qualifies on the same grounds the sun terminus does: it is
+                      `aria-hidden`, carries no text, and has no contrast
+                      requirement to fail. A mark that only slid would be
+                      sitting on the rail before the rail got there.
+
+                      Two boxes. The node's placement is a `translate` written
+                      in classes, and an animation on the same element replaces
+                      that transform outright rather than composing with it —
+                      the dot would jump to the corner. So the positioning stays
+                      on the span and the arrival goes on a wrapper. */}
                   <span
                     aria-hidden="true"
-                    className={
-                      'absolute top-0 left-0 h-1.5 w-1.5 -translate-x-1/2 lg:translate-x-0 lg:-translate-y-1/2 ' +
-                      (ahead ? 'border border-inactive bg-ground' : 'bg-accent')
-                    }
-                  />
-                  {/* The entry's copy rides in on the same scroll range as the
-                      rule that reaches it, offset into the back half of that
-                      draw — so the line arrives at a station and the station's
-                      text is what it delivers, rather than the two being
-                      separate events that happen to overlap. The dashed "ahead"
-                      entry gets the same treatment: what is static about it is
-                      its dashes, not its right to arrive. */}
+                    className="absolute top-0 left-0 -translate-x-1/2 lg:translate-x-0 lg:-translate-y-1/2"
+                  >
+                    <span
+                      data-scroll="pop"
+                      style={{
+                        ['--scrub-from' as string]: `cover ${10 + i * 13 + 10}%`,
+                        ['--scrub-to' as string]: `cover ${10 + i * 13 + 18}%`,
+                      }}
+                      className={
+                        'block h-1.5 w-1.5 ' +
+                        (ahead ? 'border border-inactive bg-ground' : 'bg-accent')
+                      }
+                    />
+                  </span>
+                  {/* The entry UNCOVERS left to right on the same scroll range
+                      as the rule that reaches it, offset into the back half of
+                      that draw — so the line arrives at a station and the
+                      station's text is what it delivers, rather than the two
+                      being separate events that happen to overlap.
+
+                      A wipe rather than the lift this used to be, and it is the
+                      right gesture for two reasons. It matches the rail: the
+                      rule is already drawing left to right, and the year
+                      appearing the same way reads as the line delivering it
+                      rather than as a second, unrelated arrival. And it reads
+                      as APPEARING, which a 28px lift does not — at half
+                      progress a lift is 14px of offset on type that was legible
+                      the whole time.
+
+                      Reversal is free and exact. These are scroll ranges, not
+                      triggers, so scrolling back up runs the clip the other
+                      way: each entry re-covers right to left, and because the
+                      entries are staggered left to right on the way down, the
+                      LAST one is the first to go. Down the line assembles from
+                      2012 outward; up it retreats from the future back. Nothing
+                      had to be written for the reverse — it is the same
+                      animation read backwards.
+
+                      Fading was not an option and is worth recording as such:
+                      axe folds ancestor opacity into contrast, and a year held
+                      at part of its ink while it waits fails. `clip-path`
+                      hides without touching a single colour value.
+
+                      The dashed "ahead" entry gets the same treatment. What is
+                      static about it is its dashes, not its right to arrive. */}
                   <div
-                    data-scene-part="enter"
+                    data-scene-part="uncover"
                     style={{
-                      ['--enter-y' as string]: '28px',
                       ['--scene-from' as string]: `cover ${10 + i * 13 + 6}%`,
-                      ['--scene-to' as string]: `cover ${10 + i * 13 + 19}%`,
+                      ['--scene-to' as string]: `cover ${10 + i * 13 + 21}%`,
                     }}
                   >
                     <p

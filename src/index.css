@@ -1437,6 +1437,57 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
     }
 
+    /* ANCHORED MASCOTS, MOVING WITHOUT LEAVING THEIR ANCHOR.
+       -------------------------------------------------------------------
+       Every mascot that touches something on this page is rendered
+       `animated={false}`, and `anchors.ts` explains why: the idle float in
+       nori.css TRANSLATES the drawing vertically, so a figure placed to rest on
+       a rule spends most of its cycle about 8px off it — at a 112px mascot that
+       is most of the contact. The rule was right and its conclusion was too
+       broad. What breaks an anchor is not motion, it is motion that MOVES THE
+       CONTACT POINT.
+
+       A rotation about that point leaves it fixed, exactly, at every angle.
+       So the pivot is the anchor: `--pivot` takes the same measured value the
+       placement already uses to put the figure there — the seat line for `sit`,
+       the sole for a standing pose, the bottom edge for `peek` — and the figure
+       rocks around the thing it is holding on to instead of drifting off it.
+
+       Scroll-driven rather than idle, like everything else here: it rocks
+       because you are moving, which is a character reacting to the page rather
+       than a decoration running on a timer. One full cycle across the whole
+       pass, so it is never caught mid-lurch at rest.
+
+       The wrapper carrying this MUST be `flex` (or otherwise not a plain block
+       around an inline-block). `<Nori>` renders an inline-block, a block parent
+       adds the line box's descender to its own height, and `transform-origin`
+       percentages resolve against that inflated box — which silently moves the
+       pivot off the anchor. Same trap the Gap stations hit when their feet came
+       out 7px above the rail. */
+    [data-scroll='nori-sway'] {
+      animation: nori-sway linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+      transform-origin: var(--pivot, 50% 100%);
+    }
+
+    /* TWO cycles across the pass, not one. At one cycle the figure turns 4.8deg
+       over a thousand pixels of scroll, which does not read as a character
+       rocking — it reads as a drawing slowly going crooked. Repetition is what
+       separates "alive" from "drifting", and it is the same reason the idle
+       float this replaces was a loop rather than a lean. */
+    @keyframes nori-sway {
+      0%,
+      50%,
+      100% {
+        transform: rotate(var(--sway, 3deg));
+      }
+      25%,
+      75% {
+        transform: rotate(calc(var(--sway, 3deg) * -1));
+      }
+    }
+
     /* A stroke that draws itself as you reach it.
 
        The element must carry `pathLength="1"`, which restates its length as 1

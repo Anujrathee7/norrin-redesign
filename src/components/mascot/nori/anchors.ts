@@ -26,6 +26,13 @@
  * the contact. Anchored poses get their motion from the section moving around
  * them, not from moving on their own.
  *
+ * That rule is about the FLOAT specifically, and it is not a ban on motion.
+ * The float translates, and translation moves the contact point. A ROTATION
+ * about the contact point does not: `[data-scroll='nori-sway']` in index.css
+ * takes one of these anchors as its `--pivot` and rocks the figure around the
+ * thing it is holding, which is why the anchored poses are no longer static
+ * while their feet, hips and fingers stay exactly where they were put.
+ *
  * `hold` carries one further restriction: the drawing contains its OWN rule, in
  * periwinkle, at this anchor height. It composes only against a rule drawn to
  * meet its ends — run against a page hairline it produces one line in two

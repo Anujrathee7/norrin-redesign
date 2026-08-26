@@ -100,11 +100,20 @@ export function Work() {
             className="absolute top-0 right-[6%] z-10 w-[68px] md:w-[112px]"
             style={{ transform: 'translateY(calc(-1 * ' + NORI_ANCHOR.sit.y + '))' }}
           >
-            {/* `animated={false}` is not a style preference — see the note in
-                anchors.ts. The idle float translates the drawing vertically, and
-                a pose whose entire job is touching a rule cannot also be moving
-                away from it. This one gets its motion from the section. */}
-            <Nori pose="sit" size={112} animated={false} />
+            {/* `animated={false}` kills the idle FLOAT, which translates and
+                would lift the hips off the rule — see anchors.ts. The rock below
+                replaces it: rotation about the seat line leaves the seat line
+                exactly where it is, so the figure moves and the contact does
+                not. `flex` on the wrapper is load-bearing, not cosmetic; a block
+                parent would add the inline-block's descender to its height and
+                shift the percentage pivot off the anchor. */}
+            <div
+              data-scroll="nori-sway"
+              className="flex"
+              style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.sit.y}` }}
+            >
+              <Nori pose="sit" size={112} animated={false} />
+            </div>
           </div>
 
         <div

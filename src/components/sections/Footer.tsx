@@ -12,6 +12,20 @@ import { Nori } from '@/components/mascot/nori/Nori'
  *
  * Mono throughout, hairline-ruled, no ornament.
  *
+ * IT MOVES NOW, AND IT DID NOT BEFORE. The scroll layer carried a note saying
+ * the footer has no motion because an `entry -> exit` range cannot complete at
+ * the page end — the element enters, the document runs out of scroll, and the
+ * animation freezes part-way. That was true when this was three columns of
+ * eleven links and stood taller than a viewport. It is 708px now, and measured
+ * at the top of the block both `cover 12% -> 40%` and `entry 0% -> 100%`
+ * complete with nothing left over, at 950px and 780px of viewport.
+ *
+ * The caveat survives where it still applies: an element at the BOTTOM of the
+ * footer has 38px of a 40px range left when the page stops scrolling. So the
+ * footprint and the navigation move, and the legal line at the very end does
+ * not. That is a real boundary, not an oversight — the last thing on the page
+ * is the one thing that can never finish arriving.
+ *
  * Deliberately not a sitemap of itself. This was three columns of eleven links,
  * six of which were aliases for two anchors — four separate labels all landing
  * on #pillars, three all landing on #thinking — plus a "Careers" link pointing at
@@ -41,12 +55,27 @@ export function Footer() {
       <Container>
         {/* Footprint */}
         <Grid className="gap-y-10">
-          <div className="col-span-4 md:col-span-3">
+          <div
+            data-scroll="enter"
+            style={{ ['--scrub-to' as string]: 'cover 30%' }}
+            className="col-span-4 md:col-span-3"
+          >
             <p className="label text-ink-3">Footprint</p>
           </div>
           <ul className="col-span-4 grid grid-cols-2 gap-x-6 gap-y-8 md:col-span-9 lg:grid-cols-5">
-            {Object.entries(byCountry).map(([country, list]) => (
-              <li key={country}>
+            {/* Staggered across the five countries, left to right — the same
+                sweep the customer roster uses, and for the same reason: this is
+                one list read across, not five things arriving separately. */}
+            {Object.entries(byCountry).map(([country, list], i) => (
+              <li
+                key={country}
+                data-scroll="enter"
+                style={{
+                  ['--enter-y' as string]: '22px',
+                  ['--scrub-from' as string]: `cover ${12 + i * 4}%`,
+                  ['--scrub-to' as string]: `cover ${12 + i * 4 + 26}%`,
+                }}
+              >
                 <p className="label mb-3 border-b border-hairline pb-2 text-ink">{country}</p>
                 <ul className="space-y-2.5">
                   {list.map((o) => (
@@ -62,8 +91,21 @@ export function Footer() {
         </Grid>
 
         {/* Navigation */}
+        {/* A shorter, earlier window than the footprint above. This block sits
+            lower, so it has less document left to run its range in — measured
+            rather than guessed, and the check at the bottom of `.shots/anim.mjs`
+            asserts that nothing down here is left mid-transform when the page
+            stops scrolling. */}
         <Grid className="mt-20 gap-y-10 border-t border-hairline pt-12">
-          <div className="col-span-4 md:col-span-3">
+          <div
+            data-scroll="enter"
+            style={{
+              ['--enter-y' as string]: '20px',
+              ['--scrub-from' as string]: 'cover 8%',
+              ['--scrub-to' as string]: 'cover 30%',
+            }}
+            className="col-span-4 md:col-span-3"
+          >
             <a href="#top" className="flex w-fit items-center gap-2.5 text-accent">
               <Nori pose="wave" size={24} crop="head" animated={false} />
               <span className="wordmark text-ink">
@@ -73,7 +115,16 @@ export function Footer() {
             <p className="caption mt-5 max-w-[38ch] text-ink-3">{footerBlurb.text}</p>
           </div>
 
-          <nav aria-label="Company" className="col-span-2 md:col-span-2 md:col-start-6">
+          <nav
+            aria-label="Company"
+            data-scroll="enter"
+            style={{
+              ['--enter-y' as string]: '20px',
+              ['--scrub-from' as string]: 'cover 12%',
+              ['--scrub-to' as string]: 'cover 34%',
+            }}
+            className="col-span-2 md:col-span-2 md:col-start-6"
+          >
             <p className="label mb-4 text-ink-3">Company</p>
             <ul className="space-y-2.5">
               {COMPANY_LINKS.map((l) => (
@@ -91,7 +142,16 @@ export function Footer() {
 
           {/* Same construction as its sibling — these are the only links that
               leave the site, so they are the last ones that should lack a landmark. */}
-          <nav aria-label="Elsewhere" className="col-span-2 md:col-span-2 md:col-start-9">
+          <nav
+            aria-label="Elsewhere"
+            data-scroll="enter"
+            style={{
+              ['--enter-y' as string]: '20px',
+              ['--scrub-from' as string]: 'cover 16%',
+              ['--scrub-to' as string]: 'cover 38%',
+            }}
+            className="col-span-2 md:col-span-2 md:col-start-9"
+          >
             <p className="label mb-4 text-ink-3">Elsewhere</p>
             <ul className="space-y-2.5">
               {social.map((s) => (
@@ -109,6 +169,11 @@ export function Footer() {
           </nav>
         </Grid>
 
+        {/* Legal. DELIBERATELY STILL — see the note at the top of this file.
+            This is the last block on the page, so there is no scroll left for a
+            range to complete in: measured, an element down here finishes a
+            40px travel with 38px still to go. A permanently half-arrived
+            copyright line is worse than a stationary one. */}
         {/* Legal */}
         <div className="mt-16 flex flex-col gap-4 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="label text-ink-3">© {new Date().getFullYear()} Norrin</p>
