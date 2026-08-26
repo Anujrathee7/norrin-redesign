@@ -1392,7 +1392,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
        this file could ship. */
     [data-scene-part='line'] {
       animation-name: scrub-line;
-      animation-range: var(--scene-from, cover 10%) var(--scene-to, cover 38%);
+      animation-range: var(--scene-from, cover 22%) var(--scene-to, cover 44%);
       --scrub-ease: var(--ease-entrance);
     }
 

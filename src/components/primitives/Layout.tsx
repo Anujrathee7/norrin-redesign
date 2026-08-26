@@ -113,7 +113,11 @@ export function SectionHeader({
       className={cx(gap === 'tight' ? 'mb-6 md:mb-7' : 'mb-12 md:mb-20', className)}
     >
       <span className="line-mask">
-        <span data-scene-part="line" style={{ ['--scene-to' as string]: 'cover 27%' }}>
+        {/* Starts at 22%, not at the layer's 10% default. Measured, the rise
+            was beginning at y=990-1046 on a 950px viewport — below the fold, so
+            the first third of it happened where nobody could see it and the
+            eyebrow was already part-risen by the time the header appeared. */}
+        <span data-scene-part="line" style={{ ['--scene-from' as string]: 'cover 22%', ['--scene-to' as string]: 'cover 44%' }}>
           <Eyebrow index={index} label={label} tone={tone} />
         </span>
       </span>
@@ -123,8 +127,8 @@ export function SectionHeader({
             <span
               data-scene-part="line"
               style={{
-                ['--scene-from' as string]: 'cover 7%',
-                ['--scene-to' as string]: 'cover 34%',
+                ['--scene-from' as string]: 'cover 28%',
+                ['--scene-to' as string]: 'cover 50%',
               }}
             >
               {children}

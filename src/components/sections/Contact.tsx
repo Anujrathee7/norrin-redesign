@@ -70,7 +70,10 @@ export function Contact() {
           <line
             data-scroll="draw-line"
             pathLength={1}
-            style={{ ['--scrub-to' as string]: 'cover 40%' }}
+            style={{
+              ['--scrub-from' as string]: 'cover 10%',
+              ['--scrub-to' as string]: 'cover 46%',
+            }}
             x1="0"
             y1="8"
             x2="1000"
@@ -95,8 +98,8 @@ export function Contact() {
         <div
           data-scroll="pop"
           style={{
-            ['--scrub-from' as string]: 'cover 42%',
-            ['--scrub-to' as string]: 'cover 50%',
+            ['--scrub-from' as string]: 'cover 48%',
+            ['--scrub-to' as string]: 'cover 56%',
           }}
           className="absolute top-[3px] right-0 h-2.5 w-2.5 bg-signal"
         />
