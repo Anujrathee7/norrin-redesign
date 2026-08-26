@@ -1420,6 +1420,16 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 
        If you are reaching for this for anything a screen reader would announce,
        reach for `enter` instead and accept that it cannot hide. */
+    /* The scene-timed twin of `pop`, for a mark inside a PINNED scene. A stuck
+       element's own `view()` timeline stops advancing the moment it pins, so
+       the self-timed form freezes there; the named timeline on the runway keeps
+       running because it belongs to the runway, not to the thing held still. */
+    [data-scene-part='pop'] {
+      animation-name: scrub-pop;
+      animation-range: var(--scene-from, contain 30%) var(--scene-to, contain 40%);
+      --scrub-ease: var(--ease-entrance);
+    }
+
     [data-scroll='pop'] {
       animation: scrub-pop var(--ease-entrance) both;
       animation-timeline: view();

@@ -36,25 +36,36 @@ export function Proof() {
             arrived once and stopped, and conspicuous now that everything around
             them keeps moving. Same offsets as Contact's, so the two hand-rolled
             headers behave like the four that are not. */}
-        <div
-          data-scroll="enter"
-          style={{
-            ['--scrub-from' as string]: 'cover 10%',
-            ['--scrub-to' as string]: 'cover 34%',
-          }}
-        >
-          <Eyebrow index="06" label="Track record" className="mb-8" />
-        </div>
+        {/* PINNED, like The Gap, and for a reason that is arithmetic rather
+            than taste.
 
-        <h2
-          id="proof-heading"
-          data-scroll="enter"
-          style={{
-            ['--scrub-from' as string]: 'cover 14%',
-            ['--scrub-to' as string]: 'cover 38%',
-          }}
-          className="display-2 max-w-[22ch]"
-        >
+            In normal flow this block scrolls at 1:1, so the distance between
+            "the first entry appears at the bottom of the screen" and "the last
+            entry is still somewhere you would look at it" is FIXED — measured
+            here at about 640px. Padding cannot buy more: making the scene taller
+            moves the percentages but not the pixels, because the block's
+            position at a given scroll offset is unchanged. Four stations were
+            being squeezed into that 640px, which is why the sequence felt
+            hurried and why 2027 was landing with the block 158px from the top
+            of the screen — already on its way out.
+
+            Pinning removes the constraint entirely: the block stops moving, so
+            the scroll available is whatever the runway says. 220svh gives about
+            1140px of `contain` at a laptop — nearly double — and every station
+            completes while the whole timeline is sitting still in front of you.
+
+            THE HEADING IS INSIDE THE PIN, not above it. A 193px rail held alone
+            leaves most of the screen empty for the whole hold; with the eyebrow
+            and the claim held above it the composition is a page rather than a
+            stripe. They carry no entrance of their own: an element inside a pin
+            does not move, so its own `view()` timeline stops the moment the
+            scene pins, and an entrance timed that way would freeze half-done.
+            The hold IS their gesture. */}
+        <div data-scene data-scene-runway className="h-[220svh]">
+          <div data-scene-pin className="sticky top-[max(88px,12svh)]">
+        <Eyebrow index="06" label="Track record" className="mb-8" />
+
+        <h2 id="proof-heading" className="display-2 max-w-[22ch]">
           {story.recognition}
         </h2>
 
@@ -73,20 +84,15 @@ export function Proof() {
             contents had not. It is a plain box now; everything that moves in
             here moves off the section's own scroll range. */}
         <div className="mt-20 md:mt-28">
-          {/* `data-scene` here declares the named view-timeline the rule
-              segments below read from. It sits fine on the same element as
-              `data-scroll="drift-slow"` — that drift is a `transform`
-              animation on the ol itself, `view-timeline-name` is not a
-              transform and doesn't compose with or fight it, so the rail can
-              keep drifting AND hand its scroll range down to its own
-              children at the same time. */}
-          {/* `drift-slow` sits on this wrapper rather than on the <ol> so the
-              rail and the figure standing on it move as ONE layer — see the
-              note on the mascot. `data-scene` stays on the <ol>, whose scroll
-              range is what the segments below read: `view-timeline-name` is
-              not a transform, so it neither composes with nor fights the drift
-              on the wrapper above it. */}
-          <div data-scroll="drift-slow" className="relative">
+          {/* The parallax drift that used to be here is gone. It was a
+              `view()` timeline, and a stuck element does not move in the
+              viewport — so from the moment the scene pins it would have frozen,
+              which is the entire time this block is on screen. A parallax layer
+              that cannot move is just a wrapper. The named `--scene` timeline
+              on the runway above is what everything in here reads instead;
+              named lookup walks the tree rather than hunting for a scrollport,
+              so it reaches through the sticky child perfectly well. */}
+          <div className="relative">
             {/* Standing ON the rail, at the far end of it — over the one entry
                 that has not happened yet, reading about it.
 
@@ -116,7 +122,9 @@ export function Proof() {
                 className="flex"
                 style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}` }}
               >
-                <Nori pose="read" size={112} animated={false} />
+                <div className="nori-idle">
+                  <Nori pose="read" size={112} animated={false} />
+                </div>
               </div>
             </div>
             {/* The same figure over the same entry, below `lg`, where the rail
@@ -137,10 +145,12 @@ export function Proof() {
                 className="flex"
                 style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}` }}
               >
-                <Nori pose="read" size={112} animated={false} />
+                <div className="nori-idle">
+                  <Nori pose="read" size={112} animated={false} />
+                </div>
               </div>
             </div>
-            <ol data-scene className="grid grid-cols-1 lg:grid-cols-4">
+            <ol className="grid grid-cols-1 lg:grid-cols-4">
 
 
             {timeline.map((t, i) => {
@@ -151,28 +161,24 @@ export function Proof() {
               // sweep reads as one continuous line being drawn rather than
               // four rules ticking off independently.
               //
-              // MEASURED IN `cover`, NOT `contain`. `contain` is the period the
-              // block is fully inside the viewport, so its length is
-              // `viewportHeight - blockHeight` — which shrinks as the block
-              // grows. At desktop this list is a 193px four-column row and
-              // `contain` is a roomy 757px of scroll; at phone width the same
-              // list is a 507px stack and `contain` collapses to 273px, so all
-              // four stations drew inside a third of a screen. That is the
-              // opposite of the pacing this device is for. `cover` is
-              // `blockHeight + viewportHeight`, which GROWS with the block:
-              // 1143px at desktop, 1287px on a phone. The window below spans
-              // 10%–70% of it, which comes out at 686px and 772px — close to
-              // what desktop already had, and nearly three times what the phone
-              // was getting.
+              // `contain` is safe here BECAUSE the block is pinned, and it
+              // was not safe before. `contain` is the period a scene is fully
+              // inside the viewport, so its length is `sceneHeight -
+              // viewportHeight` — which collapses toward zero as a scene
+              // approaches the viewport's height, and that is what ruled it out
+              // when this list was a 193px row in normal flow. A 220svh runway
+              // is always more than a viewport tall by construction, so
+              // `contain` is always about 120svh of scroll: roughly 1140px on a
+              // laptop, and it cannot degenerate at any height.
               //
-              // The last slot closes at 68%, comfortably inside the block's
-              // stay rather than exactly as it leaves. A rail that finishes
-              // drawing while you can still see all of it is the point; landing
-              // the final stroke on the way out just means it completes
-              // off-screen.
+              // Four stations across 5%–80% of it, 25% wide and 17% apart, so
+              // each takes ~285px of scrolling (it was 240) and the sequence
+              // spans ~855px (it was 617). The last station closes at 80%,
+              // leaving a fifth of the hold to look at a finished line before
+              // the pin releases.
               const sceneRange = {
-                ['--scene-from' as string]: `cover ${10 + i * 13}%`,
-                ['--scene-to' as string]: `cover ${10 + i * 13 + 17}%`,
+                ['--scene-from' as string]: `contain ${5 + i * 17}%`,
+                ['--scene-to' as string]: `contain ${5 + i * 17 + 25}%`,
               }
               return (
                 <li
@@ -231,10 +237,10 @@ export function Proof() {
                     className="absolute top-0 left-0 -translate-x-1/2 lg:translate-x-0 lg:-translate-y-1/2"
                   >
                     <span
-                      data-scroll="pop"
+                      data-scene-part="pop"
                       style={{
-                        ['--scrub-from' as string]: `cover ${10 + i * 13 + 10}%`,
-                        ['--scrub-to' as string]: `cover ${10 + i * 13 + 18}%`,
+                        ['--scene-from' as string]: `contain ${5 + i * 17 + 11}%`,
+                        ['--scene-to' as string]: `contain ${5 + i * 17 + 19}%`,
                       }}
                       className={
                         'block h-1.5 w-1.5 ' +
@@ -276,8 +282,8 @@ export function Proof() {
                   <div
                     data-scene-part="uncover"
                     style={{
-                      ['--scene-from' as string]: `cover ${10 + i * 13 + 6}%`,
-                      ['--scene-to' as string]: `cover ${10 + i * 13 + 21}%`,
+                      ['--scene-from' as string]: `contain ${5 + i * 17 + 7}%`,
+                      ['--scene-to' as string]: `contain ${5 + i * 17 + 25}%`,
                     }}
                   >
                     <p
@@ -295,6 +301,8 @@ export function Proof() {
               )
             })}
             </ol>
+          </div>
+        </div>
           </div>
         </div>
       </Container>
