@@ -571,9 +571,35 @@
     line-height: 1.5;
     font-weight: 500;
     white-space: nowrap;
+    /* `transform` is in this list for the press below. Without it the scale
+       would snap rather than travel, which reads as a glitch rather than as a
+       button being pushed.
+
+       160ms and an ease-OUT curve, both deliberate. An ease-in-out — which is
+       what `--ease-ui` is, and what the colour above correctly uses for a
+       crossfade — starts slow, and the start is the exact instant the finger
+       lands and the user is looking for a response. Reusing `--ease-entrance`
+       rather than adding a fifth near-identical cubic-bezier to the file: it is
+       already an ease-out cubic and three curves that almost match is worse
+       than one that is 0.1 off ideal. */
     transition:
       background-color 0.2s var(--ease-ui),
-      color 0.2s var(--ease-ui);
+      color 0.2s var(--ease-ui),
+      transform 0.16s var(--ease-entrance);
+  }
+
+  /* PRESS FEEDBACK. The buttons already changed colour when held — there is a
+     `--accent-press` token and a note beside it saying a filled control with no
+     pressed state "feels dead under the finger on touch, where there is no
+     hover to fall back on". That reasoning was right and it stopped one step
+     short: colour tells you the control noticed, movement tells you it was
+     PUSHED. Nothing physical happens under the finger without it, and this page
+     exists to produce exactly one click.
+
+     0.97, not lower. A press is a couple of millimetres of travel; anything
+     that reads as a shrink is a different gesture. */
+  .btn:active {
+    transform: scale(0.97);
   }
 
   /* The bar's copy. A 72px header cannot carry a 51px button and still look
@@ -645,7 +671,15 @@
     border-radius: var(--radius-control);
     transition:
       background-color 0.2s var(--ease-ui),
-      color 0.2s var(--ease-ui);
+      color 0.2s var(--ease-ui),
+      transform 0.16s var(--ease-entrance);
+  }
+
+  /* Shallower than the action's. These are nav items and menu options — hit far
+     more often than the call to action and worth far less each time — so the
+     feedback confirms the press without performing it. */
+  .control:active {
+    transform: scale(0.985);
   }
 
   .control:hover {
@@ -820,6 +854,16 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Movement goes; the colour change stays. `prefers-reduced-motion` asks for
+     less motion, not less feedback, and the blanket `transition-duration:
+     0.01ms` above would otherwise leave the press SNAPPING to 97% in a single
+     frame — which is a jump, and a jump is the thing the setting exists to
+     avoid. */
+  .btn:active,
+  .control:active {
+    transform: none !important;
   }
 
   html.js [data-reveal]:not([data-revealed]),
