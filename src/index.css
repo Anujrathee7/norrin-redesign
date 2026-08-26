@@ -1123,7 +1123,12 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     [data-scroll='draw'] {
       animation: scroll-draw linear both;
       animation-timeline: view();
-      animation-range: entry 20% cover 55%;
+      /* Overridable, like every other range in this layer. The default is
+         unchanged, so the production line's own appearances are untouched;
+         what it buys is the seam rule, whose subject is one pixel tall and for
+         which `entry 20%` and "the bottom edge of the screen" are the same
+         thing to within a rounding error. */
+      animation-range: var(--scrub-from, entry 20%) var(--scrub-to, cover 55%);
       transform-origin: left center;
     }
 

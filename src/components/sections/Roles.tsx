@@ -99,6 +99,51 @@ export function Roles() {
           </ul>
         </div>
       </Container>
+
+      {/* SEAM 3 — the taper, and the last of them.
+          A single hairline drawing left to right at the boundary. Nothing else
+          moves; `03 What you can buy` builds from it exactly as it already did.
+
+          This is the third and smallest use of one idea. Seam 1 gives the
+          reader a bright edge sweeping up the screen with a whole section
+          behind it, seam 2 sends the same edge back out, and this reduces it
+          to the rule alone — after which the page stops doing it entirely.
+          Seams 4 through 7 get nothing. Three different tricks would read as a
+          bag of tricks; one idea decaying reads as a page that knows where its
+          opening ends.
+
+          MOSS, NOT SUN. Sun is budgeted on paper grounds and this rule sits on
+          one — it is not part of an inverse band the way seam 1's edge is.
+
+          It hosts here rather than on Pillars because this section is already
+          `overflow-clip` and Pillars is not: a full-width rule there would add
+          horizontal document overflow. It does not need `-50vw` at all — the
+          section IS full width, so `inset-x-0` reaches both edges — and the
+          negative bottom margin cancels the section's own bottom padding so
+          the rule lands on the seam itself rather than a screenful above it.
+          Net height cost: one pixel.
+
+          `[data-scroll='draw']` is scaleX from `transform-origin: left center`,
+          which is what makes it draw rather than fade. Not `draw-line`, which
+          animates stroke-dashoffset and needs `pathLength="1"` on an SVG. */}
+      <div aria-hidden="true" className="relative mt-24 -mb-24 h-px md:mt-36 md:-mb-36">
+        {/* Nudged in from `draw`'s default `entry 20%`. On a one-pixel element
+            `entry 20%` is indistinguishable from "the moment it touches the
+            bottom edge of the screen", and `.shots/timing.mjs` measured the
+            draw starting at y=938 of a 950px viewport — on screen by twelve
+            pixels, which is on screen in the same sense that a train is in the
+            station as the doors close. Opening at `cover 6%` starts it at 893
+            and finishes it at 551, so the rule is fully drawn a screenful
+            before the boundary it marks. */}
+        <span
+          data-scroll="draw"
+          style={{
+            ['--scrub-from' as string]: 'cover 6%',
+            ['--scrub-to' as string]: 'cover 42%',
+          }}
+          className="absolute inset-0 block bg-accent"
+        />
+      </div>
     </section>
   )
 }
