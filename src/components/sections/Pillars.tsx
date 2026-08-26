@@ -60,33 +60,107 @@ export function Pillars() {
           </div>
         </Grid>
 
-        <Grid>
+        {/* `data-scene` sits on this `<Grid>`, not on the index nav and not
+            on the articles column, because the fill bar below lives in the
+            nav's subtree while the rows it is timed against live in the
+            articles column's — two sibling subtrees. A named view-timeline
+            only reaches DESCENDANTS of the element that declares it, so the
+            one element that can hand the same `--scene` timeline to both
+            sides is their common ancestor. It also happens to be the
+            geometrically honest choice: `Grid`'s own rendered height already
+            equals the articles column's height (that column is what sizes
+            the row under `align-items: stretch`), so `contain 0%` → `100%`
+            on `Grid` maps 1:1 onto exactly the span the fill needs to cover. */}
+        <Grid data-scene>
           {/* Sticky index — desktop only. */}
           <nav
             aria-label="Pillars"
             className="col-span-4 hidden md:col-span-4 md:block lg:col-span-3"
           >
-            <ol className="sticky top-[120px] border-t border-hairline">
-              {pillars.map((p, i) => (
-                <li key={p.id}>
-                  <a
-                    href={`#pillar-${p.id}`}
-                    aria-current={active === i ? 'true' : undefined}
-                    className={cx(
-                      'flex items-baseline gap-3 border-b py-4 transition-colors duration-300',
-                      // The active row is marked by its own rule going moss. The
-                      // previous mark was a 6px sun square at 1.03:1 on --surface —
-                      // arithmetically invisible, and in the theme most people use
-                      // it was the only thing carrying the state.
-                      active === i ? 'border-accent text-ink' : 'border-hairline text-ink-3 hover:text-ink-2',
-                    )}
-                  >
-                    <span className="label tabular-nums">{String(i + 1).padStart(2, '0')}</span>
-                    <span className="ui">{p.name}</span>
-                  </a>
-                </li>
-              ))}
-            </ol>
+            {/* The moss fill rides alongside the sticky rows, not on them:
+                `[data-scene-part]` animates `transform`, and a transform on
+                `nav`'s sticky child would replace whatever positioning that
+                child depends on outright rather than combine with it — the
+                same "animation beats inline transform/class" trap as Nori's
+                anchor above. So the fill is a separate `<span>`, a sibling of
+                `<ol>`, both laid out inside one `relative` wrapper.
+
+                That wrapper is `h-full`, not just `relative`. `nav` is a
+                grid item under `Grid`'s default `align-items: stretch`, so
+                its real rendered height already matches the tall articles
+                column beside it, not the three short rows inside `<ol>` —
+                that extra height above and below the rows is exactly the
+                room `<ol>`'s sticky positioning uses to stay pinned for
+                nearly the whole section instead of for a few rows' worth of
+                scroll. Inserting a wrapper here makes IT `<ol>`'s new
+                containing block for sticky purposes, so if the wrapper only
+                hugged the rows (the default for a plain `relative` div) it
+                would hand `<ol>` a containing block a fraction of that
+                height and the sticky range would collapse to almost
+                nothing. `h-full` keeps the wrapper exactly as tall as `nav`
+                already was with `<ol>` as its only child, so the sticky math
+                is untouched — verified by screenshot below, since this is
+                the one change in this file most likely to silently break
+                it. */}
+            <div className="relative h-full">
+              {/* THE FILL HAS TO BE PINNED WITH THE ROWS, NOT BESIDE THEM.
+                  It was first hung off the tall `h-full` wrapper as a sibling
+                  of `<ol>`. Every number that pass checked came back right —
+                  `<ol>` stayed pinned at exactly 120px and the fill's scaleY
+                  tracked scroll linearly — and it was still wrong, because the
+                  wrapper is as tall as the ARTICLES column (1368px) while the
+                  rows are ~193px and it is the rows that are sticky. The two
+                  scrolled independently: mid-section the index sat pinned with
+                  its last row ending at y≈285 while the moss line ran on to
+                  y≈470, ~190px of colour hanging in empty space beside
+                  nothing. It was not riding the rail, it just shared an
+                  x-coordinate with it. Only a screenshot showed that.
+
+                  So the sticky element moves off `<ol>` and onto a wrapper the
+                  fill can live inside. `position: sticky` IS a positioned
+                  element, so the fill resolves against it, is exactly as tall
+                  as the index, and travels with it. The sticky range does not
+                  change: this box's containing block is still the `h-full`
+                  wrapper and its own height is still the rows' height.
+
+                  It cannot go directly inside `<ol>` — the content model there
+                  is `<li>` only, and a stray `<span>` would be an actual
+                  validity error, not a nitpick. */}
+              <div className="sticky top-[120px]">
+                <span
+                  aria-hidden="true"
+                  data-scene-part="rule-v"
+                  className="pointer-events-none absolute top-0 left-0 h-full w-px bg-accent"
+                />
+                <ol className="border-t border-hairline">
+                  {pillars.map((p, i) => (
+                    <li key={p.id}>
+                      <a
+                      href={`#pillar-${p.id}`}
+                      aria-current={active === i ? 'true' : undefined}
+                      className={cx(
+                        // `pl-4` clears the fill bar at the row's left edge —
+                        // it insets the number and label, not the border:
+                        // `border-b` is drawn on this same element's own
+                        // border box, which padding never moves, so the rule
+                        // still meets the fill bar and the ol's `border-t`
+                        // at x=0 instead of floating 16px to its right.
+                        'flex items-baseline gap-3 border-b py-4 pl-4 transition-colors duration-300',
+                        // The active row is marked by its own rule going moss. The
+                        // previous mark was a 6px sun square at 1.03:1 on --surface —
+                        // arithmetically invisible, and in the theme most people use
+                        // it was the only thing carrying the state.
+                        active === i ? 'border-accent text-ink' : 'border-hairline text-ink-3 hover:text-ink-2',
+                      )}
+                    >
+                        <span className="label tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+                        <span className="ui">{p.name}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
           </nav>
 
           <div className="col-span-4 md:col-span-7 md:col-start-6 lg:col-span-8 lg:col-start-5">
