@@ -39,11 +39,6 @@ solid, what is still ahead is dashed), and the line that finally completes edge-
 above the closing CTA. There is no other decorative device on the site. The argument *is*
 the layout.
 
-Note what the hero deliberately does **not** do: there is no marker-pen highlight behind
-the money word. That gesture is on every launch page of the last three years. The emphasis
-is the site's own device instead — moss ink, and the solid half of the production line
-drawn beneath the word that earns it.
-
 ## 2. Nori — the mascot
 
 **Nori** is Norrin's character: a small white robot with a lavender antenna, drawn in six
@@ -149,9 +144,10 @@ src/
     useDrawLine.ts            measures once, then hands off to a CSS transition
   components/
     primitives/               Container, SectionHeader, Eyebrow, Reveal
+    mascot/nori/              Nori — placement and sizing only, never repainting
     mascot/Fyr.tsx            the sea mark — a diagram, never a character
     mascot/Lunni.tsx          the puffin; lands only on a mark that is on station
-    nav/                      one bar (three competing variants were cut in Phase 2)
+    nav/                      one bar
     sections/                 one file per homepage section
 tools/
   shot.mjs                    screenshot harness (viewports, themes, clips, --nav states)
@@ -165,48 +161,42 @@ comment naming the public page it came from.
 
 ## 5. Motion
 
-Three easings, on purpose. `--ease-entrance` (0.33, 1, 0.68, 1) for arrivals, `--ease-ui`
-for state, `--ease-exit` for dismissals.
+Three easings: `--ease-entrance` (0.33, 1, 0.68, 1) for arrivals, `--ease-ui` for state,
+`--ease-exit` for dismissals.
 
-**Reveals are CSS, not a library.** An earlier version used GSAP + ScrollTrigger; it set
-`autoAlpha: 0` inline and depended on a trigger firing to undo it, which means any misfire
-leaves copy permanently invisible. That is a bad trade for an 18px slide. Now the hidden
-state is scoped to `html.js` and an IntersectionObserver flips one attribute — so *no JS*,
-*no IntersectionObserver*, or *reduced motion* all degrade to fully visible content.
+**Reveals are CSS, not a library.** The hidden state is scoped to `html.js` and an
+IntersectionObserver flips one attribute, so *no JS*, *no IntersectionObserver* or *reduced
+motion* all degrade to fully visible content — where the earlier GSAP + ScrollTrigger version
+set `autoAlpha: 0` inline and left copy permanently invisible if a trigger misfired. Dropping
+GSAP cut **46 kB gzip**.
 
-Removing GSAP entirely — it was down to animating one line — cut **46 kB gzip**.
-
-Fyr's idle motion is pure CSS on nested groups (`heave` and `roll` are separate axes with a
-non-harmonic 7 : 4.5 period ratio, so the loop never visibly repeats). The lamp uses a real
-IALA rhythm, `Fl(2) 6s`. JS writes exactly two custom properties.
+Fyr's idle is pure CSS on nested groups — `heave` and `roll` are separate axes with a
+non-harmonic 7 : 4.5 period ratio, so the loop never visibly repeats — and the lamp uses a
+real IALA rhythm, `Fl(2) 6s`. JS writes exactly two custom properties.
 
 `prefers-reduced-motion` stops all of it, holds the lamp **lit** rather than dark, and
 changes nothing about what the page communicates.
 
-## 6. Responsive
+## 6. Responsive and accessible
 
-Verified at 320 / 390 / 834 / 1280 / 1512. No horizontal overflow at 320px.
-
-The gap diagram is the one section that genuinely re-lays-out rather than reflowing: three
-marks side by side at phone width would be three unreadable smudges, so the rule turns
-vertical and the marks become a rail. Fyr itself is **redrawn, not scaled**, below ~44px —
-sea, mooring and glow are dropped and everything that survives is thickened, because a
-faithful miniature turns to mush at favicon size.
-
-## 7. Accessibility
+Verified at 320 / 390 / 834 / 1280 / 1512. No horizontal overflow at 320px. The gap diagram
+is the one section that re-lays-out rather than reflowing: the rule turns vertical and the
+three marks become a rail. Fyr is **redrawn, not scaled**, below ~44px — sea, mooring and
+glow are dropped and what survives is thickened, because a faithful miniature turns to mush
+at favicon size.
 
 - **axe-core: zero violations**, light and dark, across `wcag2a/2aa/21a/21aa` + best-practice.
 - The fixed header inverts its palette while an inverted section is beneath it, so it never
   slices a heading with a cream band on forest green.
-- Contrast was a real finding, not a formality: `--ink-3` measured **3.67:1** on ground and
-  drove ~52 nodes of failure at 11px. Recomputed to `#696d5f` (4.96:1 / 4.65:1). Alpha ink
-  on the forest band went from `/45` (3.40:1) to `/60` (4.83:1).
+- Contrast was a real finding: `--ink-3` measured **3.67:1** on ground and drove ~52 nodes of
+  failure at 11px, recomputed to `#696d5f` (4.96:1 / 4.65:1). Alpha ink on the forest band
+  went from `/45` (3.40:1) to `/60` (4.83:1).
 - Single `h1`, no heading-level skips, `header`/`main`/`footer`/`nav` landmarks, skip link.
 - Escape and outside-click close the nav panel; the mobile sheet locks scroll and releases it.
 - `:focus-visible` only — a 2px moss outline, never suppressed.
 - Fyr is `role="img"` with a label where it carries meaning, `aria-hidden` where decorative.
 
-## 8. Performance
+## 7. Performance
 
 | | |
 |---|---|
@@ -214,15 +204,11 @@ faithful miniature turns to mush at favicon size.
 | CSS | 36 kB / **8 kB gzip** |
 | Fonts | **3 files, ~120 kB**, latin-subset woff2 only |
 
-Font work: dropped Cyrillic/Greek/Vietnamese subsets and legacy `.woff` fallbacks that were
-being shipped for a page that renders none of them; dropped Newsreader italic (a second
-~55 kB face serving four headings); the mono is used at a single weight, so only 500 ships.
-The headline face is preloaded.
+Fonts ship latin subsets only, no legacy `.woff` fallbacks, no Newsreader italic, and one
+mono weight; the headline face is preloaded. Fyr animates `transform` and `opacity` only,
+and its glow is a radial-gradient circle rather than a blur filter.
 
-Fyr animates `transform` and `opacity` only. Its glow is a radial-gradient circle, never a
-blur filter — filter repaints are the one real trap in an SVG this size.
-
-## 9. What was observed, and what changed
+## 8. What changed, and why
 
 **Observed on norrin.com** (evidence in `docs/research-brief.md`): ~25 primary nav
 destinations; the value proposition sitting *below* a "Highlights and News" webinar promo;
@@ -231,14 +217,11 @@ proof numbers reachable only via `/about-us`; service copy that is genuinely goo
 clicks deep; a script typeface for headings; and no visualisation anywhere of the
 pilot→production gap the company's entire thesis rests on.
 
-**Changed deliberately**
-
 1. **Lead with the thesis, not the newsroom.**
-2. **Promoted the proof.** The four figures now appear twice — a quiet station log in the
-   hero (answering "are you durable?" in the first five seconds) and a full proof bar.
+2. **Promoted the proof** — the four figures appear twice, as a station log in the hero and
+   as a full proof bar.
 3. **Collapsed the IA** from ~25 destinations to five, on Norrin's own three-pillar taxonomy,
-   which absorbs all eleven service links without loss. Technologies demoted from seven nav
-   items to one evidence block. Locale moved to a utility switcher.
+   which absorbs all eleven service links without loss. Locale moved to a utility switcher.
 4. **Surfaced the four roles** — integrator / deployer / infrastructure partner /
    transformation lead — from a dense paragraph into the page's spine.
 5. **Designed the roster** as type instead of a link list.
@@ -246,30 +229,21 @@ pilot→production gap the company's entire thesis rests on.
    which discards every visitor who is researching rather than buying.
 7. **Replaced the script display face.**
 8. **Visualised the gap.**
-9. **Told the company's story.** The 2012 → 2024 merger (Cloud1, Devisioona, Smartbi) →
-   2025 Bizone acquisition → 2027 listing ambition is a genuinely differentiating arc that
-   currently sits in one paragraph of prose on `/about-us`. It is now a timeline drawn on
-   the production line.
+9. **Told the company's story** — the 2012 → 2024 merger (Cloud1, Devisioona, Smartbi) →
+   2025 Bizone acquisition → 2027 listing ambition, drawn as a timeline on the production
+   line rather than left as one paragraph of prose on `/about-us`.
 
-## 10. Assumptions
+## 9. Assumptions, and what a real build would need
 
-Made because no internal information was available: that the primary visitor is an enterprise
-buyer (CIO/CDO/Head of Data or AI) at a large Nordic enterprise, with candidates secondary;
-that the primary conversion is a qualified conversation, with the gated Vision Paper and
-newsletter as lower rungs; that the Anthropic + Microsoft alignment is deliberate positioning.
-No analytics, funnel data, brand guidelines or CMS constraints were available.
+Assumed, because no internal information was available: that the primary visitor is an
+enterprise buyer (CIO/CDO/Head of Data or AI) at a large Nordic enterprise, with candidates
+secondary; that the primary conversion is a qualified conversation, with the gated Vision
+Paper and newsletter as lower rungs; that the Anthropic + Microsoft alignment is deliberate
+positioning. No analytics, funnel data, brand guidelines or CMS constraints were available.
 
-## 11. Placeholders and what a real build would need
-
-Nothing on this site invents a statistic, client, testimonial, award or capability. Where
-content does not exist publicly, it is **absent rather than fabricated**. A production build
-would still need:
-
-- **Testimonial quotes with attribution** — none are published; none were invented.
-- **Photography and headshots** — none used. People appear as names and titles only.
-- **Customer logo files** — deliberately not reproduced; we hold no licence to those marks,
-  so the roster is set as type. This is the honest option and the better-looking one.
-- **Real destinations** — this is a single landing page; nav and case links resolve to
-  on-page anchors.
-- **Case metrics beyond the four Norrin publishes**, and the Vision Paper form/CRM wiring.
-- Licences for Norrin's actual typefaces, if the real brand faces were to be used.
+Nothing here invents a statistic, client, testimonial, award or capability — where content
+does not exist publicly it is **absent rather than fabricated**. A production build would
+still need testimonial quotes with attribution, photography and headshots, licensed customer
+logo files (the roster is set as type because we hold no licence to those marks), real
+destinations behind the nav and case links, case metrics beyond the four Norrin publishes,
+the Vision Paper form and CRM wiring, and licences for Norrin's actual typefaces.
