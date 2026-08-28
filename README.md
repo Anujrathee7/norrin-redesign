@@ -72,10 +72,8 @@ The pilot → production diagram still uses the earlier spar-buoy drawing (`Fyr.
 
 Derived from **Norrin's own published theme tokens**, extracted from their HubSpot theme
 CSS — not invented. Their palette is a named Nordic nature system (`moss`, `sun`, `forest`,
-`lichen`, `sand`, `bark`, `sky`, `turquoise`), which is genuinely distinctive in a category
-drowning in indigo gradients, and which their current site barely exploits.
-
-Four of those eight survive as UI colours. Seven nature colours is a mood board, not a system.
+`lichen`, `sand`, `bark`, `sky`, `turquoise`), which their current site barely exploits.
+Four of those eight survive as UI colours; seven nature colours is a mood board, not a system.
 
 | Token | Light | Dark | Role |
 |---|---|---|---|
@@ -92,94 +90,53 @@ Four of those eight survive as UI colours. Seven nature colours is a mood board,
 | `--inactive` | `#88967e` *(lichen)* | `#5d6a55` | the "not yet in production" state — **strokes only** |
 | `--tint` | moss @ 6% | accent @ 8% | the wash that fills a rounded control on hover |
 
-The forest bands carry the **same ladder again**, because they used to carry eight
-hand-picked alphas of `--inverse-ink` — `/15 /20 /25` for rules and `/60 /65 /70 /75 /80 /85`
-for type — chosen file by file for the same three jobs, so "muted text on forest" was a
-different colour in four sections. `--inverse-ink-2` / `-ink-3`, `--inverse-hairline` /
-`-hairline-strong`, `--inverse-inactive`, `--inverse-tint` and `--inverse-overlay` replace
-all of them. The two hairline alphas are **solved** to reproduce the paper hairlines'
-measured ratios (1.29:1 and 1.85:1) rather than picked by eye, and `--inverse-inactive`
-likewise reproduces lichen's 2.92:1 — so a rule reads as the same weight of rule on either
-ground, and the page's one device does not change strength when it crosses into a band.
+The forest bands carry the same ladder again — `--inverse-ink-2` / `-ink-3`,
+`--inverse-hairline` / `-hairline-strong`, `--inverse-inactive`, `--inverse-tint` and
+`--inverse-overlay` — replacing eight hand-picked alphas of `--inverse-ink` that had drifted
+section by section. Their alphas are *solved* to reproduce the paper values' measured ratios
+(1.29:1, 1.85:1, and lichen's 2.92:1) rather than picked by eye, so a rule reads as the same
+weight of rule on either ground.
 
-`node tools/palette.mjs` measures every pair the system actually renders — 61 of them,
-alpha composited onto its real background first — and exits non-zero on a miss. It is a
+`node tools/palette.mjs` measures every pair the system actually renders — 61 of them, alpha
+composited onto its real background first — and exits non-zero on a miss. It is a
 verification gate alongside the build, the lint and the axe run.
 
-Two structural rules hold it together:
+Three rules hold it together:
 
 1. **Separation is carried by 1px hairlines. There are zero box-shadows on the site.**
-2. **Sun is a signal, never a surface** — budget of three solid uses per page (the
+2. **Sun is a signal, never a surface** — a budget of three solid uses per page (the
    recognition marker in the proof bar, the crossing marker in the gap diagram, and the
-   terminal square where the closing line completes). Anything sitting on
-   sun uses fixed dark ink in *both* themes.
+   terminal square where the closing line completes). Anything sitting on sun uses fixed
+   dark ink in *both* themes.
+3. **Radius means you can touch it.** Structure stays square — rules, bands, ruled tables,
+   timeline nodes. Only what responds is rounded.
+
+| Token | Value | Used by |
+|---|---|---|
+| `--radius-action` | `999px` | the solid call to action and the ghost that pairs with it |
+| `--radius-control` | `8px` | nav items, locale trigger, menu options, hamburger, skip link |
+| `--radius-panel` | `14px` | things that open or frame: the locale list, the Thinking rungs |
 
 Lichen is a stroke colour, not a text colour: at 11px it clears neither theme's AA
 threshold, so "ahead" labels use the ink ramp while the dashed rule keeps the lichen.
 
-### Radius
-
-The scale was `0 / 2px`, on the argument that Norrin's own `2em` pill form fields read soft
-and consumer while this is enterprise infrastructure. That argument was right about the
-disease and wrong about the cure: what makes a page read consumer is rounding *everything*
-indiscriminately, so that curvature says nothing. And `2px` on a 50px button is not a
-restrained radius, it is a rasterising artefact — the system was effectively at zero.
-
-The scale is now three values, and it carries a meaning:
-
-> **Radius means you can touch it.**
-
-Structure stays square. Hairlines separate rather than contain, and a rule has no corners —
-the production line, the eyebrow rules, the ruled tables, the section bands, the timeline
-nodes and the sun terminus are all unchanged. So the only rounded shapes on the page are the
-ones that respond, and the eye finds every action without anything having to be coloured
-louder. That makes the change subtractive rather than decorative.
-
-The geometry is **the mark's own**. Fyr's float is `rect w=3.6 rx=1.8` — a capsule, fully
-rounded — and its mast cap is a softly rounded stroke, so the page borrows the buoy's two
-radii instead of inventing a house rounding:
-
-| Token | Value | Used by |
-|---|---|---|
-| `--radius-action` | `999px` | the solid call to action and the ghost that pairs with it — the float's silhouette |
-| `--radius-control` | `8px` | pressable but not the action: nav items, locale trigger, menu options, hamburger, skip link |
-| `--radius-panel` | `14px` | things that open or frame: the locale list, the Thinking rungs |
-
-Not rounded, deliberately: **the nav drawer**. It is the header temporarily getting taller —
-it shares the bar's ground and takes the bar's own border as its top edge — and a radius
-would turn it into a floating card, which is the one thing its construction exists to avoid.
-
-### Controls
-
-There was no button in this system. There were four hand-assembled ones — hero, nav, closing
-CTA, mobile sheet — already drifted to three paddings, two transition durations, and two
-different ways of writing the same sun hover, one of them a raw hex in a file that could not
-see the other raw hex. `.ui` had been extracted for exactly this reason and stopped one rung
-short of the thing using it.
-
 `.btn` is geometry and behaviour; `.btn-solid` / `.btn-signal` / `.btn-ghost` are colour
-only. `.control` is the smaller pressable role, `.panel` is the opening one. Both invert
-under `[data-tone='inverse']`, which the header now declares — without that attribute
-`[data-tone='inverse'] :focus-visible` never matched inside the bar, so tabbing the nav while
-it sat over a forest band drew a **moss** ring at 1.40:1, which is to say no ring at all. axe
-does not automate focus-indicator contrast, so every clean audit run to date was silent
-about it.
+only. `.control` is the smaller pressable role, `.panel` the opening one. Both invert under
+`[data-tone='inverse']`, which the header declares.
 
 ### Typography
 
 Three families, all open-source and self-hosted. Norrin's real faces (ABC Camera Plain,
-LFS Adelia) are commercially licensed and could not be used — but their heading face is a
-**script**, which in an enterprise-AI context reads decorative and costs them authority.
-Replacing it was a deliberate correction, not a workaround.
+LFS Adelia) are commercially licensed and could not be used; their heading face is a script,
+which in an enterprise-AI context costs them authority.
 
-- **Schibsted Grotesk** — display and UI. Commissioned by the Norwegian-Swedish press group;
-  genuinely Nordic provenance rather than cosplay, and it holds up at both 7.5rem and 0.875rem.
-- **Newsreader** — the thesis, leads, case bodies. Carries the human register Norrin's values
-  copy actually has.
-- **IBM Plex Mono** — indices, unit labels, addresses, telemetry. The "production" voice.
+- **Schibsted Grotesk** — display and UI, at both 7.5rem and 0.875rem.
+- **Newsreader** — the thesis, leads, case bodies.
+- **IBM Plex Mono** — indices, unit labels, addresses, telemetry.
 
 Fluid scale via `clamp()` in `src/index.css` (`.display-1` … `.label`), clamped against a
-360 → 1512px range.
+360 → 1512px range. The reasoning behind the radius scale, the control classes and the face
+swap is in [docs/design-notes.md](docs/design-notes.md).
 
 ## 4. Architecture
 

@@ -34,3 +34,48 @@ The pilot → production diagram in `TheGap` still uses the earlier **spar-buoy*
 four states borrow real IALA buoyage grammar and the section's copy names it directly
 ("unlit, unmoored, marking nothing"; "isolated danger"). Swapping it for Nori is a copy
 rewrite, not an asset swap, and has deliberately been left as a separate decision.
+
+## Radius — why the scale changed
+
+The scale was `0 / 2px`, on the argument that Norrin's own `2em` pill form fields read soft
+and consumer while this is enterprise infrastructure. That argument was right about the
+disease and wrong about the cure: what makes a page read consumer is rounding *everything*
+indiscriminately, so that curvature says nothing. And `2px` on a 50px button is not a
+restrained radius, it is a rasterising artefact — the system was effectively at zero.
+
+Three values, carrying a meaning — **radius means you can touch it**. Hairlines separate
+rather than contain, and a rule has no corners, so the production line, the eyebrow rules,
+the ruled tables, the section bands, the timeline nodes and the sun terminus are all
+unchanged. The only rounded shapes on the page are the ones that respond, and the eye finds
+every action without anything having to be coloured louder. That makes the change
+subtractive rather than decorative.
+
+The geometry is **the mark's own**. Fyr's float is `rect w=3.6 rx=1.8` — a capsule, fully
+rounded — and its mast cap is a softly rounded stroke, so the page borrows the buoy's two
+radii instead of inventing a house rounding.
+
+Not rounded, deliberately: **the nav drawer**. It is the header temporarily getting taller —
+it shares the bar's ground and takes the bar's own border as its top edge — and a radius
+would turn it into a floating card, which is the one thing its construction exists to avoid.
+
+## Controls — why `.btn` exists
+
+There was no button in this system. There were four hand-assembled ones — hero, nav, closing
+CTA, mobile sheet — already drifted to three paddings, two transition durations, and two
+different ways of writing the same sun hover, one of them a raw hex in a file that could not
+see the other raw hex. `.ui` had been extracted for exactly this reason and stopped one rung
+short of the thing using it.
+
+Both `.control` and `.panel` invert under `[data-tone='inverse']`, which the header now
+declares — without that attribute `[data-tone='inverse'] :focus-visible` never matched
+inside the bar, so tabbing the nav while it sat over a forest band drew a **moss** ring at
+1.40:1, which is to say no ring at all. axe does not automate focus-indicator contrast, so
+every clean audit run to date was silent about it.
+
+## Typography — why the display face was replaced
+
+Norrin's heading face is a **script**, which in an enterprise-AI context reads decorative and
+costs them authority. Replacing it was a deliberate correction, not a workaround. Schibsted
+Grotesk was commissioned by the Norwegian-Swedish press group — genuinely Nordic provenance
+rather than cosplay — and it holds up at both 7.5rem and 0.875rem. Newsreader carries the
+human register Norrin's values copy actually has; IBM Plex Mono is the "production" voice.
