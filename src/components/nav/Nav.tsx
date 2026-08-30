@@ -1,5 +1,6 @@
 import { Container } from '@/components/primitives/Layout'
 import { LocaleMenu } from '@/components/primitives/LocaleMenu'
+import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { cx } from '@/lib/cx'
 import { NAV } from './navData'
 import { ContactButton, Drawer, Hamburger, MobileSheet, RuleSegment, Wordmark } from './NavParts'
@@ -142,7 +143,13 @@ export function Nav() {
               </ul>
             </nav>
 
-            <div data-nav-end className="hidden items-center gap-4 justify-self-end lg:flex">
+            <div data-nav-end className="hidden items-center gap-3 justify-self-end lg:flex">
+              {/* Left of the locale, not right of it: both are quiet controls
+                  and they belong in one group, with the action on the outside.
+                  The gap tightened from 4 to 3 because there are three objects
+                  in this corner now — at gap-4 the pair read as two separate
+                  utilities rather than as a set. */}
+              <ThemeToggle inverted={inverted} />
               <LocaleMenu inverted={inverted} />
               <ContactButton inverted={inverted} />
             </div>

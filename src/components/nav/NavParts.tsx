@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Container } from '@/components/primitives/Layout'
 import { LocaleMenu } from '@/components/primitives/LocaleMenu'
+import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { cx } from '@/lib/cx'
 import { NAV, type NavItem } from './navData'
 
@@ -262,10 +263,23 @@ export function MobileSheet({ onNavigate, barHeight = 72 }: { onNavigate: () => 
           >
             Contact
           </a>
-          {/* Was desktop-only, which quietly stranded four of five languages. */}
-          <div className="mt-8 flex items-center justify-between border-t border-hairline pt-6">
-            <span className="label text-ink-3">Language</span>
-            <LocaleMenu />
+          {/* Was desktop-only, which quietly stranded four of five languages.
+              The theme joins it on the same terms and for the same reason: the
+              toggle lives in the desktop utilities row, which is `hidden` below
+              lg, so without this the entire phone audience is locked to the
+              default with no way out of it. Two rows, one rule between them —
+              the ruled-table idiom the hero stats and the drawer both use. */}
+          <div className="mt-8 divide-y divide-hairline border-t border-hairline">
+            <div className="flex items-center justify-between py-4">
+              <span className="label text-ink-3">Language</span>
+              <LocaleMenu />
+            </div>
+            <div className="flex items-center justify-between py-4">
+              <span className="label text-ink-3">Appearance</span>
+              {/* The sheet is always on paper — it sets `bg-ground` itself and
+                  never inverts — so no `inverted` here, unlike the bar's copy. */}
+              <ThemeToggle />
+            </div>
           </div>
         </nav>
       </Container>

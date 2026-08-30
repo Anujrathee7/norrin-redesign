@@ -1,11 +1,32 @@
 <!doctype html>
-<html lang="en">
+<!-- Dark is the default, so it is in the MARKUP, not applied by script.
+     A stored "light" is an upgrade applied below, before first paint. Doing it
+     the other way round — ship neutral, let JS pick — is what produces the
+     white flash every dark-first site is known for, and it would also leave a
+     JS-less visitor on whatever the OS happened to prefer. -->
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/nori-mark.svg" />
-    <meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0e120f" media="(prefers-color-scheme: dark)" />
+    <!-- One tag, not two media-scoped ones. The theme is no longer the OS
+         preference, so scoping the browser chrome to `prefers-color-scheme`
+         painted a paper-coloured address bar above a black page for anyone on a
+         light OS. useTheme rewrites this to match whichever theme is showing. -->
+    <meta name="theme-color" content="#0e120f" />
+
+    <!-- Blocking on purpose, and first: it runs before the body paints, so a
+         returning light-mode reader never sees the dark default flash past.
+         Wrapped because Safari throws on localStorage in a blocked-cookies
+         context; the catch leaves the markup's dark in place. -->
+    <script>
+      try {
+        if (localStorage.getItem('norrin-theme') === 'light') {
+          document.documentElement.dataset.theme = 'light'
+          document.querySelector('meta[name="theme-color"]').content = '#f8f7f3'
+        }
+      } catch {}
+    </script>
 
     <title>Norrin — Enterprise AI is won in production</title>
     <meta
