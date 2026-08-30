@@ -119,7 +119,7 @@ export function Contact() {
                 ['--scrub-to' as string]: 'cover 34%',
               }}
             >
-              <Eyebrow index="07" label="Next" tone="inverse" className="mb-8" />
+              <Eyebrow index="08" label="Next" tone="inverse" className="mb-8" />
             </div>
             <h2
               id="contact-heading"
@@ -167,8 +167,18 @@ export function Contact() {
             </div>
           </div>
 
-          {/* Named humans. No headshots — we hold no rights to their images. */}
-          <div className="col-span-4 mt-16 self-end md:col-span-4 md:col-start-9 md:mt-0">
+          {/* Named humans. No headshots — we hold no rights to their images.
+
+              CENTRED AGAINST THE COPY, not pinned to its foot. This was
+              `self-end`, which bottom-aligned the roster with the CTA row and
+              left roughly 230px of empty band above it — the column reading as
+              though it had slipped down rather than been placed. The left
+              column runs headline, lede, then buttons; this list is about half
+              its height, so centring is what makes the two read as a pair.
+
+              `md:` only. Below that the column has stacked underneath and there
+              is nothing left to centre against. */}
+          <div className="col-span-4 mt-16 md:col-span-4 md:col-start-9 md:mt-0 md:self-center">
             {/* One label at every width. Nori used to point at it from the row
                 above, which meant this column carried two copies of the same
                 three words plus a `md:` branch to choose between them. The

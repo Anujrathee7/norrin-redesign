@@ -52,10 +52,14 @@ export const NAV: NavItem[] = [
   {
     label: 'Company',
     href: '#proof',
-    owns: ['proof'],
+    // Careers and Proof are one contiguous run, which is what lets the bar's
+    // marker travel in one direction down the page. See the note in App.tsx.
+    owns: ['careers', 'proof'],
     children: [
       { label: 'About us', href: '#proof', note: 'Track record · Story' },
-      // Careers pointed at the values section, which held no careers content.
+      // This used to point at the values section, which held no careers
+      // content. There is a Careers section now, so the link is real.
+      { label: 'Careers', href: '#careers', note: 'Work at Norrin' },
       { label: 'Offices & billing', href: '#footer', note: 'Seven offices · Five countries' },
     ],
   },

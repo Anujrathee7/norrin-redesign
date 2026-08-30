@@ -57,8 +57,15 @@ poses. The artwork is authored directly as finished SVGs in `public/nori-*.svg`.
 them and nothing else; editing a pose means editing the file. The nav and footer mark is
 the same file with `crop="head"` re-declaring the viewBox, not a second asset.
 
-The pilot → production diagram still uses the earlier spar-buoy drawing (`Fyr.tsx`,
-`Lunni.tsx`) — a diagram rather than a character.
+Poses are **generated**, not hand-drawn files: `tools/nori.mjs` draws the character once
+and emits every `public/nori-*.svg`. Editing a pose means editing that script and re-running
+it. Each pose is drawn to meet **one kind of edge** — `lean` a vertical one, `sit` a rule,
+`peek` a long ledge — and they are not interchangeable. The rule learned the expensive way:
+**Nori may touch a rule, never type.** A white character with a thin contour resting a hand
+on white ink has no visible contact point; every join that works on this site is the mascot
+meeting a hairline, the production line or a card border.
+
+The earlier spar-buoy drawings (`Fyr.tsx`, `Lunni.tsx`) are **deleted**.
 
 `src/components/mascot/nori/Nori.tsx` · `nori.css` · `public/nori-*.svg` — rationale in
 [docs/design-notes.md](docs/design-notes.md).
@@ -207,20 +214,33 @@ src/
   lib/cx.ts                   class joiner (own module, so Fast Refresh survives)
   hooks/
     useReducedMotion.ts       useSyncExternalStore — cannot tear under concurrent render
-    useDrawLine.ts            measures once, then hands off to a CSS transition
+    useTheme.ts               the DOM is the source of truth; MutationObserver on data-theme
   components/
-    primitives/               Container, SectionHeader, Eyebrow, Reveal
+    primitives/               Container, SectionHeader, Eyebrow, Reveal, Photo
     mascot/nori/              Nori — placement and sizing only, never repainting
-    mascot/Fyr.tsx            the sea mark — a diagram, never a character
-    mascot/Lunni.tsx          the puffin; lands only on a mark that is on station
     nav/                      one bar
-    sections/                 one file per homepage section
+    sections/                 one file per homepage section, plus Compare and MascotLab
 tools/
+  nori.mjs                    draws the character once, emits all 13 poses + the mark
+  photos.mjs                  fetches Norrin's photography, encodes AVIF/WebP/JPEG at 3 widths
+  compare.mjs                 captures both sides of #compare in one pass
   shot.mjs                    screenshot harness (viewports, themes, clips, --nav states)
   audit.mjs                   axe-core (incl. open nav drawer) + heading order + landmarks
   contrast.mjs                WCAG ratio, with alpha composited onto its real background
   palette.mjs                 every pair the system renders, declared and measured
 ```
+
+Two surfaces hang off the hash rather than the page: **`#compare`** puts each section of
+norrin.com beside the same section rebuilt, and **`#mascots`** is the pose workbench.
+Neither is in the nav; the homepage should make the argument rather than talk about it.
+
+**Photography.** The site shipped zero raster images for most of its life, deliberately —
+we hold no licence to customer logos or to anyone's headshots. Norrin's own homepage
+photographs are the one category without that problem, and they are used here: self-hosted
+under `public/photos/`, never hotlinked, re-encoded by `tools/photos.mjs`. They are Norrin's
+pictures, shown back to Norrin, in a redesign of Norrin's page. The alt text is **ours** —
+five of their six ship with none at all — and `src/data/norrin.ts` marks every one as
+authored rather than transcribed.
 
 `src/data/norrin.ts` is the single source of content. Every string carries a provenance
 comment naming the public page it came from.
@@ -236,9 +256,9 @@ motion* all degrade to fully visible content — where the earlier GSAP + Scroll
 set `autoAlpha: 0` inline and left copy permanently invisible if a trigger misfired. Dropping
 GSAP cut **46 kB gzip**.
 
-Fyr's idle is pure CSS on nested groups — `heave` and `roll` are separate axes with a
-non-harmonic 7 : 4.5 period ratio, so the loop never visibly repeats — and the lamp uses a
-real IALA rhythm, `Fl(2) 6s`. JS writes exactly two custom properties.
+Nori's idle is pure CSS. Each anchored pose breathes or sways about its own **measured
+contact point** (`anchors.ts`) rather than about its box centre, so a figure resting on a
+rule never lifts off the thing it is resting on. JS writes exactly two custom properties.
 
 `prefers-reduced-motion` stops all of it, holds the lamp **lit** rather than dark, and
 changes nothing about what the page communicates.
@@ -247,9 +267,9 @@ changes nothing about what the page communicates.
 
 Verified at 320 / 390 / 834 / 1280 / 1512. No horizontal overflow at 320px. The gap diagram
 is the one section that re-lays-out rather than reflowing: the rule turns vertical and the
-three marks become a rail. Fyr is **redrawn, not scaled**, below ~44px — sea, mooring and
-glow are dropped and what survives is thickened, because a faithful miniature turns to mush
-at favicon size.
+three marks become a rail. Nori is **re-cropped, not scaled**, below ~40px: the same file
+with its viewBox re-declared to the head, because at that size a full figure collapses into
+a grey pill and only the ears and eyes survive.
 
 - **axe-core: zero violations**, light and dark, across `wcag2a/2aa/21a/21aa` + best-practice.
 - The fixed header inverts its palette while an inverted section is beneath it, so it never
@@ -260,7 +280,10 @@ at favicon size.
 - Single `h1`, no heading-level skips, `header`/`main`/`footer`/`nav` landmarks, skip link.
 - Escape and outside-click close the nav panel; the mobile sheet locks scroll and releases it.
 - `:focus-visible` only — a 2px accent outline, sun on the forest bands, never suppressed.
-- Fyr is `role="img"` with a label where it carries meaning, `aria-hidden` where decorative.
+- Nori is `aria-hidden` wherever it is decorative, which is everywhere it appears: each
+  pose sits beside text that already says the thing, so a label would only repeat it.
+- Photography carries real alt text, authored by us and marked as ours in the data file —
+  five of Norrin's six homepage images ship with no alt attribute at all.
 
 ## 7. Performance
 
@@ -271,8 +294,14 @@ at favicon size.
 | Fonts | **3 files, ~120 kB**, latin-subset woff2 only |
 
 Fonts ship latin subsets only, no legacy `.woff` fallbacks, no Newsreader italic, and one
-mono weight; the headline face is preloaded. Fyr animates `transform` and `opacity` only,
-and its glow is a radial-gradient circle rather than a blur filter.
+mono weight; the headline face is preloaded. Nori animates `transform` only, and every pose
+is a static SVG the browser can cache rather than a runtime drawing.
+
+Photography is AVIF with WebP and JPEG fallbacks at three widths, intrinsic dimensions on
+every `<img>` so nothing reflows, and lazy below the fold. Measured against their live page:
+norrin.com transfers ~915 kB of images, this rebuild ~525 kB — about 1.7x lighter. Their
+delivery is genuinely competent, and the flattering comparison against their 47 MB of source
+files would have been wrong, because their CDN resizes and serves WebP.
 
 ## 8. What changed, and why
 

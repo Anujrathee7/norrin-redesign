@@ -54,3 +54,16 @@ desktop.ini
 
 .vercel
 .env*
+
+# Unrelated personal media that lives in this folder. Ignored rather than
+# deleted — they are not the project's to remove, but they should not show up
+# in every `git status` either.
+/52987733106264159.jpg
+/Anime icon pfp pdp.jpg
+/download.gif
+/one piece x af.jpg
+
+# Agent tooling that lives alongside the project rather than in it.
+/.agents/
+/.claude/
+/skills-lock.json

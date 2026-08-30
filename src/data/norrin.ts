@@ -31,6 +31,22 @@ export const positioning = {
    * paragraph alongside them would repeat the same words twice in one viewport.
    */
   thesisOpening: 'Real impact takes more than frontier models.',
+  /**
+   * Their brand statement — and the one string here that is NOT read from the DOM,
+   * because on norrin.com it is not text at all.
+   *
+   * It plays as an 825x633 `<video>` in the hero: scattered letterforms that fly
+   * together into the sentence. Searching the live page for "MINDS" returns zero
+   * hits anywhere in the document; the video carries no `aria-label`, no caption
+   * track and no text alternative. So this was transcribed from the rendered
+   * frame, and that is the reason it is worth putting back as real type — a
+   * company shipping five languages (see `languages`) cannot translate a sentence
+   * that has been baked into a video.
+   *
+   * Set here in sentence case. Their video renders it uppercase, which is a
+   * styling decision we can make in CSS rather than one we have to store.
+   */
+  slogan: 'When minds join, creative engineering forges new realities',
   metaDescription:
     'Norrin transforms AI & Data into measurable business impact by integrating AI into ' +
     'business processes and building Enterprise AI.',
@@ -418,6 +434,115 @@ export const publications = {
     title: 'NorrInsights',
     body: 'Writing and a newsletter on enterprise AI, data and adoption.',
     excerpt: 'Writing and a newsletter on enterprise AI, data and adoption.',
+  },
+  /**
+   * The webinar card from their "Highlights and News" band. It is the one item
+   * in that band we had never modelled, which is why our Thinking panel had
+   * three rungs where their page has four things to offer.
+   *
+   * Dated content, and that is the point of keeping it separate from the three
+   * evergreen publications above: a webinar promo goes stale, and their homepage
+   * gives it the position directly under the hero. Ours puts it last in the
+   * panel, which is the argument the compare page makes.
+   */
+  webinar: {
+    title: 'Webinar: Industrial AI for business leadership',
+    body:
+      'What does it take to deploy AI in a production environment so that it delivers measurable ' +
+      'results? In the webinar, we walk through what industrial AI looks like when it works, ' +
+      'with real use cases.',
+    excerpt:
+      'We walk through what industrial AI looks like when it works, with real use cases.',
+  },
+} as const
+
+/* ------------------------------------------------------------------ *
+ * Careers — source: homepage "Work at Norrin"
+ * ------------------------------------------------------------------ */
+
+/**
+ * The one section of their homepage we had no counterpart for at all.
+ *
+ * Verbatim, including the joke in the second sentence — "But so does our
+ * headcount" is the only line on their site with a sense of humour in it, and
+ * cutting it to sound more corporate would be editing them into someone else.
+ */
+export const careers = {
+  title: 'Work at Norrin',
+  body:
+    'As Norrin grows, our employees grow. But so does our headcount. We are always looking for ' +
+    'new individuals to join us in building a more productive, more human world - forged from ' +
+    'the union of creativity and technology.',
+  cta: 'Explore our careers',
+} as const
+
+/* ------------------------------------------------------------------ *
+ * Photography — source: norrin.com homepage, their own images
+ * ------------------------------------------------------------------ */
+
+/**
+ * Norrin's own photographs, self-hosted rather than hotlinked.
+ *
+ * PROVENANCE, and the one place this file carries authored text. `src` is the
+ * exact HubSpot URL each file came from, so any claim here is checkable. `alt`
+ * is OURS: five of their six homepage images ship with no alt text at all and
+ * the sixth has "Norrin-Change management", so there was nothing to transcribe.
+ * Writing real descriptions is a fix we are demonstrating, not a quotation, and
+ * `altIsOurs` marks every one of them so the distinction survives.
+ *
+ * `w`/`h` are the intrinsic dimensions their CDN reports. They are here to be
+ * rendered as `width`/`height` attributes — the images ship at up to 6682px
+ * wide on their side, and the point of the pipeline in `tools/photos.mjs` is
+ * that ours do not.
+ */
+export const photos = {
+  change: {
+    file: 'change-management',
+    src: 'https://norrin.com/hs-fs/hubfs/Change%20management%20or%20AI%20etc.jpg',
+    w: 5062,
+    h: 3180,
+    alt: 'Two colleagues talking across a desk in a bright meeting room.',
+    altIsOurs: true,
+  },
+  portrait: {
+    file: 'portrait-29',
+    src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-29.jpg',
+    w: 3402,
+    h: 4552,
+    alt: 'A Norrin consultant at work, photographed in portrait orientation.',
+    altIsOurs: true,
+  },
+  process: {
+    file: 'process',
+    src: 'https://norrin.com/hs-fs/hubfs/Process%20or%20change%20management%20etc.jpg',
+    w: 3992,
+    h: 2992,
+    alt: 'A working session in progress, notes and laptops on the table.',
+    altIsOurs: true,
+  },
+  team: {
+    file: 'team-34',
+    src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-34.jpg',
+    w: 4084,
+    h: 4560,
+    alt: 'A Norrin team member in the office, photographed in portrait orientation.',
+    altIsOurs: true,
+  },
+  vision: {
+    file: 'vision-paper',
+    src: 'https://norrin.com/hs-fs/hubfs/AI%20or%20change%20management%20etc.jpg',
+    w: 5464,
+    h: 3640,
+    alt: 'Colleagues in conversation, used on Norrin’s Face of AI vision paper section.',
+    altIsOurs: true,
+  },
+  careers: {
+    file: 'careers-9',
+    src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-9.jpg',
+    w: 6682,
+    h: 4411,
+    alt: 'The Norrin office, people working and talking across an open floor.',
+    altIsOurs: true,
   },
 } as const
 

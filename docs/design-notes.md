@@ -29,11 +29,10 @@ lichen. The character is legible and holds its silhouette on both the paper grou
 forest bands, so nothing is broken — but it is the one element on the site whose colour is
 not derived from Norrin's own published theme.
 
-The pilot → production diagram in `TheGap` still uses the earlier **spar-buoy** drawing
-(`src/components/mascot/Fyr.tsx`, `Lunni.tsx`). That is a diagram rather than a mascot: its
-four states borrow real IALA buoyage grammar and the section's copy names it directly
-("unlit, unmoored, marking nothing"; "isolated danger"). Swapping it for Nori is a copy
-rewrite, not an asset swap, and has deliberately been left as a separate decision.
+The spar-buoy drawings that preceded Nori (`Fyr.tsx`, `Lunni.tsx`) are **deleted**, and the
+pilot → production diagram in `TheGap` now carries Nori's `idea` / `laptop` / `rocket` poses
+at its three stations. This note used to say the buoy was still there and that replacing it
+was a pending decision; it was made, and this paragraph was simply stale.
 
 ## Radius — why the scale changed
 
@@ -50,9 +49,11 @@ unchanged. The only rounded shapes on the page are the ones that respond, and th
 every action without anything having to be coloured louder. That makes the change
 subtractive rather than decorative.
 
-The geometry is **the mark's own**. Fyr's float is `rect w=3.6 rx=1.8` — a capsule, fully
-rounded — and its mast cap is a softly rounded stroke, so the page borrows the buoy's two
-radii instead of inventing a house rounding.
+The geometry was **borrowed rather than invented**: the scale came off the buoy mark that
+stood here before Nori, whose float was `rect w=3.6 rx=1.8` — a capsule, fully rounded —
+and whose mast cap was a softly rounded stroke. The drawing is gone; the two radii it gave
+the page are still the ones in use, which is the only reason to record where they came
+from.
 
 Not rounded, deliberately: **the nav drawer**. It is the header temporarily getting taller —
 it shares the bar's ground and takes the bar's own border as its top edge — and a radius

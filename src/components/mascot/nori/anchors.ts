@@ -57,4 +57,11 @@ export const NORI_ANCHOR = {
   hold: { y: '67.97%' },
   /** Where the finger ends up, for aligning the gesture with a line of type. */
   point: { x: '96.33%', y: '59%' },
+  /**
+   * The resting palm. Pair it with `stand` — `prop` touches the world at two
+   * points, the sole on a baseline and the hand on whatever it is resting on,
+   * and a placement that honours only one of them tilts the figure off its
+   * own geometry. Wrist at (150, 250) in the drawing's 512 box.
+   */
+  prop: { x: '29.30%', y: '48.83%' },
 } as const

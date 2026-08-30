@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Nav } from '@/components/nav/Nav'
 import { MascotLab } from '@/components/sections/MascotLab'
+import { Compare } from '@/components/sections/Compare'
 import { Hero } from '@/components/sections/Hero'
 import { TheGap } from '@/components/sections/TheGap'
 import { Proof } from '@/components/sections/Proof'
 import { Roles } from '@/components/sections/Roles'
 import { Work } from '@/components/sections/Work'
+import { Careers } from '@/components/sections/Careers'
 import { Pillars } from '@/components/sections/Pillars'
 import { Thinking } from '@/components/sections/Thinking'
 import { Contact } from '@/components/sections/Contact'
@@ -21,25 +23,46 @@ import { Footer } from '@/components/sections/Footer'
  * which sat either side of Work. Two backward jumps.
  *
  * Each nav item now owns a contiguous run, in bar order:
- *   What we do → Roles, Pillars   Work → Work   Thinking → Thinking   Company → Proof
+ *   What we do → Roles, Pillars   Work → Work   Thinking → Thinking
+ *   Company → Careers, Proof
+ *
+ * Careers is why Company owns two sections rather than one. It is content for
+ * a different audience than the rest of the page, it belongs beside the track
+ * record under "Company", and the contiguity rule above is what decides where
+ * it goes: placed between Work and Thinking — which is Norrin’s own order —
+ * it would split Company’s run and reintroduce the backward jump this note
+ * exists to record. So it follows Thinking instead.
  *
  * The narrative it produces is the better one anyway: the problem, then what we
  * take responsibility for, then what you can buy, then who we did it for, then
- * the thinking, then the track record, then the ask.
+ * the thinking, then who we are, then the track record, then the ask.
  */
 /**
- * The mascot lab hangs off #mascots rather than living in the page.
+ * Two surfaces hang off the hash rather than living in the page.
  *
- * It is a workbench: four characters against both grounds, down to 24px, with
- * motion off. That is worth having and is not worth putting in the nav — the
- * page has one argument to make and a gallery of mascots is not part of it.
+ * `#mascots` is a workbench: every pose against both grounds, down to 24px,
+ * with motion off. Worth having, not worth a nav slot — the page has one
+ * argument to make and a gallery of mascots is not part of it.
+ *
+ * `#compare` is the opposite: it is FOR sending. It puts each section of
+ * norrin.com beside the same section rebuilt, because a redesign shown on its
+ * own asks the viewer to hold the original in their head and do the diff
+ * themselves, and a cold link does not get that much patience. It stays off the
+ * page for the same reason the lab does — the homepage should make the argument,
+ * not talk about making it.
  *
  * Gated on the hash rather than on a router because the project has no router
- * and does not need one for a single dev surface. `hashchange` does not fire
- * for the hash the page LOADED with, so the initial value is read from
- * `location` directly and not defaulted to empty.
+ * and needs none for two standalone surfaces; it also means both work on a
+ * static host with no rewrite rules. `hashchange` does not fire for the hash the
+ * page LOADED with, so the initial value is read from `location` directly and
+ * not defaulted to empty.
+ *
+ * A surface OWNS the whole document when its hash matches — it is not a section
+ * of the homepage — so anchors like `#contact` must never collide with these
+ * two names. They do not: every in-page anchor is a section id, and neither
+ * `mascots` nor `compare` is one.
  */
-function useIsMascotLab() {
+function useHashSurface() {
   const [hash, setHash] = useState(() =>
     typeof window === 'undefined' ? '' : window.location.hash,
   )
@@ -48,12 +71,15 @@ function useIsMascotLab() {
     window.addEventListener('hashchange', onChange)
     return () => window.removeEventListener('hashchange', onChange)
   }, [])
-  return hash === '#mascots'
+  if (hash === '#mascots') return 'mascots'
+  if (hash === '#compare') return 'compare'
+  return null
 }
 
 export default function App() {
-  const mascotLab = useIsMascotLab()
-  if (mascotLab) return <MascotLab />
+  const surface = useHashSurface()
+  if (surface === 'mascots') return <MascotLab />
+  if (surface === 'compare') return <Compare />
 
   return (
     <>
@@ -93,6 +119,7 @@ export default function App() {
         <Pillars />
         <Work />
         <Thinking />
+        <Careers />
         <Proof />
         <Contact />
       </main>

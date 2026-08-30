@@ -1196,6 +1196,44 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
     }
 
+    /* A photograph that keeps moving after it has arrived.
+
+       THE FRAME HOLDS STILL AND THE PICTURE TRAVELS. That is the whole idea:
+       nothing in the layout shifts, no box changes size, and the only thing
+       that moves is the image inside its own hairline. It is the one place on
+       this site where raster imagery is given motion, and it earns it because
+       the photograph IS the argument of its section — everywhere else the
+       argument is type and one rule.
+
+       IT ANIMATES A DESCENDANT rather than the element it is declared on, which
+       is the only rule in this layer that does. A frame that moved would not be
+       a frame, so the attribute goes on the frame and the animation goes on the
+       picture inside it.
+
+       THE SCALE FLOOR IS LOAD-BEARING. The <img> is `h-full w-full
+       object-cover`, so it exactly fills its frame at `scale(1)` — translate it
+       at that size and a sliver of `--surface` opens along the edge it moves
+       away from. Every keyframe below therefore stays at or above `scale(1.05)`
+       while travelling +/-2%, which covers the shift with room to spare. Change
+       one of these numbers and check the other.
+
+       It depends on `Photo`'s figure being `overflow: clip`; see the note
+       there, and the scrollport warning at the top of this section. */
+    [data-scroll='photo-pan'] img {
+      animation: scroll-photo-pan linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    @keyframes scroll-photo-pan {
+      from {
+        transform: scale(1.1) translateY(2%);
+      }
+      to {
+        transform: scale(1.05) translateY(-2%);
+      }
+    }
+
     /* A rule that draws itself across as its section is read. Used for the
        production line's section-scale appearances. */
     [data-scroll='draw'] {

@@ -11,9 +11,14 @@ import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
  * researching rather than buying — which, this early in a cycle, is most of
  * them.
  *
- * These three already exist publicly (a gated vision paper, a podcast, a
- * newsletter). Presented as rungs, they let someone convert to an email address
- * months before they are ready to talk to sales.
+ * All of these already exist publicly (a newsletter, a podcast, a gated vision
+ * paper, a webinar). Presented as rungs ordered by what they ASK FOR, they let
+ * someone convert months before they are ready to talk to sales.
+ *
+ * The webinar is the one their homepage promotes hardest — it sits in the band
+ * directly under their hero, above their own thesis. Here it is last, because
+ * it asks the most and because a dated promo is the most perishable thing a
+ * homepage can lead with.
  *
  * Two deliberate absences:
  *
@@ -50,6 +55,30 @@ const RUNGS = [
     body: publications.visionPaper.excerpt,
     cta: publications.visionPaper.cta,
   },
+  /**
+   * The webinar — the one item from their "Highlights and News" band this
+   * ladder had no rung for, which is why our panel offered three things where
+   * their homepage offers four.
+   *
+   * IT GOES LAST, and that placement is the argument. Norrin runs this card in
+   * the band directly under their hero, above their own thesis. It is the most
+   * perishable thing on the page — a dated promo for one event — sitting in the
+   * position that should carry the most durable. Here it is the top of the
+   * ladder because it asks the most, not because it is the most important.
+   *
+   * "Registration" IS AN INFERENCE, and the only one in this file. Their card
+   * does not say whether the webinar is gated, live or on demand, so this does
+   * not claim an email is required — `Email` would have been that claim.
+   * "Registration" describes the act a webinar involves and nothing more. If it
+   * turns out to be an open link, the correction is one word.
+   */
+  {
+    step: 'Attend',
+    commitment: 'Registration',
+    title: publications.webinar.title,
+    body: publications.webinar.excerpt,
+    cta: 'See upcoming webinars',
+  },
 ]
 
 export function Thinking() {
@@ -65,9 +94,9 @@ export function Thinking() {
           Start anywhere you like.
         </SectionHeader>
 
-        {/* Wiped rather than faded: the three rungs are one framed object, and
-            a wipe crossing it reads as one gesture where three fades read as
-            three separate arrivals. */}
+        {/* Wiped rather than faded: the rungs are one framed object, and a wipe
+            crossing it reads as one gesture where four fades read as four
+            separate arrivals. */}
         {/* The frame gets a `relative` wrapper for one reason: Nori peeks over
             its top border, and the border is on the <ul> two levels down inside
             an `overflow-hidden` frame — anything positioned in there would be
@@ -111,9 +140,9 @@ export function Thinking() {
 
         {/* Uncovered left to right against its own scroll range, so it runs
             backwards when you scroll back up instead of being spent on the
-            first pass. Still ONE gesture across the whole frame and not three
+            first pass. Still ONE gesture across the whole frame and not four
             staggered cells: the rungs are hairline-separated parts of a single
-            object, and three arrivals would argue they are three competing
+            object, and four arrivals would argue they are four competing
             boxes — which is the exact reading the frame was built to prevent.
 
             The clip lives on a wrapper rather than on the <ul>, because the
@@ -136,13 +165,21 @@ export function Thinking() {
             ['--scrub-to' as string]: 'cover 46%',
           }}
         >
-          {/* One frame with three cells, not three cards.
+          {/* One frame with four cells, not four cards.
               The rungs are hairline-separated already, so the radius goes on the
-              OUTER edge and the interior stays ruled — twelve rounded corners
+              OUTER edge and the interior stays ruled — sixteen rounded corners
               become four, and the block still reads as one object you can choose
-              from rather than three competing boxes. `overflow-hidden` is what
-              lets the cells' own square backgrounds be clipped by the frame. */}
-          <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-panel border border-hairline bg-hairline md:grid-cols-3">
+              from rather than four competing boxes. `overflow-hidden` is what
+              lets the cells' own square backgrounds be clipped by the frame.
+
+              THE COLUMN COUNT HAS TO DIVIDE THE RUNGS. This was `md:grid-cols-3`
+              when there were three; adding the webinar left a fourth cell alone
+              on a second row beside two cells of bare frame — the one failure
+              mode a single framed object cannot survive, because the empty space
+              is inside the frame and reads as a rendering fault. Two-up from
+              `md`, four-up from `xl` where there is room for four measures of
+              this length. Never an odd column count while there are four. */}
+          <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-panel border border-hairline bg-hairline md:grid-cols-2 xl:grid-cols-4">
             {RUNGS.map((r) => (
               <li key={r.title} className="flex flex-col bg-surface p-7 md:p-9">
                 <div className="mb-7 flex items-baseline justify-between gap-4 border-b border-hairline pb-4">
@@ -163,8 +200,8 @@ export function Thinking() {
         </div>
 
         <p className="caption mt-8 text-ink-3">
-          All three are published on norrin.com. This speculative rebuild does not reproduce
-          them, so the rungs above are shown rather than linked.
+          Each of these is published or announced on norrin.com. This speculative rebuild
+          does not reproduce them, so the rungs above are shown rather than linked.
         </p>
       </Container>
     </section>

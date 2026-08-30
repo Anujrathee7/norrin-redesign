@@ -228,7 +228,22 @@ export function Hero() {
               Sections 02–07 were converted precisely because they are NOT above
               the fold. */}
           <div className="col-span-4 md:col-span-8 lg:col-span-7">
-            <Eyebrow label="Nordic partner for enterprise AI" className="mb-7" />
+            {/* THEIR h1, demoted to the eyebrow — and that demotion is the
+                argument this whole section makes.
+
+                On norrin.com "We are Norrin" is the document's only `<h1>`, set
+                at 19.5px/700. Measured, every heading on their homepage is
+                19.5px except one `h2` at 66.2px; their h1 is the same size as
+                the paragraph beneath it and the CTA beside it. So the page's
+                top-level heading is a company name at body size, while the
+                sentence that actually argues for them — "We believe enterprise
+                AI is won in production" — is an `h3` at 19.5px/400, two
+                sections down, under a webinar promo.
+
+                We keep both strings and swap their ranks. The name becomes the
+                eyebrow, because that is what a name is: a label on the thing,
+                not the thing. The thesis takes the `display-1` and the `<h1>`. */}
+            <Eyebrow label={positioning.h1} className="mb-7" />
 
             {/* No highlighter behind the money word — that gesture is on
                 every launch page of the last three years. The emphasis is the
@@ -238,109 +253,93 @@ export function Hero() {
                 The two lines rise out from behind their own edges, in sequence.
                 The split is stated in the markup rather than measured, so it
                 cannot disagree with what actually renders. */}
-            {/* `relative` so the mascot below can be positioned against the
-                heading. NOT `w-fit` any more — see the note on the mascot for
-                why the wrapper's own width turned out to be useless as an
-                anchor. */}
+            {/* `relative` so the mascot can be positioned against the heading's
+                own em rather than against the column. */}
             <div className="relative">
               <Reveal as="h1" lines className="display-1" stagger={0.11}>
                 <Line>Enterprise AI is won in</Line>
-                <Line className="relative block w-fit pb-[0.14em] text-accent after:absolute after:right-0 after:bottom-0 after:left-0 after:h-px after:bg-accent after:content-['']">
-                  production.
-                </Line>
+                {/* The accent carries the emphasis on its own now. There used to
+                  be a solid rule under this word — the production line restated
+                  at heading scale — but the real one runs full-bleed at the
+                  foot of this same section, and two instances of the site's one
+                  device inside a single viewport is the device explaining
+                  itself. The colour is the emphasis; the rule below is the
+                  argument. */}
+                <Line className="block w-fit text-accent">production.</Line>
               </Reveal>
 
-              {/* Nori leans on the last "e" of "Enterprise", standing on that
-                  line's baseline and scaled to the type. `lean` is tilted with
-                  its LEFT shoulder forward, so it leans onto an edge that sits
-                  to ITS left — which is exactly what the end of a word is. The
-                  pose works unmirrored, the way it was drawn.
+              {/* NORI STANDS IN THE NOTCH BESIDE "Enterprise" — clear of it,
+                  not touching it, and that is a finding rather than a compromise.
 
-                  It cannot live INSIDE the heading: `.line-mask` is
-                  `overflow: hidden`, which is what lets the lines rise out from
-                  behind themselves, and it would clip the mascot away. So it is
-                  positioned against the wrapper instead.
+                  The pose rests a palm on an edge, and the first placement put
+                  that palm on the end of the word. Cropped and looked at
+                  (`.shots/probe/headline-crop.png`) it does not read: Nori is a
+                  WHITE character with a thin contour and the headline is white
+                  ink, so the pixels where they meet are white on white. Every
+                  other contact on this site works because the mascot meets a
+                  RULE — a hairline, the production line, a card border — a dark
+                  line on a light ground or the reverse. Type is not a rule. So
+                  the figure stands clear, the raised arm reads as a gesture
+                  toward the word rather than a grip on it, and the drawing keeps
+                  its own silhouette against the ground.
 
-                  EVERY NUMBER HERE IS IN THE HEADING'S OWN em, and that is the
-                  whole point. The obvious anchor — hang the mascot off the
-                  wrapper's right edge — does not work, because the headline
-                  WRAPS: at every width it renders as three visual lines, not
-                  the two the markup states, and a wrapped text block's box is
-                  always wider than its ragged ink. Measured, the ink stops at
-                  74% of the wrapper at 1512px and 86% at 1024px, so there is no
-                  fixed percentage to anchor to either. Hung off the box edge
-                  the mascot floated 206px clear of the type, leaning on
-                  nothing.
+                  THE POCKET IS MEASURED. The headline breaks identically at
+                  every width tested (390 / 768 / 1024 / 1280 / 1512): three
+                  lines ending at 4.47em, 5.02em and 5.05em of `display-1`, to
+                  two decimals, because the type scales with the font and the
+                  column never gets narrow enough to rebreak it. Line one is the
+                  SHORT one, so the notch to its right is free at every width,
+                  and the tightest the column ever leaves it is 1.43em at 1024.
+                  The figure occupies 4.62-5.72em, which clears both edges there
+                  and everywhere else. See `.shots/probe/h1-lines.mjs`.
 
-                  What IS stable is the width of the word itself: "Enterprise"
-                  at `display-1` measures 4.475em at 1024, 1280, 1512 AND 1920 —
-                  the same number to three decimals at every width, because it
-                  scales with the font rather than with the column. (Derive it
-                  by measuring, not by dividing by an assumed font-size: the
-                  first attempt guessed 124px where the computed value is 120,
-                  and landed the shoulder 19px inside the letter.)
-
-                  `h-[1lh]` is exactly one line of the heading, so `items-end`
-                  drops the figure onto the FIRST line's baseline rather than
-                  the heading's. That matters: the shoulder sits only about a
-                  quarter of the drawing's height above the sole, so a mascot
-                  standing at the bottom of a three-line block could never reach
-                  the top line's ink — the geometry rules it out, not taste.
-
-                  The size is on the inner box, in em, and the image's own
-                  `max-width: 100%` takes it from there, so the mascot tracks
-                  the type instead of being pinned to a px value that is right
-                  at one viewport and wrong at the next.
-
-                  PRESENT AT EVERY WIDTH, and it needs no breakpoint to be. The
-                  offset is `4.475em` measured from the h1's own left edge, and
-                  "Enterprise" is the first word of the heading at every size, so
-                  that offset lands on the same letter whatever the type is doing
-                  — at 390 the line breaks after "Enterprise" and the lean simply
-                  has more room. The figure scales itself for the same reason:
-                  its box is `1.15em`, so it tracks the heading rather than a px
-                  value that is right once.
-
-                  This used to be `lg` and up, on the grounds that the station
-                  log sat against the headline column below that and a mascot
-                  here would overlap the figures. Measured at 390 / 480 / 640 /
-                  768 / 1024 / 1280: the only element its box ever intersects is
-                  the h1 it is leaning on, and its right edge stays inside the
-                  h1's at every one of them. */}
-              <div className="display-1 absolute top-0 left-[4.475em] flex h-[1lh] items-end">
+                  `--sole-drop` IS A CORRECTION, and it exists because `1lh` is
+                  not the baseline. The line box is 0.94em while the font's own
+                  content box is 1.233em, so the glyphs overflow their line and
+                  the baseline sits above the box bottom that `items-end` aligns
+                  to. Standing the figure on that bottom sank it 12px into the
+                  descender space — measured off the crop, not guessed. */}
+              <div
+                aria-hidden="true"
+                className="display-1 pointer-events-none absolute top-0 left-[4.27em] flex h-[1lh] items-end"
+                style={{ ['--sole-drop' as string]: '0.096em' }}
+              >
                 <div
-                  className="w-[1.15em]"
+                  className="w-[1em]"
                   style={{
-                    // X: the measured shoulder (anchors.ts) onto the letter's
-                    // edge, then a hair past flush — daylight between a leaning
-                    // figure and what it leans on reads as floating.
-                    // Y: the painted sole is at 84.72% of the box, not at its
-                    // bottom edge, so without this it hovers above the baseline.
-                    transform:
-                      'translateX(calc(-1 * ' + NORI_ANCHOR.lean.x + ' - 0.03em)) ' +
-                      'translateY(calc(100% - ' + NORI_ANCHOR.stand.y + '))',
+                    transform: `translateY(calc(100% - ${NORI_ANCHOR.stand.y} - var(--sole-drop)))`,
                   }}
                 >
-                  {/* `breathe`, not the rock the other anchored poses get.
-                      This one is held at two points at once — feet on the
-                      heading's baseline, shoulder against the letter — and a
-                      rotation keeps whichever it pivots on and breaks the
-                      other. A vertical scale about the sole keeps the feet
-                      planted and slides the shoulder along the letter's edge,
-                      which is near-vertical where it touches, so both survive. */}
+                  {/* Breathing pivots on the sole, so the feet stay planted. */}
                   <div
                     className="nori-breathe"
-                    style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}` }}
+                    style={{
+                      ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}`,
+                    }}
                   >
-                    <Nori pose="lean" size={240} animated={false} />
+                    <Nori pose="prop" size={280} animated={false} />
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* THEIR BRAND LINE, PUT BACK AS TEXT — and sitting where a
+                subtitle belongs, directly under the headline it amplifies.
+
+                On norrin.com this sentence is an 825x633 `<video>` of letters
+                flying into place. It is the largest thing in their hero and it
+                is not type: the live DOM returns zero hits for "MINDS", and the
+                element carries no `aria-label`, no caption track and no text
+                alternative. It cannot be selected, indexed or read aloud — and
+                a company shipping five languages cannot translate a sentence
+                that has been rendered into a video.
+
+                It is short, so it belongs here rather than in a narrow column:
+                one serif line under the display type reads as the headline's
+                second breath. Sentence case, not their uppercase — the caps
+                were a styling decision, so they stay one. */}
             <Reveal as="p" delay={0.34} className="lead measure-serif mt-7 text-ink-2">
-              We turn AI ambition into production — co-creating the solutions, infrastructure and
-              adoption that make it stick.
+              {positioning.slogan}
             </Reveal>
 
             {/* The ghost carries the same pill geometry as the solid one, so the
@@ -349,16 +348,10 @@ export function Hero() {
                 51px one, and visually a caption that had wandered in. The gap
                 closes from 32px to 8px now that both have real padding. */}
             <Reveal delay={0.46} className="mt-9 flex flex-wrap items-center gap-x-2 gap-y-2">
-              <a
-                href="#contact"
-                className="btn btn-solid"
-              >
+              <a href="#contact" className="btn btn-solid">
                 Contact us
               </a>
-              <a
-                href="#gap"
-                className="btn btn-ghost group"
-              >
+              <a href="#gap" className="btn btn-ghost group">
                 Why pilots stall
                 <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none">
                   <path
@@ -382,11 +375,78 @@ export function Hero() {
               people durable enough for a three-year programme" never sees
               them. Answering that in the first five seconds is the single
               highest-leverage change available. Every figure is published. */}
+          {/* ONE BLOCK, HUNG FROM THE HEADLINE'S CAP LINE.
+              The statement and the evidence read as a single object here, and
+              the object is aligned to the type opposite it: `md:mt-3.5` lands
+              the paragraph's first line on the cap of "Enterprise", measured
+              rather than eyeballed (`.shots/probe/wide.mjs`). The two blocks
+              travel together — the gap between them is a plain margin on the
+              paragraph, so moving the column moves all of it.
+
+              THIS REPLACES A FOUR-CORNERS CONSTRUCTION, and the thing it gives
+              up is worth writing down. The column used to be `self-stretch`
+              with `justify-between`: the log was pushed to the bottom of the
+              row, which put its last rule within 3px of the CTA row's baseline
+              opposite — an alignment nobody names but everybody feels. That is
+              gone. In exchange the right column is now a compact unit tied to
+              the headline instead of a pair of blocks tied to the frame, and
+              the space it used to distribute now sits under the log.
+
+              If that space ever reads as a dead corner rather than as air,
+              `md:self-stretch md:justify-between` is the whole of the way back
+              — but the paragraph then unhooks from the cap line, because those
+              two things cannot both be true. */}
           <aside
             data-scroll="drift-slow"
-            className="col-span-4 mt-14 self-start md:col-span-4 md:col-start-9 md:mt-2 lg:col-span-3 lg:col-start-10"
+            className="col-span-4 mt-14 self-start md:col-span-4 md:col-start-9 md:mt-3.5 md:flex md:flex-col"
           >
-            <Reveal as="dl" stagger={0.06} variant="right" delay={0.2} className="border-t border-hairline">
+            {/* THEIR LEDE — verbatim, complete, and read from `data` rather
+                than retyped here.
+
+                It used to be a hand-edited version sitting in this file: em
+                dash for their comma, Oxford comma dropped, final clause cut.
+                Small liberties, but the project's whole claim is that every
+                string is traceable to a public page, and a paraphrase in JSX is
+                exactly where that claim quietly stops being true. (It also
+                retires the `sr-only` duplicate that used to sit at the foot of
+                this section and made screen readers hear it twice.)
+
+                It sits in THIS column rather than under the headline because it
+                is long — three sentences — and this column was 370px of empty
+                ground. A narrow measure is where a long paragraph does its best
+                work, and the swap turns the dead quadrant into the part of the
+                hero that actually explains the company. What is left under the
+                headline is the short line, which is what a subtitle wants to be.
+
+                It holds four columns at every width now. It used to step DOWN
+                to three at `lg`, so this paragraph got tighter exactly as the
+                page got more room to give it — 39ch at 1512 with 265px of
+                empty grid beside it, which read as a caption in the corner
+                rather than as the lede. At four it is 47ch and the gutter to
+                the copy column is a whole grid column.
+
+                `md:mb-24` is the gap to the station log, stated rather than
+                distributed. It used to be whatever `justify-between` had left
+                over, which is why it ran 170px at 1512 and 0px at 768 — the
+                narrower the column, the more lines this paragraph takes and the
+                less slack there was to spend. A stated margin is the same at
+                every width and cannot collapse. */}
+            <Reveal
+              as="p"
+              variant="right"
+              delay={0.14}
+              className="body-serif mb-7 text-ink-2 md:mb-24"
+            >
+              {positioning.lede}
+            </Reveal>
+
+            <Reveal
+              as="dl"
+              stagger={0.06}
+              variant="right"
+              delay={0.2}
+              className="border-t border-hairline"
+            >
               {STATION.map((row) => (
                 <div
                   key={row.term}
@@ -421,10 +481,7 @@ export function Hero() {
             rows. A one-pixel staircase at both joints, in the one object the
             page is remembered by. */}
         <div className="flex items-start">
-          <span
-            aria-hidden="true"
-            className="h-px flex-1 border-t border-dashed border-inactive"
-          />
+          <span aria-hidden="true" className="h-px flex-1 border-t border-dashed border-inactive" />
 
           <div className="relative h-px w-[clamp(104px,23vw,320px)] shrink-0 text-accent">
             {/* The rule continues across the mark itself, changing state at
@@ -435,12 +492,15 @@ export function Hero() {
             />
             <span aria-hidden="true" className="absolute top-0 right-0 left-1/2 h-px bg-accent" />
 
-            {/* The rocket pose used to stand here, on the crossing. It is gone:
-                the mascot now leans on the headline, and one hero cannot carry
-                two of the same character without the pair reading as a mistake.
-                The crossing itself is unchanged — the state change in the rule
-                IS the object, and it never needed a figure standing on it to be
-                legible. */}
+            {/* NO FIGURE ON THE CROSSING, deliberately.
+
+                A mascot stood here twice — `rocket` originally, then `sit`
+                while the headline had none. Both times it competed with the
+                one thing this object exists to say. The state change in the
+                rule IS the argument; a character sitting on it is a second
+                focal point 40px from the first, and the eye goes to the face
+                every time. The hero carries one figure, and it is up in the
+                headline where there is room for it. */}
           </div>
 
           {/* The tail is measured from the CONTAINER's right edge, not in raw
@@ -461,8 +521,6 @@ export function Hero() {
           </div>
         </Container>
       </div>
-
-      <p className="sr-only">{positioning.lede}</p>
     </section>
   )
 }

@@ -659,6 +659,56 @@ const POSES = {
     ],
     { note: 'READ — eyes down on a held page. The one pose not looking at you.' },
   ),
+
+  /**
+   * PROP — standing on a baseline with a palm resting on something at
+   * shoulder-and-a-bit height. Drawn for the hero headline, and drawn because
+   * none of the other twelve could go there.
+   *
+   * `lean` needs a VERTICAL edge to butt a shoulder into, and the end of a word
+   * is ragged whitespace, so it floated. `peek` needs a long HORIZONTAL ledge to
+   * grip, and a single capital is narrower than the head, so it hovered. Both
+   * were tried in the hero and both are in `.shots/`.
+   *
+   * What the headline actually offers is neither: it is a baseline to stand on
+   * and, one arm's reach up, the flat top of a lowercase letter. So this pose
+   * stands, and rests a hand — it does not hang its weight on anything, because
+   * there is nothing there strong enough to look like it could take it.
+   *
+   * TWO CONTACT POINTS, both measured and both exported to `anchors.ts`:
+   * the sole at 84.72% (shared with every standing pose) and the palm at
+   * (29.3%, 48.83%). The palm is where it is because of the rig's own reach
+   * limit — arms are two ~40-unit segments from a FIXED shoulder, so the hand
+   * cannot go higher than about 80 units above it without the limb reading as
+   * stretched. That ceiling is what sets the figure's size in the hero: scaled
+   * so the palm lands on the x-height of the word it is resting on.
+   *
+   * The glance is left, toward the word. It is the only thing telling you the
+   * hand is resting on something rather than held out at nothing.
+   */
+  prop: pose(
+    [
+      tail(20),
+      feet(),
+      body,
+      panel,
+      // Near arm up and out. Segments 41.0 and 39.4 units — within the ~15%
+      // the rig asks for, so the limb reads as jointed rather than stretched.
+      arm([180, 304], [150, 270], { side: 'l', w: 26 }),
+      arm([340, 344], [350, 380], { side: 'r' }),
+      catEars(),
+      ears,
+      head,
+      eyes({ look: -7 }),
+      blush,
+      nose(),
+      smile(),
+    ],
+    {
+      note:
+        'PROP — standing, palm resting on an edge at (150,250). Sole at y=434,\n       palm at (150,250); see NORI_ANCHOR.stand and NORI_ANCHOR.prop.',
+    },
+  ),
 }
 
 for (const [name, svg] of Object.entries(POSES)) {
