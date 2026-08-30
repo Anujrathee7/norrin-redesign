@@ -28,11 +28,9 @@ The hero: their thesis at display size with the `h1` it never had, their positio
 statement hung from the cap line of "Enterprise", and the six public figures they bury on
 `/about-us` set as a station log. Nori stands in the notch beside the headline.
 
-![The gap diagram](docs/images/gap.png)
-
-`01 The gap` — the pilot→production argument drawn rather than described. At 320px the rule
-turns vertical and the three marks become a rail; it is the one section that re-lays-out
-instead of reflowing.
+`01 The gap` draws that argument rather than describing it, and it is the one section that
+re-lays-out rather than reflowing: at 320px the rule turns vertical and the three marks
+become a rail.
 
 ![Careers](docs/images/careers.png)
 
