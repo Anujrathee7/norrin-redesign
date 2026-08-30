@@ -46,6 +46,11 @@
    meaning and dropped sky/turquoise/bark/sand as UI colours — seven nature
    colours is a mood board, not a system.
 
+   One departure from that source, and it is deliberate: the accent is no
+   longer moss. Moss is an olive, and with a theme toggle now sitting in the
+   bar, the accent changing family between themes is a thing the reader can
+   watch happen. The accent is green on both grounds — see --accent.
+
    Two structural rules hold the whole thing together:
      1. Separation is carried by 1px hairlines. There are no box-shadows.
      2. Sun is a signal, never a surface.
@@ -58,9 +63,12 @@
    and the explicit override are the same mechanism and the ordering problem
    does not exist.
 
-   The [data-theme] attribute is what tools/audit.mjs and tools/shot.mjs set to
-   force a theme, so it must keep working: deleting it would make every "dark"
-   test silently assert against light.
+   The [data-theme] attribute is the theme. index.html ships `data-theme="dark"`
+   in the markup — dark is the default here, not the OS preference — and the
+   toggle in the bar rewrites the attribute (src/hooks/useTheme.ts).
+   tools/audit.mjs and tools/shot.mjs set the same attribute to force a theme,
+   so the harness and the product now drive the site through one switch rather
+   than two: deleting it would break both at once.
 
    DARK IS A TRANSLATION, NOT AN INVERSION. Two dark values are deliberately
    not the mechanical flip of their light counterparts — see --inverse and
@@ -71,17 +79,38 @@
   color-scheme: light dark;
 
   /* Ground & surfaces ---------------------------------------------------- */
+  /* Dark is a near-black, and it was tried as a charcoal. Lifting the floor to
+     L* 10 does buy the hairlines room — 1.29 → 1.35:1 and 1.82 → 1.94:1 — but
+     it takes that room from the forest band, whose lift off the page falls to
+     1.65:1, and a page of large display type on near-black is the effect this
+     build is actually after. Reverted. The hairlines can work harder. */
   --ground: light-dark(#f8f7f3, #0e120f); /* warm paper, 0.005 chroma */
   --surface: light-dark(#f1f0ea, #161b17);
 
   /* The forest band.
      In light this is the darkest plane on the page: you cross into it and the
-     rules change. Dark used to "deepen" it to #0d2a1b — L* 14.5 against a
-     ground at L* 5.1, which made it the LIGHTEST plane, 1.23:1 from the page,
-     with no hairline marking the edge. Same pixels, opposite rhetoric, and
-     practically invisible. It is now RAISED (L* 25.6, 1.73:1) and sits within
-     three L* of the light-mode forest, so it reads as the same material at a
-     different exposure rather than as an inverted one. */
+     rules change. Dark used to "deepen" it — L* 14.5 against a ground at L*
+     5.1, which made it the LIGHTEST plane, 1.23:1 from the page, with no
+     hairline marking the edge. Same pixels, opposite rhetoric, and practically
+     invisible. It is now RAISED (L* 25.6, 1.73:1) and sits within three L* of
+     the light-mode forest, so it reads as the same material at a different
+     exposure rather than as an inverted one.
+
+     THE BAND IS A SATURATED PLANE, AND THAT IS A DECISION, NOT AN OVERSIGHT.
+     At 71% and 68% it is the only surface here above 12% — the paper, the
+     surface, the overlay and both grounds all sit between 2% and 12% — so it is
+     the one place in the system where a surface carries real colour rather than
+     leaving colour to the marks.
+
+     It was tried both ways. A desaturated pass took the band to 34% chroma, and
+     by the numbers that pass was better: it separated further from both grounds
+     (11.22 → 11.99:1 from paper, 1.65 → 1.67:1 from the dark ground) and every
+     rung of the inverse ink ramp gained on it. It was rejected on sight anyway,
+     and the reason is worth keeping: at low chroma this hue goes teal, and a
+     grey-green plane beside warm paper reads like a colour that drained rather
+     than a colour that was chosen. Forest full strength is the brand's, and it
+     looks like it means it. Measurements can say a plane is better separated;
+     they cannot say it is the right plane. */
   --inverse: light-dark(#123e28, #16452c);
 
   /* Ink ------------------------------------------------------------------ */
@@ -94,9 +123,12 @@
      chosen file by file for the same three jobs, so "muted text on forest" was a
      different colour in four sections. The band now gets the same three-rung ink
      ladder and two-rung hairline ladder as paper. The two hairline alphas are
-     solved to match the PAPER hairlines' measured ratios (1.29:1 and 1.85:1)
-     rather than picked by eye, so a rule reads as the same weight of rule on
-     either ground. `node tools/palette.mjs` prints all of it. */
+     solved to match the PAPER hairlines' measured ratios rather than picked by
+     eye, so a rule reads as the same weight of rule on either ground. It briefly
+     went 22% → 23% while the dark band was lifted for a charcoal ground — at
+     22% it measured 1.79:1 there — and came back with the band. That round trip
+     is what these solved alphas are for: the number moved, it was caught, and
+     it moved back. `node tools/palette.mjs` prints all of it. */
   --inverse-ink: #eef0e6;
   --inverse-ink-2: color-mix(in srgb, var(--inverse-ink) 78%, transparent);
   --inverse-ink-3: color-mix(in srgb, var(--inverse-ink) 62%, transparent);
@@ -110,8 +142,18 @@
   --inverse-inactive: color-mix(in srgb, var(--inverse-ink) 38%, transparent);
 
   /* Structure ------------------------------------------------------------ */
-  --hairline: light-dark(#dddcd2, #252b26);
-  --hairline-strong: light-dark(#b9b9ac, #3a423b);
+  /* Solved against --surface, not just --ground. The gate measured both of
+     these on the page ground only, but Pillars and Thinking are `bg-surface`
+     and draw hairlines there, so two whole sections were rendering a pair
+     nobody had ever measured — and it missed: 1.74:1 and 1.68:1 for the strong
+     one, 1.21:1 for the plain one, all under their own parity bar. The values
+     below clear on BOTH grounds (1.27–1.38:1 and 1.85–2.00:1), so a rule reads
+     as the same weight of rule wherever it is drawn, which is the entire point
+     of solving these rather than picking them. Found while retiring the
+     platforms band: off the forest, that block's rules became its only
+     structure, and they were the ones sitting on surface. */
+  --hairline: light-dark(#d8d7cc, #292f2a);
+  --hairline-strong: light-dark(#b3b3a5, #404841);
 
   /* The plane a floating control opens onto — the locale list, and anything
      that joins it. There are no shadows in this system, so "above the page" has
@@ -130,16 +172,32 @@
   --inverse-overlay: color-mix(in srgb, var(--inverse-ink) 6%, var(--inverse));
 
   /* Meaning -------------------------------------------------------------- */
-  /* Moss — the only accent allowed to touch type or stroke.
-     In light, moss and sun are the same hue (58 vs 57) and separate by
-     LUMINANCE: moss is dark, sun is light, 7.32:1 apart. In dark the accent
-     has to be light to survive on a near-black ground, so that separation is
-     not available — and the old #c9c574 sat at the same hue as sun, 1.53:1
-     apart, degrading the moss/sun distinction the whole system rests on to
-     "slightly less bright yellow". Dark moss therefore separates by HUE
-     instead, shifted to 86 against sun's 57. Same role, same family, still
-     legibly not the signal. */
-  --accent: light-dark(#504e18, #9fb87e);
+  /* The accent — the only colour allowed to touch type or stroke.
+     THE ACCENT IS GREEN IN BOTH THEMES. It did not used to be: light was moss
+     #504e18, Norrin's own token, which is hue 58 — an olive that reads khaki on
+     paper. Dark was already a green (hue 86), so the same word, "production.",
+     was a different family depending on the theme, and the toggle in the bar
+     made that a thing you could watch happen in one click rather than a
+     difference nobody could see two devices apart. A theme switch is an
+     exposure change, not a rebrand.
+
+     Light is the FOREST BAND'S OWN GREEN, lifted one step off it (#123e28 →
+     #1a5335) so it clears as type on paper: 8.40:1 on ground, 7.64:1 on the
+     hover wash. So the page has one green at three exposures — band, light
+     accent, dark accent — instead of an olive and a green.
+
+     Dark stays the sage #9fb87e, at hue 86. It was briefly moved to #9fd6a8 to
+     match light's hue 152 exactly, and that is the more consistent number — but
+     the sage is what reads right on this near-black, and a hue chart is not the
+     brief. The two greens are a family rather than one colour twice, which is
+     what "dark is a translation, not an inversion" already says everywhere else
+     in this file.
+
+     Separation from sun survives the change either way. Moss and sun were the
+     same hue (58 vs 57) and separated by LUMINANCE alone; light's #1a5335 is
+     hue 152 and dark's sage is 86, so both now separate by hue as well and
+     nothing relies on brightness alone to say "this is not the signal". */
+  --accent: light-dark(#1a5335, #9fb87e);
 
   /* Sun — fill only, never type.
      Identical in both themes on purpose: a light does not change colour when
@@ -166,8 +224,12 @@
      hover state, and the utility the theme bridge generated from it
      (text-accent-soft) was never used once — so the palette carried an extra
      name for a colour that only ever did one job. It is that job now. */
-  --accent-hover: light-dark(#6f6c2a, #b3c795);
-  --accent-press: light-dark(#3c3a10, #8aa36a);
+  /* Light's pressed value is the forest band exactly. The accent is the band
+     lifted one step, so pressing it puts it back — the control returns to the
+     colour the page's own dark plane is made of, rather than to a fourth green
+     mixed for the occasion. 11.22:1 under --ground. */
+  --accent-hover: light-dark(#2a6b47, #b3c795);
+  --accent-press: light-dark(#123e28, #8aa36a);
   --signal-hover: #ebe565;
   --signal-press: #ddd74d;
 
@@ -177,7 +239,7 @@
      wash is only ever read against the --ink and --ink-2 rungs — --ink-3 on the
      light wash measures 4.53:1, which is a pass with no margin, so labels inside
      controls use --ink-2. Tuned per theme rather than shared: 6% of moss reads
-     on paper, 6% of the dark accent does not read on near-black. */
+     on paper, 6% of the dark accent does not read on the dark ground. */
   /* light-dark() takes colours, not percentages, so the branch is the whole
      mix rather than the alpha inside it. */
   --tint: light-dark(
@@ -235,6 +297,22 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
+}
+
+/* The flip is instant, and it has to be told to be.
+   Most of the page repaints on the frame the attribute changes, but a handful
+   of elements carry their own `transition-colors` for reasons that have nothing
+   to do with theming — the header cross-fades over 500ms as it enters a forest
+   band, nav items over 200ms on hover. Left alone, switching theme made the bar
+   lag half a second behind the page underneath it and the nav labels arrive a
+   beat after the bar. Suppressed for one frame around the write, so the whole
+   page changes exposure at once. `*` is affordable here because it is applied
+   for a single frame and removed on the next. */
+:root.theme-switching,
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+  transition: none !important;
 }
 
 /* ==========================================================================

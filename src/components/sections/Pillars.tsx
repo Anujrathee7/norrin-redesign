@@ -49,7 +49,11 @@ export function Pillars() {
       id="pillars"
       data-shot="pillars"
       aria-labelledby="pillars-heading"
-      className="bg-surface py-24 md:py-36"
+      // Symmetric padding again. `pb-0` was correct while this section ended
+      // in a full-bleed band — a band running edge to edge IS the terminus and
+      // does not also need setting away from the boundary — but the band is
+      // gone and the section has to carry its own floor.
+      className="bg-surface py-20 md:py-28"
     >
       <Container>
         <Grid>
@@ -289,10 +293,35 @@ export function Pillars() {
       <div
         id="platforms"
         data-shot="platforms"
-        data-tone="inverse"
-        className="mt-24 scroll-mt-32 bg-inverse py-20 text-inverse-ink md:mt-32 md:py-24"
+        // NOT A PLANE. This was a full-bleed forest band, and it was the only
+        // one on the page that was a band INSIDE a section rather than a
+        // section. Both of its edges sat in one viewport, so you looked AT it
+        // instead of travelling through it — which is why it read as a slab
+        // however it was painted, and it was painted three ways before that
+        // became clear: full-strength forest, desaturated, and rehued warm.
+        //
+        // It also over-claimed. Forest is the loudest thing in this system and
+        // it was spent on nine vendor names — evidence for a claim made 200px
+        // earlier, which changes no rules and so should not change the plane.
+        // TheGap and Contact keep theirs: they are sections you scroll through,
+        // and each announces its crossing with the page's own device (a sun
+        // leading-edge rule, the completing production line). This one had
+        // nothing, which is what the border-y was compensating for.
+        //
+        // So it is the closing movement of Pillars now, on the section's own
+        // surface, separated by a hairline — which is this system's first rule
+        // and the one place that was not following it. The rule is
+        // container-width, not full-bleed: Roles and Work already rule their
+        // rows inside Container, and a full-bleed rule here would redraw the
+        // section boundary this block just stopped being.
+        //
+        // `id` and `data-shot` stay. The nav drawer links to #platforms
+        // ("Platforms we run", navData.ts) and tools/shot.mjs --clip=platforms
+        // targets the shot name; scroll-mt-32 is what clears the fixed header.
+        className="mt-20 scroll-mt-32 md:mt-24"
       >
         <Container>
+          <div className="border-t border-hairline-strong pt-14 md:pt-16">
           <Grid>
             {/* The claim arrives a line at a time on the way down and unwinds on
                 the way back up. Each line is timed against its own scroll range
@@ -312,11 +341,7 @@ export function Pillars() {
                   ['--scrub-to' as string]: 'cover 36%',
                 }}
               >
-                <Eyebrow
-                  label="Built on the stack you already run"
-                  tone="inverse"
-                  className="mb-7"
-                />
+                <Eyebrow label="Built on the stack you already run" className="mb-7" />
               </div>
               <p
                 data-scroll="enter"
@@ -326,8 +351,14 @@ export function Pillars() {
                 }}
                 className="display-4 max-w-[18ch]"
               >
+                {/* The year was sun. Sun is FILL ONLY, never type, on a paper
+                    ground — it was type here purely because sun is the
+                    inverse-mode stand-in for moss, which measures 1.40:1 on
+                    forest. Off the band, that exemption is gone and the
+                    emphasis goes back to the accent. Not a change to the sun
+                    budget either way: that budget counts fills. */}
                 Logic Apps in production since{' '}
-                <span className="text-signal">{productionSince.year}</span>.
+                <span className="text-accent">{productionSince.year}</span>.
               </p>
               <p
                 data-scroll="enter"
@@ -335,7 +366,7 @@ export function Pillars() {
                   ['--scrub-from' as string]: 'cover 18%',
                   ['--scrub-to' as string]: 'cover 44%',
                 }}
-                className="body-serif measure-serif mt-6 text-inverse-ink-2"
+                className="body-serif measure-serif mt-6 text-ink-2"
               >
                 {productionSince.claim}
               </p>
@@ -345,15 +376,45 @@ export function Pillars() {
                   ['--scrub-from' as string]: 'cover 22%',
                   ['--scrub-to' as string]: 'cover 48%',
                 }}
-                className="caption mt-6 max-w-[44ch] text-inverse-ink-3"
+                className="caption mt-6 max-w-[44ch] text-ink-3"
               >
                 {partnership}
               </p>
             </div>
 
+            {/* Nine names, so the grid is THREE columns on desktop, not two.
+                At two, nine items leave the ninth spanning the full width on a
+                row of its own — an orphan under a rule as wide as the whole
+                list — and a dead quadrant beside it. Three columns is a clean
+                3×3 with no special case, which is why the `last:odd:col-span-2`
+                rule that used to paper over it is gone.
+
+                It also needs the width to do that: `col-start-6 / span-7`
+                rather than `col-start-7 / span-6`, since "Azure Integration
+                Services" will not sit on one line in a third of half the page.
+                One column earlier is all it can take — the claim occupies 1–5,
+                and starting at 5 puts both in the same track, which grid
+                resolves by dropping the list onto a row of its own and making
+                the band 100px TALLER than the layout it replaced.
+
+                `md:self-end` bottom-aligns it against the claim. The two
+                columns have different natural heights — the claim runs 255px,
+                three rows of names run 151 — so one of them has to decide where
+                the 104px difference goes. Top-aligned it fell under the list as
+                185px of empty band, which is the same hole the old two-column
+                grid left in the corner, moved to the floor. Ending both columns
+                on one line is the thing a two-column block gets most out of;
+                the air moves up beside the claim's own display type, where
+                there is already air.
+
+                The md overrides below are `odd:`/`even:`, not a flat `px-0`:
+                `sm:even:pl-8` carries a pseudo-class and therefore outranks a
+                plain `md:px-0` on specificity no matter which breakpoint comes
+                later in the sheet, so every second name in the three-column
+                grid kept a 32px indent that nothing had asked for. */}
             <ul
               data-scroll="breathe"
-              className="col-span-4 mt-12 grid grid-cols-1 self-start border-t border-inverse-hairline-strong sm:grid-cols-2 md:col-span-6 md:col-start-7 md:mt-0"
+              className="col-span-4 mt-12 grid grid-cols-1 self-start border-t border-hairline-strong sm:grid-cols-2 md:col-span-7 md:col-start-6 md:mt-0 md:grid-cols-3 md:gap-x-6 md:self-end"
             >
               {/* The stack list arrives row by row against the claim beside it.
                   Staggered by index rather than by column: this is a two-column
@@ -368,13 +429,14 @@ export function Pillars() {
                     ['--scrub-from' as string]: `cover ${10 + i * 3}%`,
                     ['--scrub-to' as string]: `cover ${10 + i * 3 + 26}%`,
                   }}
-                  className="border-b border-inverse-hairline-strong py-3 sm:odd:pr-8 sm:even:pl-8 sm:last:odd:col-span-2 sm:last:odd:pr-0"
+                  className="border-b border-hairline-strong py-3 sm:odd:pr-8 sm:even:pl-8 md:odd:pr-0 md:even:pl-0"
                 >
-                  <span className="ui text-inverse-ink">{t.name}</span>
+                  <span className="ui">{t.name}</span>
                 </li>
               ))}
             </ul>
-          </Grid>
+            </Grid>
+          </div>
         </Container>
       </div>
     </section>

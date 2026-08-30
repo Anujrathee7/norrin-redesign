@@ -10,7 +10,7 @@ npm install
 npm run dev      # http://localhost:5173
 npm run build    # typecheck + production build
 npm run lint     # oxlint — must be zero
-node tools/palette.mjs # every rendered colour pair, measured (must be 61/61)
+node tools/palette.mjs # every rendered colour pair, measured (must be 65/65)
 node tools/audit.mjs   # axe-core (light + dark) + structure audit
 node tools/shot.mjs --vp=desktop --sections   # visual QA harness
 ```
@@ -70,20 +70,63 @@ CSS — not invented. Their palette is a named Nordic nature system (`moss`, `su
 `lichen`, `sand`, `bark`, `sky`, `turquoise`), which their current site barely exploits.
 Four of those eight survive as UI colours; seven nature colours is a mood board, not a system.
 
+One departure from that source, and it is deliberate. The accent used to be `moss` — hue
+58, an olive that reads khaki on paper — while the dark theme's accent was already a green.
+That was a difference nobody could see two devices apart, until a theme toggle went in the
+bar and made it a thing you can watch happen in one click. **The accent is green on both
+grounds now:** light is the forest band's own `#123e28` lifted one step to `#1a5335`, which
+clears 8.40:1 on paper. Dark stays the sage `#9fb87e`. Both now separate from `sun` by hue
+as well as by luminance, which moss never did.
+
+**Two larger palette changes were built, measured, and rejected on sight** — worth recording
+because both were *better by the numbers* and still wrong:
+
+- **A charcoal dark ground** (`#0e120f` → `#171a18`). It buys the hairlines real room —
+  1.29 → 1.35:1 and 1.82 → 1.94:1 — but it takes that room from the forest band, whose lift
+  off the page falls to 1.65:1, and a page of large display type on near-black is the effect
+  this build is after.
+- **A desaturated forest band** (71%/68% chroma → ~34%). It separated *further* from both
+  grounds and every rung of the inverse ink ramp gained on it. But at low chroma this hue
+  goes teal, and a grey-green plane beside warm paper reads like a colour that drained
+  rather than one that was chosen.
+
+Both are recorded rather than quietly dropped, because the lesson is the useful part: the
+band is the one surface in this system carrying real colour — everything else sits between
+2% and 12% chroma — and that is a decision, not an oversight. Measurements can say a plane
+is better separated. They cannot say it is the right plane.
+
+**The forest plane is used twice, not three times.** It was three: the argument (`TheGap`),
+a vendor list (the platform stripe), and the ask (`Contact`). The stripe was the only one
+that was a band *inside* a section rather than a section — both of its edges sat in one
+viewport, so you looked at it instead of travelling through it, and it read as a slab however
+it was painted. It was painted three ways before that became clear. It also over-claimed:
+nine product names are evidence for a claim made 200px earlier, and they change no rules, so
+they should not change the plane. That block is now the closing movement of `Pillars`, on the
+section's own surface, separated by a hairline. The two planes that survive both mark a real
+change of argument, and each announces its crossing with the page's own device — a sun
+leading-edge rule, and the completing production line.
+
+Retiring it surfaced a hole in the gate. Both hairlines were measured against `--ground`
+only, but `Pillars` and `Thinking` are `bg-surface` and rule their rows there, so two whole
+sections rendered a pair nobody had measured — and it missed, at 1.74:1 / 1.68:1 for the
+strong rule and 1.21:1 for the plain one, all under their own parity bar. Both tokens are now
+solved for the tighter of the two grounds and clear on both, so a rule reads as the same
+weight of rule wherever it is drawn.
+
 | Token | Light | Dark | Role |
 |---|---|---|---|
 | `--ground` | `#f8f7f3` | `#0e120f` | page (warm paper — `sand`'s only survival) |
 | `--surface` | `#f1f0ea` | `#161b17` | alternating bands |
 | `--overlay` | `#fdfcfa` | `#191f1b` | the plane a floating control opens onto |
-| `--inverse` | `#123e28` *(forest)* | `#16452c` | the inverted sections — raised, not deepened, in dark |
+| `--inverse` | `#123e28` *(forest)* | `#16452c` | the two inverted sections — raised, not deepened, in dark |
 | `--ink` / `--ink-2` / `--ink-3` | `#14170f` / `#4a4d42` / `#696d5f` | `#f2f2ec` / `#b4b8ac` / `#868a7c` | text levels |
-| `--hairline` / `--hairline-strong` | `#dddcd2` / `#b9b9ac` | `#252b26` / `#3a423b` | **all** separation |
-| `--accent` | `#504e18` *(moss)* | `#9fb87e` | the only accent touching type or stroke |
-| `--accent-hover` / `--accent-press` | `#6f6c2a` / `#3c3a10` | `#b3c795` / `#8aa36a` | filled-control states |
+| `--hairline` / `--hairline-strong` | `#d8d7cc` / `#b3b3a5` | `#292f2a` / `#404841` | **all** separation (solved on `--ground` *and* `--surface`) |
+| `--accent` | `#1a5335` *(forest, lifted)* | `#9fb87e` *(sage)* | the only accent touching type or stroke |
+| `--accent-hover` / `--accent-press` | `#2a6b47` / `#123e28` | `#b3c795` / `#8aa36a` | filled-control states |
 | `--signal` | `#f6f279` *(sun)* | same | fill only |
 | `--signal-hover` / `--signal-press` | `#ebe565` / `#ddd74d` | same | as above, on the bands |
 | `--inactive` | `#88967e` *(lichen)* | `#5d6a55` | the "not yet in production" state — **strokes only** |
-| `--tint` | moss @ 6% | accent @ 8% | the wash that fills a rounded control on hover |
+| `--tint` | accent @ 6% | accent @ 8% | the wash that fills a rounded control on hover |
 
 The forest bands carry the same ladder again — `--inverse-ink-2` / `-ink-3`,
 `--inverse-hairline` / `-hairline-strong`, `--inverse-inactive`, `--inverse-tint` and
@@ -92,7 +135,7 @@ section by section. Their alphas are *solved* to reproduce the paper values' mea
 (1.29:1, 1.85:1, and lichen's 2.92:1) rather than picked by eye, so a rule reads as the same
 weight of rule on either ground.
 
-`node tools/palette.mjs` measures every pair the system actually renders — 61 of them, alpha
+`node tools/palette.mjs` measures every pair the system actually renders — 65 of them, alpha
 composited onto its real background first — and exits non-zero on a miss. It is a
 verification gate alongside the build, the lint and the axe run.
 
@@ -118,6 +161,29 @@ threshold, so "ahead" labels use the ink ramp while the dashed rule keeps the li
 `.btn` is geometry and behaviour; `.btn-solid` / `.btn-signal` / `.btn-ghost` are colour
 only. `.control` is the smaller pressable role, `.panel` the opening one. Both invert under
 `[data-tone='inverse']`, which the header declares.
+
+### Light and dark
+
+**Dark is the default, and it is in the markup** — `<html data-theme="dark">` — not applied
+by script. A blocking inline script in the head upgrades that to `light` if the reader has
+chosen it before, so the flash every dark-first site is known for cannot happen, and a
+visitor with JS off still gets the theme the page was designed on rather than whatever their
+OS happened to prefer.
+
+The toggle is a single icon button in the bar's utilities, repeated in the mobile sheet
+because the utilities row is `hidden` below `lg` and the phone audience would otherwise have
+no way out of the default. It is not a track-and-thumb switch: a sliding knob is a second
+small moving object in the chrome, two hundred pixels above the production line, which is
+the argument that killed the runner-up navbar. The glyph shows where you are *going* — a
+sun in dark — and the accessible name says the same thing in words.
+
+Every token is declared once via `light-dark()`, so `[data-theme]` is the only switch:
+`useTheme` writes it, and `tools/audit.mjs` / `tools/shot.mjs` write the same attribute to
+force a theme. The hook watches it with a `MutationObserver` rather than only reading it at
+mount, which is what keeps the harness honest — without that, a forced-light screenshot
+rendered a sun where the product shows a moon. Transitions are suppressed for one frame
+around the write (`.theme-switching`), or the header's 500ms colour cross-fade arrives half
+a second after the page underneath it.
 
 ### Typography
 
@@ -193,7 +259,7 @@ at favicon size.
   went from `/45` (3.40:1) to `/60` (4.83:1).
 - Single `h1`, no heading-level skips, `header`/`main`/`footer`/`nav` landmarks, skip link.
 - Escape and outside-click close the nav panel; the mobile sheet locks scroll and releases it.
-- `:focus-visible` only — a 2px moss outline, never suppressed.
+- `:focus-visible` only — a 2px accent outline, sun on the forest bands, never suppressed.
 - Fyr is `role="img"` with a label where it carries meaning, `aria-hidden` where decorative.
 
 ## 7. Performance
