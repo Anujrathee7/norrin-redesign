@@ -58,7 +58,7 @@ export function Thinking() {
       id="thinking"
       data-shot="thinking"
       aria-labelledby="thinking-heading"
-      className="bg-surface py-24 md:py-36"
+      className="bg-surface py-20 md:py-28"
     >
       <Container>
         <SectionHeader index="05" label="Thinking" id="thinking-heading">

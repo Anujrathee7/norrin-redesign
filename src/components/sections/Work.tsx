@@ -43,7 +43,7 @@ export function Work() {
       id="work"
       data-shot="work"
       aria-labelledby="work-heading"
-      className="overflow-clip py-24 md:py-36"
+      className="overflow-clip py-20 md:py-28"
     >
       <Container>
         <Grid>

@@ -33,7 +33,7 @@ export function Roles() {
       id="roles"
       data-shot="roles"
       aria-labelledby="roles-heading"
-      className="overflow-clip py-24 md:py-36"
+      className="overflow-clip py-20 md:py-28"
     >
       <Container>
         {/* Stacked, not the heading-left / paragraph-top-right lockup used by

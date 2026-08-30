@@ -26,7 +26,7 @@ export function Proof() {
       id="proof"
       data-shot="proof"
       aria-labelledby="proof-heading"
-      className="py-24 md:py-36"
+      className="py-20 md:py-28"
     >
       <Container>
         {/* Proof and Contact are the two sections that set their own eyebrow

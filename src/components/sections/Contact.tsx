@@ -30,7 +30,7 @@ export function Contact() {
       data-shot="contact"
       aria-labelledby="contact-heading"
       data-tone="inverse"
-      className="relative overflow-clip bg-inverse py-24 text-inverse-ink md:py-36"
+      className="relative overflow-clip bg-inverse py-20 text-inverse-ink md:py-28"
     >
       {/* The line completes. */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-4" aria-hidden="true">
