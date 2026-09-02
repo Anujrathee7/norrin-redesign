@@ -4,8 +4,15 @@
    Fonts — self-hosted, latin subset only, woff2 only.
    Three families, three files. The mono is used at a single weight (500) and
    the two text faces are variable, so one file each covers the whole range.
-   Newsreader's italic is deliberately absent: it would have been a second
-   ~55 kB face serving four headings.
+
+   NEWSREADER IS GONE. It held the serif slot — thesis, lead, body copy — until
+   Fraunces was chosen for display. Two serifs with different axes of contrast
+   doing adjacent jobs reads as an accident, so Fraunces took the whole serif
+   voice rather than sitting beside it. The face and its file are deleted rather
+   than left declared: an unused `@font-face` costs a reader nothing (nothing
+   requests it) but costs the next person reading this file, and a font that is
+   present but unreferenced is exactly the kind of thing that gets re-adopted by
+   accident later.
    ========================================================================== */
 
 @font-face {
@@ -19,21 +26,54 @@
 }
 
 @font-face {
-  font-family: 'Newsreader Variable';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 200 800;
-  src: url('/fonts/newsreader-latin-wght-normal.woff2') format('woff2-variations');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
-    U+2122, U+2191, U+2193, U+2212, U+2215;
-}
-
-@font-face {
   font-family: 'IBM Plex Mono';
   font-style: normal;
   font-display: swap;
   font-weight: 500;
   src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+/* ==========================================================================
+   DISPLAY CANDIDATES — under review, not in the page.
+   --------------------------------------------------------------------------
+   Three faces being judged as a replacement for Schibsted Grotesk in the
+   display roles. They are declared here so `#fonts` can render them at real
+   size in the real headline; NOTHING on the homepage references them yet.
+
+   Whichever wins stays and the other two get deleted along with these blocks.
+   A font that is declared but unused still costs a reader nothing — `swap` only
+   fetches a face something actually asks for — but it costs the next person
+   reading this file, so they should not outlive the decision.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Fraunces Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/fraunces-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Familjen Grotesk Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url('/fonts/familjen-grotesk-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/bricolage-grotesque-latin-wght-normal.woff2') format('woff2-variations');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
     U+2122, U+2191, U+2193, U+2212, U+2215;
 }
@@ -155,6 +195,59 @@
   --hairline: light-dark(#d8d7cc, #292f2a);
   --hairline-strong: light-dark(#b3b3a5, #404841);
 
+  /* THE CONTOUR FIELD'S OWN PAIR, and it is separate from the hairlines above
+     for a reason that is easy to lose.
+
+     The field used to draw with `--hairline` / `--hairline-strong` at
+     `opacity: 0.5` on the group. Those tokens are solved to read as STRUCTURE —
+     a rule you are meant to notice as an edge — and halving them turned the
+     survey into something you had to hunt for, particularly in dark where
+     `#292f2a` is only a few steps off `#0e120f`.
+
+     These are white in dark rather than a lifted grey. That is the whole
+     difference: a near-white at low alpha reads as a drawn line on a dark
+     ground, where a grey of the same luminance reads as noise in the plate.
+     The alphas are the inverse-hairline rungs (10% and 22% of `--inverse-ink`),
+     which is the same relationship the inverse bands already use, so this is
+     not a new grey invented for one component.
+
+     Light keeps pigment rather than white — white on paper is invisible — and
+     goes DARKER than `--hairline` to compensate for the group opacity that is
+     no longer there.
+
+     Decoration only: `aria-hidden`, no text on them, so they are outside the
+     contrast gate by policy rather than by omission. Nothing readable is ever
+     drawn in these. */
+  --contour: light-dark(#cfcec2, color-mix(in srgb, var(--inverse-ink) 10%, transparent));
+  --contour-strong: light-dark(#a8a89a, color-mix(in srgb, var(--inverse-ink) 22%, transparent));
+
+  /* READING INK — long-form serif passages, and the one place on this page where
+     the ink is allowed to carry a hue.
+
+     It is LICHEN, derived from Norrin's own `--color-lichen: #88967e`, shifted
+     to a reading weight in each theme: 8.41:1 on the dark ground, 7.09:1 on the
+     light one. Both are far above the 4.5 floor, which matters because reading
+     text is the last thing that should be sitting near a threshold.
+
+     WHY NOT `--ink-2`, which is what these passages used. Two reasons, and the
+     second is the real one.
+
+     The neutral measured 9.35:1 on the dark ground, and a near-white serif at
+     reading size on a near-black field blooms — the glyph edges halate and the
+     eye keeps refocusing. Coming DOWN in contrast is the fix for that, not going
+     up, which is the opposite of the instinct.
+
+     The better reason is that it is a choice rather than an absence. `--ink-2`
+     is a neutral grey doing a job by default. Lichen is in the same family as
+     `--accent`, so the page stays one temperature and the reading text reads as
+     ink with a cast rather than as a dimmer version of the headline.
+
+     IT IS NOT USED FOR EMPHASIS. The Gap's station quotes are `--ink` on
+     purpose — they are the loudest copy in the section — and they stay there.
+     This token is for passages you read, not passages you are meant to notice. */
+  --reading: light-dark(#4d5744, #a8b09b);
+
+
   /* The plane a floating control opens onto — the locale list, and anything
      that joins it. There are no shadows in this system, so "above the page" has
      to be said tonally: the overlay is lifted away from --ground in both themes
@@ -257,14 +350,26 @@
    softening pass over everything — it is a distinction, and the distinction is
    the point:
 
-     RADIUS MEANS YOU CAN TOUCH IT.
+     RADIUS MEANS IT IS AN OBJECT, NOT A PLANE.
 
-   Structure stays square. Hairlines separate rather than contain, and a rule
-   has no corners; the production line, the eyebrow rules, the ruled tables, the
-   section bands, the timeline nodes and the sun terminus are all unchanged. So
-   the only rounded shapes on the page are the ones that respond, and the eye
-   finds every action without anything having to be coloured louder. That is
-   what makes this subtractive rather than decorative.
+   AMENDED, and deliberately rather than quietly. The rule used to read "radius
+   means you can touch it", which was a lossy summary of its own scale even
+   then: `--radius-panel` was already documented below as "anything that opens
+   OR FRAMES", and it was already carried by the Thinking frame, which neither
+   opens nor is pressable. Framing was sanctioned; the headline sentence had just
+   stopped describing the thing underneath it.
+
+   Stating it as object-vs-plane covers both cases honestly and answers the one
+   the page now needs: inset section panels. A PLANE is the page itself — a
+   full-bleed band, the ground, the forest, a rule, a timeline. Planes have no
+   corners because they have no edges you are meant to see. An OBJECT sits on a
+   plane, and an object has a shape.
+
+   Structure that is plane stays square: the production line, the eyebrow rules,
+   the ruled tables, the full-bleed bands, the timeline nodes and the sun
+   terminus are all unchanged. What this permits that the old wording did not is
+   a section that floats rather than spans — which is the single move that breaks
+   the nine-identical-bands rhythm the page was criticised for.
 
    The geometry was taken from the sea mark this page used to carry: its float
    was `rect w=3.6 rx=1.8` — a capsule, fully rounded — and its mast cap was a
@@ -280,8 +385,26 @@
                        silhouette of the thing the whole page is about.
      --radius-control  the mast cap. Anything pressable that is not the action:
                        nav items, the locale trigger, menu options, skip link.
-     --radius-panel    anything that opens or frames: the locale list, the
-                       Thinking rungs.
+     --radius-panel    anything that opens or frames at component scale: the
+                       locale list, the Thinking rungs.
+     --radius-section  a whole section lifted off the ground as a floating
+                       panel. Its own step because 14px on a 1400px-wide block
+                       is the rasterising artefact the 2px scale was — a radius
+                       has to scale with the thing carrying it or it reads as a
+                       rendering error rather than a shape.
+
+                       CURRENTLY UNUSED, and left in place deliberately rather
+                       than deleted. Roles was its only consumer; that panel
+                       has been removed because it shared `--surface` with the
+                       2112px band directly beneath it, so the "floating
+                       object" and the plane under it computed to the same
+                       colour. This step is what the standing radius rule —
+                       "radius means you can touch it, structure stays square"
+                       — was amended in the open to allow, so retiring the step
+                       means un-amending the rule, and CLAUDE.md §4 puts that
+                       decision with the user rather than in a cleanup. It
+                       stays declared, and it stays flagged, until that is
+                       decided rather than drifted into.
 
    Not rounded, deliberately: the nav drawer. It is the header temporarily
    getting taller — it shares the bar's ground and takes the bar's own border as
@@ -337,6 +460,7 @@
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
+  --color-reading: var(--reading);
 
   --color-hairline: var(--hairline);
   --color-hairline-strong: var(--hairline-strong);
@@ -347,16 +471,32 @@
   --color-tint: var(--tint);
   --color-inverse-tint: var(--inverse-tint);
 
-  /* Exposed as utilities (rounded-control, rounded-panel, rounded-action) so a
-     radius cannot be typed as an arbitrary value at a call site — which is
-     exactly how the old scale drifted to `rounded-[2px]` in six files. */
+  /* Exposed as utilities (rounded-control, rounded-panel, rounded-action,
+     rounded-section) so a radius cannot be typed as an arbitrary value at a
+     call site — which is exactly how the old scale drifted to `rounded-[2px]`
+     in six files. */
+  /* THE UI TEXT SIZE, DECLARED ONCE BECAUSE TWO THINGS SET IT. `.ui` and
+     `.btn` both need it, and `.btn` used to hardcode the value with a
+     `/* .ui *\/` comment beside it claiming that was where it came from. It
+     was not: reducing `.ui` left every button a size behind, and the comment
+     made the drift look intentional. A token cannot disagree with itself. */
+  --text-ui: 0.875rem;
+
   --radius-control: 8px;
   --radius-panel: 14px;
   --radius-action: 999px;
+  --radius-section: 24px;
 
   --font-sans:
     'Schibsted Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-serif: 'Newsreader Variable', ui-serif, Georgia, 'Times New Roman', serif;
+  /* FRAUNCES IS THE SERIF NOW, replacing Newsreader outright rather than
+     sitting beside it. Picking a serif for display made the old pairing
+     untenable: Fraunces at 94px over Newsreader at 17px is two serifs with
+     different axes of contrast doing adjacent jobs, which reads as an
+     accident rather than a system. One serif covering display AND the
+     argument copy is the arrangement Reaktor uses (Larken over Scto), and it
+     leaves three voices instead of four. */
+  --font-serif: 'Fraunces Variable', ui-serif, Georgia, 'Times New Roman', serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
   /* Motion. Three easings, on purpose. */
@@ -493,32 +633,58 @@
 /* ==========================================================================
    Typographic roles
    Fluid sizes are clamped against a 360 → 1512px viewport range.
+   --------------------------------------------------------------------------
+   THE SCALE WAS COMPRESSED AT THE TOP AND HELD AT THE BOTTOM. The display end
+   came down roughly 20%; nothing from `lead` down moved at all.
+
+     display-1  120 → 96px      metric   96 → 76px
+     display-2   72 → 58px      thesis   52 → 44px
+     display-3   48 → 40px      lead / body / body-serif / ui / caption /
+     display-4   32 → 28px      label / wordmark — unchanged
+
+   WHY NOT A UNIFORM MULTIPLIER, which is what "make it smaller everywhere"
+   sounds like it means. `.label` is 11px mono and is used 122 times — every
+   eyebrow, the hero's statistics strip, PILOT / PRODUCTION. A uniform 0.85
+   takes it to 9.4px and a uniform 0.75 to 8.25px, and uppercase mono at those
+   sizes is not small, it is unreadable. The bottom of a scale has a floor that
+   the top does not.
+
+   Compressing the top is also what actually reads as "smaller": perception of
+   scale is dominated by the largest thing on screen, so cutting the h1 by a
+   fifth changes the whole page's density while every word stays legible. It is
+   the ratio between steps that tightened, not the type.
+
+   EVERY CLAMP WAS RE-SOLVED, not just its ceiling. Each one keeps its original
+   minimum and its original crossover viewport, with the slope recomputed so the
+   curve still reaches the new maximum at the same width it used to reach the
+   old one. Editing only the third argument would have left the middle of the
+   range scaling on the old slope and hitting the cap early.
    ========================================================================== */
 
 @layer components {
   .display-1 {
-    font-family: var(--font-sans);
-    font-size: clamp(2.75rem, 1.55rem + 6.6vw, 7.5rem);
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 2.07rem + 4.23vw, 5.875rem);
     font-weight: 500;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.02em;
     line-height: 0.94;
     text-wrap: balance;
   }
 
   .display-2 {
-    font-family: var(--font-sans);
-    font-size: clamp(2.125rem, 1.5rem + 3.6vw, 4.5rem);
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 1.86rem + 1.51vw, 3.125rem);
     font-weight: 500;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.018em;
     line-height: 1;
     text-wrap: balance;
   }
 
   .display-3 {
-    font-family: var(--font-sans);
-    font-size: clamp(1.625rem, 1.3rem + 2vw, 3rem);
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 1.49rem + 0.82vw, 2.1875rem);
     font-weight: 500;
-    letter-spacing: -0.022em;
+    letter-spacing: -0.014em;
     line-height: 1.08;
     text-wrap: balance;
   }
@@ -528,10 +694,10 @@
      `.display-3` and then overrode its font-size, keeping only the tracking —
      which silently coupled those files to a role they were not using. */
   .display-4 {
-    font-family: var(--font-sans);
-    font-size: clamp(1.375rem, 1.15rem + 0.9vw, 2rem);
+    font-family: var(--font-serif);
+    font-size: clamp(1.25rem, 1.31rem + 0.27vw, 1.5625rem);
     font-weight: 500;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.012em;
     line-height: 1.15;
     text-wrap: balance;
   }
@@ -539,7 +705,7 @@
   /* The wordmark lockup. Identical in the bar and the footer, so it is a role
      rather than the same three arbitrary values written out twice. */
   .wordmark {
-    font-size: 1.0625rem;
+    font-size: 1rem;
     font-weight: 500;
     letter-spacing: -0.02em;
   }
@@ -548,13 +714,13 @@
      It shipped 14 times as an arbitrary value with no name, so the next person
      to add a button had to guess. */
   .ui {
-    font-size: 0.9375rem;
+    font-size: var(--text-ui);
     line-height: 1.5;
   }
 
   .metric {
     font-family: var(--font-sans);
-    font-size: clamp(2.5rem, 1.9rem + 4.2vw, 6rem);
+    font-size: clamp(2.25rem, 2.24rem + 1.8vw, 4rem);
     font-weight: 400;
     letter-spacing: -0.045em;
     line-height: 0.88;
@@ -567,7 +733,7 @@
      most people use. The floor now clears display-3 at every width. */
   .thesis {
     font-family: var(--font-serif);
-    font-size: clamp(1.875rem, 1.35rem + 2.2vw, 3.25rem);
+    font-size: clamp(1.75rem, 1.68rem + 0.8vw, 2.375rem);
     font-weight: 300;
     letter-spacing: -0.012em;
     line-height: 1.24;
@@ -579,7 +745,7 @@
      nearly the same size exactly where the hierarchy is needed most. */
   .lead {
     font-family: var(--font-serif);
-    font-size: clamp(1.3125rem, 1.08rem + 0.65vw, 1.5rem);
+    font-size: clamp(1.25rem, 1.235rem + 0.22vw, 1.375rem);
     font-weight: 400;
     letter-spacing: -0.006em;
     line-height: 1.48;
@@ -588,7 +754,7 @@
 
   .body-serif {
     font-family: var(--font-serif);
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
     line-height: 1.62;
     text-wrap: pretty;
   }
@@ -596,7 +762,7 @@
   /* No baked colour: ten of its fourteen uses immediately overrode it, and a
      type role has no business deciding ink. Callers set it. */
   .caption {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
     text-wrap: pretty;
   }
@@ -604,7 +770,7 @@
   /* The "production" voice: indices, units, addresses, telemetry. */
   .label {
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: 0.65625rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.14em;
@@ -645,7 +811,7 @@
        label, so 1.5rem measured at the widest point leaves the first and last
        glyph sitting in the arc. */
     padding: 0.875rem 1.75rem;
-    font-size: 0.9375rem; /* .ui */
+    font-size: var(--text-ui);
     line-height: 1.5;
     font-weight: 500;
     white-space: nowrap;
@@ -779,6 +945,75 @@
   [data-tone='inverse'] .panel {
     border-color: var(--inverse-hairline-strong);
     background-color: var(--inverse-overlay);
+  }
+
+  /* ------------------------------------------------------------------------
+     THE CONTOUR FIELD'S QUIET ZONE.
+
+     A GROUND GETS OUT OF THE WAY OF READING MATTER. That is the whole rule
+     here, and it is the reason this is a mask on the DRAWING rather than a
+     panel behind the paragraph or a heavier ink on it.
+
+     The field was strengthened deliberately — see `--contour` above, which
+     exists because the old `opacity: 0.5` on the group turned the survey into
+     something you had to hunt for. That change bought presence everywhere and
+     charged for it in exactly one place: the hero lede, three sentences of
+     18px serif in the right-hand column with survey lines crossing the
+     letterforms. Display type at 80px shrugs those off; body serif does not.
+
+     WHAT THIS IS NOT. It is not a contrast fix — the contours are decorative,
+     sit at `-z-10` behind the type, and `--reading` on `--ground` is gated in
+     `tools/palette.mjs`. axe passes either way. It is a legibility fix, which
+     is the kind the gates cannot catch and only looking can.
+
+     THE FEATHER IS MOST OF THE VALUE. `transparent` to `black` across a wide
+     band, not a hard stop: a sharp edge would read as a rectangle cut out of
+     the drawing, which is worse than the problem. The field thins toward the
+     reading column and recovers before it reaches the frame.
+
+     PERCENTAGES, AND WHY THEY ARE CLOSE ENOUGH. The paragraph is placed by the
+     grid inside the page measure (`Container`, currently 1440), so above that
+     width the container centres and the column drifts inward relative to the
+     viewport. One ellipse cannot track that exactly, but with this much feather
+     it does not need to: every width in the table below sits inside the
+     falloff. The measure is not a constant — it has already moved 1512 → 1200 →
+     1440 — so if it moves again, re-measure rather than assume.
+
+     TWO ELLIPSES, BECAUSE THE PARAGRAPH IS IN TWO DIFFERENT PLACES. Below the
+     breakpoint the aside is not a right-hand column at all — it is full width
+     and sits under the buttons. Reusing the desktop ellipse there would have
+     put the hole over the headline and left the lede exactly as it was, which
+     is moving the problem rather than fixing it.
+
+     Both are placed from measured positions rather than guessed. The lede's
+     box, as a percentage of the hero:
+
+       390px    x  6–94%    y 49.5–66%     (full width, lower middle)
+       834px    x 67–96%    y 17.7–48.9%   (right column, upper)
+       1512px   x 66–97%    y ~17–47%
+       1900px   x 60–91%    y ~17–47%
+
+     Each ellipse's radii cover its own range with the feather to spare. Re-measure
+     if the copy column's spans change — the numbers above are the check.
+     ------------------------------------------------------------------------ */
+  .contour-field {
+    mask-image: radial-gradient(
+      ellipse 66% 22% at 50% 58%,
+      transparent 40%,
+      rgb(0 0 0 / 0.55) 68%,
+      black 100%
+    );
+  }
+
+  @media (min-width: 48rem) {
+    .contour-field {
+      mask-image: radial-gradient(
+        ellipse 42% 34% at 79% 27%,
+        transparent 38%,
+        rgb(0 0 0 / 0.55) 62%,
+        black 84%
+      );
+    }
   }
 }
 
@@ -967,6 +1202,16 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   [data-scene-part] {
     animation: none !important;
     transform: none !important;
+    /* The artefact field animates the INDIVIDUAL transform properties rather
+       than the `transform` shorthand (see scene-converge), and those are a
+       separate cascade — `transform: none` does not touch them. Killing the
+       animation already leaves all three at their initial values, so this is
+       the same belt-and-braces the clip-path line below is, not a fix for a
+       live bug. It is here so that a part which later sets one of these
+       statically cannot quietly survive reduced motion. */
+    translate: none !important;
+    rotate: none !important;
+    scale: none !important;
     opacity: 1 !important;
     /* `animation: none` already drops the keyframed clip, but the uncover
        parts end on `inset(0 0 0 0)` and this states the resting value rather
@@ -1106,6 +1351,13 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    still crossing it. */
 :root {
   --deck-hold: 0px;
+
+  /* `--hero-band` lived here and is gone with the band it measured. It was
+     declared once because two things read it — the photographs in `Hero.tsx`
+     and the `--deck-card-h` model below — and that pairing was the right call
+     while it existed. With the photographs removed it has no consumers, and a
+     variable with no consumers is a comment pretending to be code. The same
+     reasoning retired `--mark` in `TheGap`. */
 }
 
 [data-deck-hold] {
@@ -1121,28 +1373,54 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     --deck-hold: 100svh;
   }
 
+  /* RE-MEASURED after the hero gained its full-bleed image band, and the shape
+     of the model changed as well as the numbers.
+
+     THE `6vh` TERM IS GONE, and it is gone by cancellation rather than by being
+     dropped. The section still carries `pt-[calc(72px+6vh)]`, but the band is
+     pulled back up by exactly `-mt-[6vh]` so it butts the nav — so the two
+     annihilate and the card's height no longer depends on that term at all.
+     What is left is: a fixed part, plus the band, plus the bottom padding.
+
+     The fixed part was solved from measurement, not arithmetic — see
+     `.shots/probe/deck-h.mjs`, which lays the page out at six widths and two
+     viewport heights and prints it. Checked at 800px and 950px tall: the fixed
+     part agrees to within 1px across both, which is what proves it is actually
+     fixed and not absorbing a vh term. Predicted heights at 800 matched measured
+     to 1049/1050, 962/962, 941/942, 971/971.
+
+     It errs SHORT on purpose. `top` is `min(0px, 100svh - card)`, so overstating
+     the card rides it too high and opens a gap under its bottom edge;
+     understating only means the top scrolls off slightly less. One of those is
+     visible and the other is not. */
   [data-deck] > [data-deck-card] {
     position: sticky;
-    --deck-card-h: max(94svh, calc(624px + 6vh + clamp(120px, 17vh, 190px)));
+    --deck-card-h: max(94svh, calc(634px + 6vh + clamp(120px, 17vh, 190px)));
     top: min(0px, calc(100svh - var(--deck-card-h)));
   }
 }
 
+/* 1024 CARRIES THE SAME NUMBER AS 768 and that is a measurement, not a
+   copy-paste. They used to differ by 87px because the station log was a
+   six-row column: the narrower the grid, the taller that column made the
+   hero. The log is a full-width strip now, so between 768 and 1280 nothing
+   about the hero's height depends on width at all. The rule is kept rather
+   than deleted so the two can diverge again without re-deriving the cascade. */
 @media (min-width: 1024px) and (min-height: 800px) {
   [data-deck] > [data-deck-card] {
-    --deck-card-h: max(94svh, calc(682px + 6vh + clamp(120px, 17vh, 190px)));
+    --deck-card-h: max(94svh, calc(583px + 6vh + clamp(120px, 17vh, 190px)));
   }
 }
 
 @media (min-width: 1280px) and (min-height: 800px) {
   [data-deck] > [data-deck-card] {
-    --deck-card-h: max(94svh, calc(696px + 6vh + clamp(120px, 17vh, 190px)));
+    --deck-card-h: max(94svh, calc(613px + 6vh + clamp(120px, 17vh, 190px)));
   }
 }
 
 @media (min-width: 1440px) and (min-height: 800px) {
   [data-deck] > [data-deck-card] {
-    --deck-card-h: max(94svh, calc(728px + 6vh + clamp(120px, 17vh, 190px)));
+    --deck-card-h: max(94svh, calc(632px + 6vh + clamp(120px, 17vh, 190px)));
   }
 }
 
@@ -1377,20 +1655,35 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
     }
 
-    /* The header condenses once the page has moved. Deliberately NOT touching
-       the bottom rule: that rule already encodes which section you are reading,
-       and two meanings on one line is one too many. */
-    [data-scroll='condense'] {
-      animation: scroll-condense linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 220px;
-    }
+    /* `condense` USED TO LIVE HERE AND WAS REMOVED FOR PERFORMANCE. It is the
+       one effect in this file that was measurably expensive, and it is worth
+       recording exactly why so it is not rebuilt the same way.
 
-    @keyframes scroll-condense {
-      to {
-        --header-shrink: 1;
-      }
-    }
+       It animated a CUSTOM PROPERTY — `--header-shrink: 0 → 1` on
+       `scroll(root) 0 220px` — which two inline styles in `Nav.tsx` read as
+       `height: calc(72px - 16px * var(--header-shrink))`.
+
+       Two things were wrong with that, and only together do they explain the
+       symptom. First, custom-property animations are NEVER composited: there is
+       no fast path, so every frame goes through style recalculation. Second, the
+       property fed a LAYOUT property, so every one of those frames also ran
+       layout and paint across the entire fixed header subtree — wordmark, five
+       nav items and their rule segments, theme toggle, locale menu, contact
+       button, hamburger.
+
+       That ran for the first 220px of every scroll, which is the hero and
+       nothing else. It is why the reported sluggishness was local to the first
+       screen: it overlapped the deck pin engaging, the curtain scaling 94px of
+       type, four Counter rAF loops and the contour field's own repaints, all in
+       the same band.
+
+       The bar still condenses. It now reads the `scrolled` boolean that
+       `useNavState` was already computing for the solid/transparent cross-fade,
+       so the height is one 300ms transition on a state flip rather than 220px of
+       per-frame layout. If a scrubbed version is ever wanted back, the only
+       cheap way to build it is a `translateY` on the bar's CONTENTS against a
+       fixed-height bar — never an animated `height`, and never a custom property
+       feeding one. */
 
     /* ======================================================================
        SCENES — one section's scroll range driving several of its elements.
@@ -1529,6 +1822,88 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
       to {
         transform: none;
+      }
+    }
+
+    /* ── CLOSING IN ────────────────────────────────────────────────────────
+       Something that starts scattered and ends in line.
+
+       The reference was a landing-page loop of little cards drifting around a
+       logo forever. Drifting forever is decoration: it sits on top of whatever
+       a section is arguing and says nothing about it. So the drift here
+       RESOLVES, and in the Gap the resolution is the argument — the three
+       stations straighten and take their places over the same scroll ranges the
+       rule reaches them, so "production" is something you watch happen rather
+       than a word printed under a line.
+
+       That also settles the fail-safe question the same way every other part in
+       this file settles it. `from` is the scatter and `to` is the resting
+       layout, so the finished state IS the tidy one: a browser with no scroll
+       timelines, or a reader who asked for less motion, gets the aligned
+       composition rather than a heap that never got tidied.
+
+       IT NEVER TOUCHES OPACITY, and unlike `land` it does not get to. `land`
+       may fade because it only ever animates decorative, `aria-hidden` marks; a
+       scrubbed fade on TEXT would hold body copy at every partial opacity
+       between 0 and 1 as a function of scroll position, and axe folds ancestor
+       opacity into its contrast maths. This part carries paragraphs, so the
+       travel is the whole of the arrival.
+
+       INDIVIDUAL `translate` / `rotate` / `scale`, NOT `transform`, and this is
+       the one place in the file that gets to avoid a workaround the rest of it
+       needs. The Gap's crossing mark is built as two nested boxes for exactly
+       one reason — an animation on `transform` REPLACES a class-based
+       `transform` on the same element instead of composing with it, so the
+       centring translate had to move to a parent. The individual properties
+       compose, so a converging element can carry a utility transform (an
+       `origin-*`, a `-translate-*`) and still be animated. Two boxes are still
+       used at the call site, but for a different and better reason — the float
+       and the converge run on different ranges, and one element can hold only
+       one `animation-range`. */
+    [data-scene-part='converge'] {
+      animation-name: scene-converge;
+      --scrub-ease: var(--ease-entrance);
+      animation-range: var(--scene-from, contain 62%) var(--scene-to, contain 92%);
+    }
+
+    @keyframes scene-converge {
+      from {
+        translate: var(--adrift-x, 0) var(--adrift-y, 0);
+        rotate: var(--adrift-rot, 0deg);
+        scale: var(--adrift-scale, 1);
+      }
+      to {
+        translate: 0 0;
+        rotate: 0deg;
+        scale: 1;
+      }
+    }
+
+    /* The parallax underneath it. Each element is given its own `--float-from`
+       / `--float-to`, which is the whole of the depth effect: things moving at
+       different rates read as different distances from the reader, with no
+       perspective, no z translation and nothing for a compositor to think
+       about.
+
+       It runs the FULL `contain` range while `converge` runs only a window
+       inside it, so for most of the hold the elements are simply adrift and the
+       closing-in is a distinct, late event rather than something that was
+       happening all along.
+
+       Rest is 0, deliberately — no static `translate` outside the keyframes.
+       With no timeline the element sits exactly where layout put it, which is
+       the settled composition the contract above promises. */
+    [data-scene-part='float'] {
+      animation-name: scene-float;
+      animation-range: var(--scene-from, contain 0%) var(--scene-to, contain 100%);
+    }
+
+    @keyframes scene-float {
+      from {
+        translate: 0 var(--float-from, 0px);
+      }
+      to {
+        translate: 0 var(--float-to, 0px);
       }
     }
 
@@ -1922,13 +2297,60 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       transform-origin: left top;
     }
 
+    /* TRANSLATE ONLY. The `scale(0.93)` that used to be here is gone, and it is
+       the single most expensive thing this seam was doing.
+
+       A transform is normally free — the compositor moves a cached texture and
+       never repaints. Scaling TEXT is the exception: glyphs are rasterised at a
+       given size, so a container being scaled through 100%→93% has to re-raster
+       its type at a new size on every frame it can be bothered to. This
+       container holds `display-1` at up to 94px of Fraunces, which is the
+       largest and most expensive text on the page, and it was being re-rastered
+       throughout the first 60svh of scroll — exactly the stretch where the deck
+       is also pinning and the section above is riding over.
+
+       Losing the scale costs almost nothing to look at. The content still lifts
+       away as the card holds, which is the whole gesture; it simply stops
+       pretending to recede in z at the same time. One idea, done cheaply, beats
+       two ideas that make the page stutter. */
     @keyframes scroll-curtain {
       from {
         transform: none;
       }
       to {
-        transform: translateY(-40px) scale(0.93);
+        transform: translateY(-40px);
       }
     }
   }
 }
+
+/* ==========================================================================
+   THE CONTOUR FIELD
+   --------------------------------------------------------------------------
+   Colour lives in the `--contour` tokens at the top of this file. There is no
+   motion here any more, and the removal is the fix for a real, reported problem
+   rather than a tidy-up — so what was here and why it went is recorded.
+
+   IT USED TO DRIFT. Two time-based loops: the dashed contours marched their
+   dash pattern (`stroke-dashoffset`, 90s), and the whole field breathed 0.4% of
+   scale (40s). The intent was a ground you cannot catch moving — you only
+   notice, coming back, that it is not quite the same picture.
+
+   BOTH WERE EXPENSIVE IN THE WORST POSSIBLE PLACE.
+
+     - `stroke-dashoffset` is a PAINT property. It has no compositor fast path,
+       so all 58 dashed paths repainted on every frame.
+     - The breathe scaled the `<svg>`, whose paths carry
+       `vector-effect: non-scaling-stroke`. Stroke width then has to be re-solved
+       in device space at each new scale, which defeats layer caching and forces
+       a full re-raster of all 87 paths.
+     - Both were `infinite`, and they sit behind a card that is `position:
+       sticky` for a 100svh deck hold. So the hero repainted continuously for the
+       entire time it was on screen — which is precisely the hero-to-Gap
+       transition that was reported as sluggish.
+
+   The field is static now and looks the same in every still frame. If drifting
+   is ever wanted back, the only affordable version is a `transform: translate`
+   on a group with a plain stroke — never a dash offset, and never a scale on a
+   non-scaling-stroke tree.
+   ========================================================================== */

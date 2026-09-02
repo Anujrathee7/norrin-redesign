@@ -20,6 +20,12 @@ const pairs = [
   { note: 'L ink       / ground ', fg: '#14170f', bg: '#f8f7f3', min: 4.5 },
   { note: 'L ink-2     / ground ', fg: '#4a4d42', bg: '#f8f7f3', min: 4.5 },
   { note: 'L ink-3     / ground ', fg: '#696d5f', bg: '#f8f7f3', min: 4.5 },
+  // Reading ink — the lichen-derived serif colour. Gated on BOTH the ground and
+  // the surface because long-form serif runs over Pillars' and Thinking's
+  // `--surface` bands as well as on plain paper, and a reading colour that only
+  // holds on one of them is a colour that fails wherever the eye spends longest.
+  { note: 'L reading   / ground ', fg: '#4d5744', bg: '#f8f7f3', min: 4.5 },
+  { note: 'L reading   / surface', fg: '#4d5744', bg: '#f1f0ea', min: 4.5 },
   { note: 'L ink-3     / surface', fg: '#696d5f', bg: '#f1f0ea', min: 4.5 },
   { note: 'L ink-3     / overlay', fg: '#696d5f', bg: '#fdfcfa', min: 4.5 },
   { note: 'L ink-3     / tint   ', fg: '#696d5f', bg: TINT_L, min: 4.5 },
@@ -36,6 +42,8 @@ const pairs = [
   // --- dark: ink ramp --------------------------------------------------------
   { note: 'D ink       / ground ', fg: '#f2f2ec', bg: '#0e120f', min: 4.5 },
   { note: 'D ink-2     / ground ', fg: '#b4b8ac', bg: '#0e120f', min: 4.5 },
+  { note: 'D reading   / ground ', fg: '#a8b09b', bg: '#0e120f', min: 4.5 },
+  { note: 'D reading   / surface', fg: '#a8b09b', bg: '#161b17', min: 4.5 },
   { note: 'D ink-3     / ground ', fg: '#868a7c', bg: '#0e120f', min: 4.5 },
   { note: 'D ink-3     / surface', fg: '#868a7c', bg: '#161b17', min: 4.5 },
   { note: 'D ink-3     / overlay', fg: '#868a7c', bg: '#191f1b', min: 4.5 },

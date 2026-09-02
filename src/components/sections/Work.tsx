@@ -53,7 +53,7 @@ export function Work() {
             </SectionHeader>
           </div>
           <div className="col-span-4 self-end md:col-span-5 md:col-start-8">
-            <p className="body-serif measure-serif mb-12 text-ink-2 md:mb-20">{customersIntro}</p>
+            <p className="body-serif measure-serif mb-12 text-reading md:mb-20">{customersIntro}</p>
           </div>
         </Grid>
 
@@ -202,7 +202,7 @@ export function Work() {
                       2-4 inside a full-width-ruled table. */}
                   <div className="col-span-4 mt-4 md:col-span-7 md:col-start-6 md:mt-0">
                     <p className="text-ink">{c.title}</p>
-                    <p className="body-serif measure-serif mt-3 text-ink-2">{c.quote}</p>
+                    <p className="body-serif measure-serif mt-3 text-reading">{c.quote}</p>
                     {'attribution' in c && c.attribution ? (
                       <p className="caption mt-3 text-ink-3">{c.attribution}</p>
                     ) : null}

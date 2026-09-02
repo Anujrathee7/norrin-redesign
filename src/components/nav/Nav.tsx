@@ -42,9 +42,21 @@ export function Nav() {
     mobileOpen,
     setMobileOpen,
     inverted,
+    scrolled,
     solid,
     currentSection,
   } = useNavState(BAR_HEIGHT)
+
+  /* The condensed height, as a STATE rather than a scrub. See the long note in
+     index.css where `condense` used to be declared: driving this from an
+     animated custom property into `height: calc()` ran style, layout and paint
+     on the whole header subtree every frame of the first 220px of scroll, which
+     is the hero and nothing else.
+
+     `scrolled` and not `solid`. They differ, and the difference matters: `solid`
+     is also true when a drawer or the mobile sheet is open, and opening a menu
+     must not make the bar it is hanging from shrink underneath it. */
+  const rowHeight = scrolled ? BAR_HEIGHT - 16 : BAR_HEIGHT
 
   return (
     <header
@@ -60,13 +72,9 @@ export function Nav() {
       // to say no ring at all. axe does not automate focus-indicator contrast,
       // so every clean audit run to date was silent about it.
       data-tone={inverted ? 'inverse' : undefined}
-      // `condense` reads `--header-shrink` from 0 to 1 over the first 220px of
-      // root scroll (see `[data-scroll='condense']` in index.css) and leaves
-      // the bar's own bottom rule alone — that rule already encodes which
-      // section is current, and this bar is not allowed to also encode scroll
-      // depth on it. Every consumer of the variable below falls back to `0`
-      // (full size) so a browser without scroll timelines just never shrinks.
-      data-scroll="condense"
+      // The bar condenses once the page has moved, and deliberately does NOT
+      // touch its own bottom rule: that rule already encodes which section you
+      // are reading, and two meanings on one line is one too many.
       className="fixed inset-x-0 top-0 z-50"
     >
       <div
@@ -82,25 +90,31 @@ export function Nav() {
         )}
       >
         <Container>
-          {/* The row's height is the thing that actually condenses. It cannot be
-              a Tailwind `h-[72px]` any more because that has no room for a
-              variable: `calc()` against `var(--header-shrink, 0)` in an inline
-              style is what lets 72px run down to 56px as the page scrolls, and
-              back up again on the way up, with zero JS in the path. The `ul`
-              below carries the identical expression rather than `h-full`,
-              because this row uses `items-center` (aligns each grid item to
-              the row's midline) and not `items-stretch` — a `h-full` child
-              would stay 72px tall regardless of the row shrinking around it. */}
+          {/* The row's height is the thing that actually condenses: 72px down
+              to 56px, once, on a transition rather than continuously on scroll.
+
+              The `ul` below carries the identical height rather than `h-full`,
+              because this row is `items-center` (each grid item aligned to the
+              row's midline) and not `items-stretch` — a `h-full` child would
+              stay 72px tall regardless of the row shrinking around it.
+
+              A height transition IS layout, and normally this file would refuse
+              one. It is allowed here because the header is `position: fixed`, so
+              the reflow is contained to its own subtree and never touches the
+              document, and because it runs twice per direction change instead of
+              on every frame of a 220px scroll band. Under
+              `prefers-reduced-motion` the global rule crushes the duration and
+              it simply snaps, which is correct. */}
           <div
-            style={{ height: 'calc(72px - 16px * var(--header-shrink, 0))' }}
-            className="grid grid-cols-[auto_1fr_auto] items-center gap-6 lg:grid-cols-[1fr_auto_1fr]"
+            style={{ height: rowHeight }}
+            className="grid grid-cols-[auto_1fr_auto] items-center gap-6 transition-[height] duration-300 ease-(--ease-ui) lg:grid-cols-[1fr_auto_1fr]"
           >
             <Wordmark inverted={inverted} />
 
             <nav aria-label="Primary" className="hidden justify-self-center lg:block">
               <ul
-                style={{ height: 'calc(72px - 16px * var(--header-shrink, 0))' }}
-                className="flex items-center gap-1"
+                style={{ height: rowHeight }}
+                className="flex items-center gap-1 transition-[height] duration-300 ease-(--ease-ui)"
               >
                 {NAV.map((item) => {
                   const isCurrent = !!currentSection && item.owns.includes(currentSection)

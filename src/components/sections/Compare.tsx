@@ -210,7 +210,7 @@ export function Compare() {
                       label="norrin.com"
                       eager={i === 0}
                     />
-                    <p className="body-serif mt-5 text-ink-2">{pair.theirs}</p>
+                    <p className="body-serif mt-5 text-reading">{pair.theirs}</p>
                   </div>
 
                   <div>
@@ -220,7 +220,7 @@ export function Compare() {
                       label="This redesign"
                       eager={i === 0}
                     />
-                    <p className="body-serif mt-5 text-ink-2">{pair.ours}</p>
+                    <p className="body-serif mt-5 text-reading">{pair.ours}</p>
                   </div>
                 </div>
               </Container>
@@ -240,7 +240,7 @@ export function Compare() {
               One number, stated carefully.
             </h2>
             <div className="max-w-[62ch]">
-              <p className="body-serif text-ink-2">
+              <p className="body-serif text-reading">
                 Loaded in a real browser and scrolled to the bottom, norrin.com transfers about{' '}
                 <strong className="text-ink">915&nbsp;kB</strong> of photography — six images,
                 served as WebP at sensible widths. This rebuild serves the same six as AVIF for

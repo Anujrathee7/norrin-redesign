@@ -227,7 +227,7 @@ export function Pillars() {
                     ['--scene-from' as string]: 'cover 22%',
                     ['--scene-to' as string]: 'cover 46%',
                   }}
-                  className="body-serif measure-serif mt-6 text-ink-2"
+                  className="body-serif measure-serif mt-6 text-reading"
                 >
                   {p.body}
                 </p>
@@ -366,7 +366,7 @@ export function Pillars() {
                   ['--scrub-from' as string]: 'cover 18%',
                   ['--scrub-to' as string]: 'cover 44%',
                 }}
-                className="body-serif measure-serif mt-6 text-ink-2"
+                className="body-serif measure-serif mt-6 text-reading"
               >
                 {productionSince.claim}
               </p>

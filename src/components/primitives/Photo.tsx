@@ -55,6 +55,27 @@ export type PhotoProps = {
    * it, so the default is right and the prop exists for the one day it is not.
    */
   loading?: 'lazy' | 'eager'
+  /**
+   * Which ramp the frame is drawn from.
+   *
+   * A PROP RATHER THAN A CLASS OVERRIDE, because the frame is a Tailwind
+   * utility and so is anything a caller would pass to beat it — same
+   * specificity, so which one wins is decided by their order in the generated
+   * stylesheet, not by the call site. That is a coin flip, and it would land on
+   * a paper hairline against the forest band roughly whenever the build
+   * reordered. Stating the ramp is the only version of this that is stable.
+   */
+  tone?: 'paper' | 'inverse'
+  /**
+   * `false` drops the hairline frame and the placeholder ground.
+   *
+   * For collage only — images butted edge to edge, where the frame would draw a
+   * grid over what is supposed to read as one continuous band. A framed photo is
+   * an object on the page; an unframed one is the page. Do not reach for this to
+   * make a single image look cleaner: the frame is what stops a loading image
+   * from being a hole rather than a deliberate gap.
+   */
+  frame?: boolean
   className?: string
   style?: CSSProperties
 }
@@ -66,6 +87,8 @@ export function Photo({
   height,
   sizes,
   loading = 'lazy',
+  tone = 'paper',
+  frame = true,
   className,
   style,
 }: PhotoProps) {
@@ -86,7 +109,14 @@ export function Photo({
     // it is the same trap the hero and the contact band already avoid — see the
     // note above the continuous-motion block in index.css.
     <figure
-      className={cx('m-0 overflow-clip border border-hairline bg-surface', className)}
+      className={cx(
+        'm-0 overflow-clip',
+        frame &&
+          (tone === 'inverse'
+            ? 'border border-inverse-hairline-strong bg-inverse-overlay'
+            : 'border border-hairline bg-surface'),
+        className,
+      )}
       style={style}
     >
       <picture>

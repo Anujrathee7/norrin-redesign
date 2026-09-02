@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { Nav } from '@/components/nav/Nav'
 import { MascotLab } from '@/components/sections/MascotLab'
 import { Compare } from '@/components/sections/Compare'
+import { StyleGuide } from '@/components/sections/StyleGuide'
+import { GapBackdrops } from '@/components/sections/GapBackdrops'
+import { FontLab } from '@/components/sections/FontLab'
 import { Hero } from '@/components/sections/Hero'
 import { TheGap } from '@/components/sections/TheGap'
 import { Proof } from '@/components/sections/Proof'
@@ -38,7 +41,7 @@ import { Footer } from '@/components/sections/Footer'
  * the thinking, then who we are, then the track record, then the ask.
  */
 /**
- * Two surfaces hang off the hash rather than living in the page.
+ * Three surfaces hang off the hash rather than living in the page.
  *
  * `#mascots` is a workbench: every pose against both grounds, down to 24px,
  * with motion off. Worth having, not worth a nav slot — the page has one
@@ -50,6 +53,19 @@ import { Footer } from '@/components/sections/Footer'
  * themselves, and a cold link does not get that much patience. It stays off the
  * page for the same reason the lab does — the homepage should make the argument,
  * not talk about making it.
+ *
+ * `#backdrops` is a workbench for one open question: whether The Gap carries
+ * a picture behind it, and if so which one and where the type goes. Seven
+ * rendered options rather than a description of seven options, for the same
+ * reason the style guide is a page — a backdrop is not a thing you can judge by
+ * reading about it.
+ *
+ * `#styleguide` is the system itself, rendered rather than written. It exists
+ * because a spec for type, colour and spacing is the one thing you cannot judge
+ * by reading it, and because a guide that restates values copied out of the
+ * stylesheet starts lying the first time a token moves. Every number on it is
+ * measured off the live DOM. It is a review gate, which is why it is here and
+ * not in `docs/`.
  *
  * Gated on the hash rather than on a router because the project has no router
  * and needs none for two standalone surfaces; it also means both work on a
@@ -73,6 +89,9 @@ function useHashSurface() {
   }, [])
   if (hash === '#mascots') return 'mascots'
   if (hash === '#compare') return 'compare'
+  if (hash === '#styleguide') return 'styleguide'
+  if (hash === '#backdrops') return 'backdrops'
+  if (hash === '#fonts') return 'fonts'
   return null
 }
 
@@ -80,6 +99,9 @@ export default function App() {
   const surface = useHashSurface()
   if (surface === 'mascots') return <MascotLab />
   if (surface === 'compare') return <Compare />
+  if (surface === 'styleguide') return <StyleGuide />
+  if (surface === 'backdrops') return <GapBackdrops />
+  if (surface === 'fonts') return <FontLab />
 
   return (
     <>

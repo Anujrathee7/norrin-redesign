@@ -77,7 +77,7 @@ export function Careers() {
             <p
               data-scene-part="enter"
               style={{ ['--scene-from' as string]: 'cover 22%', ['--scene-to' as string]: 'cover 48%' }}
-              className="body-serif measure-serif mt-6 text-ink-2"
+              className="body-serif measure-serif mt-6 text-reading"
             >
               {careers.body}
             </p>

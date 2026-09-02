@@ -1,9 +1,8 @@
 import { useEffect, useRef } from 'react'
 
-import { Container, Eyebrow, Grid } from '@/components/primitives/Layout'
+import { Container, Grid } from '@/components/primitives/Layout'
+import { ContourField } from '@/components/sections/ContourField'
 import { metrics, offices, positioning, story } from '@/data/norrin'
-import { Nori } from '@/components/mascot/nori/Nori'
-import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
 import { Line } from '@/components/primitives/SplitLines'
 import { Reveal } from '@/components/primitives/Reveal'
 import { Counter } from '@/components/primitives/Counter'
@@ -14,8 +13,8 @@ import { Counter } from '@/components/primitives/Counter'
  * The composition is one idea: a horizon. Everything the visitor reads sits
  * above the waterline, and the waterline itself is the site's central device —
  * dashed to the left of the mark (pilot: provisional, unfinished) and solid to
- * the right (production: committed, load-bearing). Nori sits exactly on the
- * crossing, which is the whole argument in one object.
+ * the right (production: committed, load-bearing). The state change AT the
+ * crossing is the whole argument in one object, and nothing sits on it.
  *
  * The rule is assembled as a flex row rather than an absolutely-positioned
  * overlay, so the dashed→solid transition lands precisely on the mark's centre
@@ -177,14 +176,60 @@ export function Hero() {
       // the moment it stops moving, an inherited background means whatever is
       // underneath shows straight through it.
       //
+      // THE HERO IS PAPER, NOT A SATURATED PLANE, and that was tried and
+      // rejected rather than never considered. Flooding this section in forest
+      // was built and looked at: it read as a different company, and it made
+      // the contour field — which is the thing worth keeping here — compete
+      // with a colour instead of drawing on a ground. What the flood was
+      // actually fixing was that the survey lines were too faint to see, and
+      // that is fixed where it belongs, in the strokes themselves.
+      //
       // `pb-[clamp(120px,17vh,190px)]`: unchanged, but it is now read twice.
       // The deck pins this card at MINUS that same expression, so the padding
       // is no longer only spacing — it is exactly how much of the hero the pin
       // is allowed to push off the top of the screen. Change one and the other
       // has to change with it; see the `[data-deck]` comment in index.css.
+      // `isolate` IS LOAD-BEARING AND FIXES A REAL BUG. The contour field sits
+      // at `z-index: -10` so it paints above this section's own `bg-ground` but
+      // below everything that is read. That only works if this element is a
+      // stacking context — otherwise the negative-z child escapes to the nearest
+      // ancestor that IS one and paints behind this section's background, which
+      // makes it invisible.
+      //
+      // It used to get that stacking context by accident, from `position:
+      // sticky`. But the deck only applies sticky at `min-width: 768px` AND
+      // `min-height: 800px`, so outside that query the hero is merely
+      // `relative` with `z-index: auto` — no stacking context, no field.
+      // Measured: visible at 1512x950, invisible at 1512x700 and 600x900.
+      //
+      // `isolation: isolate` creates one unconditionally and does nothing else,
+      // which is exactly the intent. Relying on sticky was relying on a layout
+      // mode to imply a paint mode.
       data-deck-card
-      className="relative flex min-h-[94svh] flex-col justify-between overflow-clip bg-ground pt-[calc(72px+6vh)] pb-[clamp(120px,17vh,190px)]"
+      className="relative isolate flex min-h-[94svh] flex-col justify-between overflow-clip bg-ground pt-[calc(72px+6vh)] pb-[clamp(120px,17vh,190px)]"
     >
+      {/* The ground the hero stands on. Behind everything, including the band —
+          the band is an object sitting on the field, not a second background
+          competing with it. See ContourField for why this figure and not a
+          gradient. */}
+      <ContourField />
+
+      {/* NO PHOTOGRAPH BAND. There was one — three of Norrin's aerials butted
+          edge to edge under the nav, at 24vh — and it is gone deliberately
+          rather than by attrition.
+
+          It worked, and it was still one thing too many. With the contour field
+          behind the type, the hero was carrying two backgrounds arguing for the
+          same idea: photographs of terrain from above, over a survey of terrain
+          from above. The field says it more quietly and lets the headline be the
+          loudest thing on the screen, which at `display-1` it should be.
+
+          What the band cost is worth recording so this is not simply undone
+          later: it was the only place the three landscapes read at full width,
+          and their left-to-right progression — unmarked water, a route being
+          cut, a causeway in use — is the page's argument stated in pictures.
+          That progression currently has no home. It is a real loss, not a
+          tidy-up. */}
       {/* THE RECEDE, and note what it is NOT on.
           It used to sit on a sticky column inside this section. It cannot stay
           there: with the whole hero holding, a sticky box inside it has nothing
@@ -227,9 +272,25 @@ export function Hero() {
               the page opens arrives pre-finished, which is no entrance at all.
               Sections 02–07 were converted precisely because they are NOT above
               the fold. */}
-          <div className="col-span-4 md:col-span-8 lg:col-span-7">
-            {/* THEIR h1, demoted to the eyebrow — and that demotion is the
-                argument this whole section makes.
+          {/* EIGHT AT `lg`, NOT SEVEN, AND IT COSTS THE RIGHT COLUMN NOTHING.
+              The aside opposite starts at column 9, so column 8 was simply
+              empty — a gutter nobody asked for. Taking it gives the headline a
+              whole column more to run in.
+
+              IT IS STILL THREE LINES, and that is measured rather than assumed —
+              3 at 1280, 1440 and 1920 (`h1` box 790px, 892px, 888px against a
+              96px face). The authored split is two lines; the first of them,
+              "Enterprise AI is won in", needs roughly 1100px at this size and
+              gets under 900, so it wraps. Widening the column and shrinking the
+              type both helped and neither was enough to change the count.
+
+              Left as is on purpose. Forcing two lines would mean either another
+              cut to `display-1` — which is already down a fifth — or taking
+              columns from the lede. The three-line stack reads as deliberate at
+              this measure; a note here beats a surprise later. */}
+          <div className="col-span-4 md:col-span-8 lg:col-span-8">
+            {/* THEIR h1 IS NOT HERE AT ALL, and the deletion is the argument
+                this section makes — more plainly than the demotion it replaces.
 
                 On norrin.com "We are Norrin" is the document's only `<h1>`, set
                 at 19.5px/700. Measured, every heading on their homepage is
@@ -240,11 +301,13 @@ export function Hero() {
                 AI is won in production" — is an `h3` at 19.5px/400, two
                 sections down, under a webinar promo.
 
-                We keep both strings and swap their ranks. The name becomes the
-                eyebrow, because that is what a name is: a label on the thing,
-                not the thing. The thesis takes the `display-1` and the `<h1>`. */}
-            <Eyebrow label={positioning.h1} className="mb-7" />
-
+                That string was carried here as an eyebrow for a while, on the
+                reasoning that a name is a label on the thing rather than the
+                thing. True, but it still spent the first line of the page saying
+                who is talking instead of what they claim — and the wordmark in
+                the header already answers that, permanently, at every scroll
+                position. So the thesis now opens the page with nothing above it.
+                The name is in the nav, where a name goes. */}
             {/* No highlighter behind the money word — that gesture is on
                 every launch page of the last three years. The emphasis is the
                 site's own device instead: moss ink, and the solid half of the
@@ -258,69 +321,33 @@ export function Hero() {
             <div className="relative">
               <Reveal as="h1" lines className="display-1" stagger={0.11}>
                 <Line>Enterprise AI is won in</Line>
-                {/* The accent carries the emphasis on its own now. There used to
-                  be a solid rule under this word — the production line restated
-                  at heading scale — but the real one runs full-bleed at the
-                  foot of this same section, and two instances of the site's one
-                  device inside a single viewport is the device explaining
-                  itself. The colour is the emphasis; the rule below is the
-                  argument. */}
+                {/* The accent carries the emphasis on its own. There used to be
+                  a solid rule under this word as well — the production line
+                  restated at heading scale — and one device stated twice inside
+                  a single viewport is the device explaining itself. */}
                 <Line className="block w-fit text-accent">production.</Line>
               </Reveal>
 
-              {/* NORI STANDS IN THE NOTCH BESIDE "Enterprise" — clear of it,
-                  not touching it, and that is a finding rather than a compromise.
+              {/* THE NOTCH BESIDE "Enterprise" IS NOW EMPTY, ON PURPOSE.
 
-                  The pose rests a palm on an edge, and the first placement put
-                  that palm on the end of the word. Cropped and looked at
-                  (`.shots/probe/headline-crop.png`) it does not read: Nori is a
-                  WHITE character with a thin contour and the headline is white
-                  ink, so the pixels where they meet are white on white. Every
-                  other contact on this site works because the mascot meets a
-                  RULE — a hairline, the production line, a card border — a dark
-                  line on a light ground or the reverse. Type is not a rule. So
-                  the figure stands clear, the raised arm reads as a gesture
-                  toward the word rather than a grip on it, and the drawing keeps
-                  its own silhouette against the ground.
+                  A mascot used to stand in it — placed against a measured pocket,
+                  standing on a corrected baseline, breathing on its own sole. The
+                  engineering was sound and it is gone anyway, because the drawing
+                  was answering the wrong question. Norrin sells enterprise AI to
+                  CIOs of Nordic industrials; a white robot with a lavender antenna
+                  beside the thesis is the single most recognisable "generated"
+                  signal the page could carry, and it was the one element whose
+                  palette belonged to no part of this system.
 
-                  THE POCKET IS MEASURED. The headline breaks identically at
-                  every width tested (390 / 768 / 1024 / 1280 / 1512): three
-                  lines ending at 4.47em, 5.02em and 5.05em of `display-1`, to
-                  two decimals, because the type scales with the font and the
-                  column never gets narrow enough to rebreak it. Line one is the
-                  SHORT one, so the notch to its right is free at every width,
-                  and the tightest the column ever leaves it is 1.43em at 1024.
-                  The figure occupies 4.62-5.72em, which clears both edges there
-                  and everywhere else. See `.shots/probe/h1-lines.mjs`.
+                  Nothing replaces it, and that is the finding. Of the four Finnish
+                  consultancies in `docs/style-research.md`, the strongest
+                  typographic page — Reaktor's — opens with no image at all: black
+                  ground, a 20px eyebrow, one 94px serif sentence. A short first
+                  line with air to its right is a headline that trusts itself. The
+                  argument is carried by the line at the foot of this section, which
+                  is the device that actually means something.
 
-                  `--sole-drop` IS A CORRECTION, and it exists because `1lh` is
-                  not the baseline. The line box is 0.94em while the font's own
-                  content box is 1.233em, so the glyphs overflow their line and
-                  the baseline sits above the box bottom that `items-end` aligns
-                  to. Standing the figure on that bottom sank it 12px into the
-                  descender space — measured off the crop, not guessed. */}
-              <div
-                aria-hidden="true"
-                className="display-1 pointer-events-none absolute top-0 left-[4.27em] flex h-[1lh] items-end"
-                style={{ ['--sole-drop' as string]: '0.096em' }}
-              >
-                <div
-                  className="w-[1em]"
-                  style={{
-                    transform: `translateY(calc(100% - ${NORI_ANCHOR.stand.y} - var(--sole-drop)))`,
-                  }}
-                >
-                  {/* Breathing pivots on the sole, so the feet stay planted. */}
-                  <div
-                    className="nori-breathe"
-                    style={{
-                      ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}`,
-                    }}
-                  >
-                    <Nori pose="prop" size={280} animated={false} />
-                  </div>
-                </div>
-              </div>
+                  Do not fill this space. It was expensive to empty. */}
             </div>
 
             {/* THEIR BRAND LINE, PUT BACK AS TEXT — and sitting where a
@@ -425,102 +452,82 @@ export function Hero() {
                 rather than as the lede. At four it is 47ch and the gutter to
                 the copy column is a whole grid column.
 
-                `md:mb-24` is the gap to the station log, stated rather than
-                distributed. It used to be whatever `justify-between` had left
-                over, which is why it ran 170px at 1512 and 0px at 768 — the
-                narrower the column, the more lines this paragraph takes and the
-                less slack there was to spend. A stated margin is the same at
-                every width and cannot collapse. */}
-            <Reveal
-              as="p"
-              variant="right"
-              delay={0.14}
-              className="body-serif mb-7 text-ink-2 md:mb-24"
-            >
-              {positioning.lede}
-            </Reveal>
+                THE STATION LOG USED TO SIT UNDER THIS PARAGRAPH and is now a
+                full-width strip at the foot of the section. The gap between the
+                two was `md:mb-24`, stated rather than distributed because
+                `justify-between` had produced anything from 0px to 170px
+                depending on how many lines this paragraph took. Stating it fixed
+                the variance and left a different problem: 96px of nothing in the
+                middle of a column, next to a left column whose content runs
+                continuously. It read as a hole rather than as air.
 
-            <Reveal
-              as="dl"
-              stagger={0.06}
-              variant="right"
-              delay={0.2}
-              className="border-t border-hairline"
-            >
-              {STATION.map((row) => (
-                <div
-                  key={row.term}
-                  className="flex items-baseline justify-between gap-4 border-b border-hairline py-2.5"
-                >
-                  <dt className="label text-ink-3">{row.term}</dt>
-                  <dd className="label tabular-nums text-ink">
-                    {row.num !== undefined ? (
-                      <>
-                        <Counter value={row.num} />
-                        {row.suffix}
-                      </>
-                    ) : (
-                      row.value
-                    )}
-                  </dd>
-                </div>
-              ))}
+                Moving the log out solves it at the root instead of tuning the
+                number. The log is METADATA — six published figures — and
+                metadata belongs at an edge, not stacked mid-column. It also
+                makes the hero shorter, which it needed to be. */}
+            <Reveal as="p" variant="right" delay={0.14} className="body-serif text-reading">
+              {positioning.lede}
             </Reveal>
           </aside>
         </Grid>
       </Container>
 
-      {/* ---------------------------------------------------------------- */}
-      {/* The production line. Dashed left of the mark, solid right of it.  */}
-      {/* ---------------------------------------------------------------- */}
-      <div className="mt-24 md:mt-10">
-        {/* `items-start` with three equal-height children, not `items-center`
-            with a zero-height one. The mark's container used to be `h-0` between
-            two `h-px` siblings, so centring resolved it onto a half pixel and
-            rounded down — putting the two halves of the rule on different device
-            rows. A one-pixel staircase at both joints, in the one object the
-            page is remembered by. */}
-        <div className="flex items-start">
-          <span aria-hidden="true" className="h-px flex-1 border-t border-dashed border-inactive" />
+      {/* THE STATION LOG, as a strip rather than a column.
 
-          <div className="relative h-px w-[clamp(104px,23vw,320px)] shrink-0 text-accent">
-            {/* The rule continues across the mark itself, changing state at
-                its exact centre — the crossing point. */}
-            <span
-              aria-hidden="true"
-              className="absolute top-0 right-1/2 left-0 border-t border-dashed border-inactive"
-            />
-            <span aria-hidden="true" className="absolute top-0 right-0 left-1/2 h-px bg-accent" />
+          Six published figures, set as metadata at the foot of the section —
+          the position a report puts its credit line. They were a six-row `<dl>`
+          in the right-hand column, which stacked two unrelated blocks in one
+          column and left 96px of dead space between them.
 
-            {/* NO FIGURE ON THE CROSSING, deliberately.
+          Still a `<dl>`: these are term/value pairs and the markup should say
+          so whichever way they are laid out. Only the axis changed.
 
-                A mascot stood here twice — `rocket` originally, then `sit`
-                while the headline had none. Both times it competed with the
-                one thing this object exists to say. The state change in the
-                rule IS the argument; a character sitting on it is a second
-                focal point 40px from the first, and the eye goes to the face
-                every time. The hero carries one figure, and it is up in the
-                headline where there is room for it. */}
-          </div>
+          The counters stay. They are seeded with the final value, so a browser
+          that never runs the effect shows the true figure rather than a zero —
+          the same fail-safe contract every other effect on this page holds to. */}
+      <Container className="mt-12 md:mt-8">
+        <Reveal
+          as="dl"
+          stagger={0.05}
+          variant="up"
+          delay={0.2}
+          className="grid grid-cols-2 gap-x-6 gap-y-5 border-t border-hairline pt-5 sm:grid-cols-3 lg:grid-cols-6"
+        >
+          {STATION.map((row) => (
+            <div key={row.term}>
+              <dt className="label text-ink-3">{row.term}</dt>
+              <dd className="label tabular-nums mt-1.5 text-ink">
+                {row.num !== undefined ? (
+                  <>
+                    <Counter value={row.num} />
+                    {row.suffix}
+                  </>
+                ) : (
+                  row.value
+                )}
+              </dd>
+            </div>
+          ))}
+        </Reveal>
+      </Container>
 
-          {/* The tail is measured from the CONTAINER's right edge, not in raw
-              vw. At 9vw capped to 150px the mark kept drifting right of the
-              1512px-capped container, and past roughly 1667px it walked out from
-              under the word naming it — so above that width "Production" was
-              labelling the dashed side. */}
-          <span
-            aria-hidden="true"
-            className="h-px w-[calc(max(var(--spacing-gutter),(100vw-1512px)/2)+clamp(40px,4vw,110px))] shrink-0 bg-accent"
-          />
-        </div>
+      {/* THE PRODUCTION LINE USED TO END THIS SECTION and is gone by request.
+          It was a full-bleed rule — dashed left of a crossing mark, solid
+          right of it — with PILOT and PRODUCTION labelled beneath.
 
-        <Container>
-          <div className="mt-14 flex justify-between md:mt-5">
-            <span className="label text-ink-3">Pilot</span>
-            <span className="label text-accent">Production</span>
-          </div>
-        </Container>
-      </div>
+          What went with it, so this is not silently rediscovered: it was the
+          LEGEND for a convention the page still uses in three other places —
+          the road in The Gap (dashed approach, solid crossing), the nav's rule
+          marker, and the edge-to-edge terminus in Contact. The convention now
+          runs without ever being introduced. The stations in The Gap name it in
+          words, which is what makes that survivable, but it is a real cost
+          rather than a tidy-up.
+
+          It also carried a stale measurement: the tail was computed against
+          `(100vw - 1512px)/2` long after `Container` moved to 1440, so above
+          ~1667px the mark walked out from under the word naming it. Dead now,
+          but the class of bug — a hardcoded container width inside a call site
+          — is exactly why `--spacing-gutter` exists. */}
     </section>
   )
 }

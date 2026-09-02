@@ -31,10 +31,34 @@ type ContainerProps = ComponentPropsWithoutRef<'div'> & {
  * There used to be three widths — wide (1512), default (1320) and text (820).
  * All sixteen call sites passed `wide`; the other two were dead options that
  * still had to be read and reasoned about. One measure, no prop.
+ *
+ * 1440, AND IT GOT THERE BY OVERSHOOTING. Worth recording, because the two
+ * moves look contradictory in a diff.
+ *
+ * It was 1512, which on a 1920 viewport leaves 204px of margin a side — 10.6% —
+ * and the page read as content pushed out to the edges. The prompt for changing
+ * it was that the design looked better at 75% browser zoom, which is not a
+ * statement about type size at all: zoom does not shrink the layout, it enlarges
+ * the viewport. At 75% a 1920 screen reports 2560 CSS pixels, so the same
+ * measure sat inside 20.5% margins instead of 10.6%.
+ *
+ * So it went to 1200 to reproduce that proportion exactly — and 1200 turned out
+ * to be too tight for the type once seen. 1440 is the settled answer: ~12.5%
+ * margins at 1920, wider lines than 1200 gave, and still less edge-to-edge than
+ * 1512 was.
+ *
+ * The type scale came DOWN at the same time (see the TYPE block in index.css),
+ * so lines run longer for two reasons at once — more measure and smaller
+ * glyphs. That pairing is the whole change; either alone would have been wrong.
+ *
+ * Every section reads this, so it is uniform by construction. The one thing it
+ * moves that is NOT free is the hero's height: measure and type size both
+ * rewrap `display-1`, and the deck's pin model is a hardcoded number that has to
+ * be re-derived whenever that happens. See `.shots/probe/deck-h.mjs`.
  */
 export function Container({ children, className, ...rest }: ContainerProps) {
   return (
-    <div className={cx('mx-auto w-full max-w-[1512px] px-(--spacing-gutter)', className)} {...rest}>
+    <div className={cx('mx-auto w-full max-w-[1440px] px-(--spacing-gutter)', className)} {...rest}>
       {children}
     </div>
   )
@@ -81,8 +105,19 @@ export function SectionHeader({
   className?: string
   /** `inverse` for the forest bands, where the hairline needs to lift. */
   tone?: 'default' | 'inverse'
-  /** `tight` when the caller puts its own copy directly beneath the heading. */
-  gap?: 'section' | 'tight'
+  /**
+   * `tight` when the caller puts its own copy directly beneath the heading.
+   *
+   * `none` when the caller composes the header into a layout that owns the
+   * spacing itself — a flex row, a grid cell. It exists because the
+   * alternative was a wrapper: `Roles` passed `gap="tight"` and then wrapped
+   * the result in `mb-12 md:mb-16`, so the prop rendered 28px of margin
+   * underneath 64px of margin and the caller's stated intent was silently
+   * discarded. That is the same defect the prop was added to prevent, walked
+   * back in through a parent instead of a className, and a third value is
+   * cheaper than a third way to lose the argument.
+   */
+  gap?: 'section' | 'tight' | 'none'
 }) {
   return (
     // Every section header arrives the same way: the eyebrow rises out from
@@ -110,7 +145,10 @@ export function SectionHeader({
     // 0.1s stagger the transition used, restated as scroll distance.
     <header
       data-scene
-      className={cx(gap === 'tight' ? 'mb-6 md:mb-7' : 'mb-12 md:mb-20', className)}
+      className={cx(
+        gap === 'none' ? '' : gap === 'tight' ? 'mb-6 md:mb-7' : 'mb-12 md:mb-20',
+        className,
+      )}
     >
       <span className="line-mask">
         {/* Starts at 22%, not at the layer's 10% default. Measured, the rise
@@ -148,11 +186,22 @@ export function Eyebrow({
   index,
   label,
   tone = 'default',
+  rule = true,
   className,
 }: {
   index?: string
   label: string
   tone?: 'default' | 'inverse'
+  /**
+   * The short lead-in rule before the index.
+   *
+   * `false` drops it. It exists because the rule reads as a dash at label size
+   * — "— 01 / The gap" — and over a drawn backdrop, where the eyebrow is
+   * already sitting on a picture rather than on a plain margin, that stray dash
+   * is one mark too many. Everywhere the eyebrow sits on flat ground it keeps
+   * the rule, which is what ties it to the hairline structure around it.
+   */
+  rule?: boolean
   className?: string
 }) {
   return (
@@ -163,13 +212,15 @@ export function Eyebrow({
         className,
       )}
     >
-      <span
-        aria-hidden="true"
-        className={cx(
-          'inline-block h-px w-8 shrink-0',
-          tone === 'inverse' ? 'bg-inverse-hairline-strong' : 'bg-hairline-strong',
-        )}
-      />
+      {rule ? (
+        <span
+          aria-hidden="true"
+          className={cx(
+            'inline-block h-px w-8 shrink-0',
+            tone === 'inverse' ? 'bg-inverse-hairline-strong' : 'bg-hairline-strong',
+          )}
+        />
+      ) : null}
       {index ? (
         <>
           <span className="tabular-nums">{index}</span>
