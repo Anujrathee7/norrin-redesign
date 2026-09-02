@@ -1,6 +1,4 @@
 import { Container, Grid, SectionHeader } from '@/components/primitives/Layout'
-import { Nori } from '@/components/mascot/nori/Nori'
-import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
 import { CardStack } from '@/components/primitives/CardStack'
 import { cases, customers, customersIntro } from '@/data/norrin'
 
@@ -47,169 +45,98 @@ export function Work() {
       className="overflow-clip py-20 md:py-28"
     >
       <Container>
-        <Grid>
-          <div className="col-span-4 md:col-span-6">
-            <SectionHeader index="04" label="Customers" id="work-heading">
+        {/* READING MATTER LEFT, THE PILE RIGHT.
+
+            The intro used to sit top-right, opposite the heading, with the case
+            rows full-width underneath. Both halves of that are gone: the text
+            is one column now, and the pile stands beside it.
+
+            THIS IS NOT ROLES' SPLIT REPEATED. Scope also runs heading-left,
+            cards-right, and two sections tracing the same rectangle is the §1.5
+            failure this whole redesign exists to answer. What separates them is
+            what the right-hand column DOES: Scope holds four static cards in a
+            2x2, contained; this holds one card with a pile behind it that deals
+            a card off the edge of the page. Checked at 25%, which is the only
+            zoom that question can be answered at.
+
+            The pile is the last column of the grid, so its right edge is the
+            container's — everything past it is gutter, and then the section's
+            clip. That is what gives the dealt card somewhere to go. */}
+        <Grid className="items-start">
+          <div className="col-span-4 md:col-span-5">
+            <SectionHeader index="04" label="Customers" id="work-heading" gap="tight">
               Forerunners, mostly Nordic.
             </SectionHeader>
+            <p className="body-serif measure-serif mt-6 text-reading">{customersIntro}</p>
+            {/* THE ROSTER, UNDER THE INTRO IT BELONGS TO.
+
+                It used to be a full-width row of ten names set large, panning
+                sideways on scroll, with the mascot sitting on its top rule. All
+                three of those are gone.
+
+                Set small and kept in this column, the names read as what they
+                grammatically are: the list the sentence above them promises.
+                Across the full width at 28px they were competing with the
+                section heading for the same job.
+
+                THE PAN WENT WITH THE WIDTH. Its whole argument was a long row
+                travelling as you read past it — "the roster being read out" —
+                and a column this wide has nowhere to travel to. Sliding it here
+                would push names into the empty middle of the split, which is the
+                gap that makes the split legible. `[data-scroll='pan']` had no
+                other consumer and has been removed from index.css rather than
+                left as a rule nothing uses.
+
+                THE MASCOT WENT TOO. It sat on the roster's top rule, and that
+                rule is gone. Nori is still on the timeline in Proof and on the
+                rungs in Thinking, so the pose and its anchor keep earning their
+                place — just not here. */}
+            <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-2.5 border-t border-hairline pt-8">
+              {customers.map((name, i) => (
+                <li
+                  key={name}
+                  data-scroll="enter"
+                  style={{
+                    ['--enter-y' as string]: '16px',
+                    // Staggered by column rather than by index: the two columns
+                    // are already offset by sitting at different heights, so an
+                    // index stagger would compound into a slow cascade down a
+                    // list this short.
+                    ['--scrub-from' as string]: `cover ${12 + (i % 2) * 5}%`,
+                    ['--scrub-to' as string]: `cover ${12 + (i % 2) * 5 + 26}%`,
+                  }}
+                  className="ui text-ink-2"
+                >
+                  {name}
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="col-span-4 self-end md:col-span-5 md:col-start-8">
-            <p className="body-serif measure-serif mb-12 text-reading md:mb-20">{customersIntro}</p>
+
+          {/* Five columns starting at eight, leaving six and seven empty. The
+              gap is what makes this a split rather than a two-cell grid — the
+              same argument Roles makes about its own empty column. It also
+              narrows the card: at six columns it was 744px, which sets the
+              quote to two lines and reads as a panel lying on its side rather
+              than as a card. */}
+          <div className="col-span-4 mt-12 md:col-span-5 md:col-start-8 md:mt-0">
+            <CardStack
+              items={cases.map((c) => ({
+                id: c.id,
+                eyebrow: c.sector,
+                title: c.client,
+                lede: c.title,
+                body: c.quote,
+                note: 'attribution' in c && c.attribution ? c.attribution : undefined,
+              }))}
+            />
+            <p className="caption mt-8 text-ink-3">
+              Case summaries quoted from Norrin&rsquo;s published customer cases.
+            </p>
           </div>
         </Grid>
 
-        {/* The roster, as type. */}
-        {/* A list of names being read out, so the whole row visibly travels as
-            the section is scrolled — 38px was barely perceptible against a
-            roster this wide.
 
-            THE TRAVEL IS DERIVED FROM THE GUTTER, and the previous number was
-            wrong twice over. `--pan` is the HALF-amplitude: the keyframes run
-            from `+pan` to `-pan`, so `120px` was 240px of travel, not the
-            "120px of total pan (60px each way)" the note here used to claim. At
-            390px the gutter is 24px, so the row was sliding a hundred pixels
-            past the edge of the page and `overflow-clip` was cutting the
-            outermost names down to "vell", "onda" and "anska". Screenshotted,
-            not deduced — and the note it replaces said it had been checked in
-            the browser, which is a good reason to distrust a number that has no
-            derivation attached.
-
-            Nine tenths of the gutter is the most the row can move before type
-            reaches the container edge, and it holds at every width by
-            construction: 22px each way on a phone, 42px on a laptop. */}
-        {/* Nori sits ON the roster's top rule — the one long uninterrupted
-            horizontal in this section, with the intro paragraph's bottom margin
-            clear above it.
-
-            Placed by `NORI_ANCHOR.sit`, the measured height of the seat line
-            within the drawing, so the hips land on the rule and the legs hang
-            below it at any size. A hand-tuned `-translate-y-[58%]` would go
-            quietly wrong the next time the pose file is edited.
-
-            The wrapper is OUTSIDE the panning div on purpose: that div slides
-            horizontally on scroll, and a mascot sitting on a rule should not
-            slide with the names. */}
-        <div className="relative">
-          {/* Sized by a WRAPPER, not by the `size` prop. `size` sets the
-              image's intrinsic width; the image's own `max-width: 100%` then
-              lets a narrower box shrink it, which is how one placement serves
-              both widths without a second copy of the markup. The anchor
-              survives the resize for free because `NORI_ANCHOR.sit` is a
-              PERCENTAGE, resolved against the element's own height — the hips
-              land on the rule at 68px exactly as they do at 112px. */}
-          <div
-            className="absolute top-0 right-[6%] z-10 w-[68px] md:w-[112px]"
-            style={{ transform: 'translateY(calc(-1 * ' + NORI_ANCHOR.sit.y + '))' }}
-          >
-            {/* `animated={false}` kills the idle FLOAT, which translates and
-                would lift the hips off the rule — see anchors.ts. The rock below
-                replaces it: rotation about the seat line leaves the seat line
-                exactly where it is, so the figure moves and the contact does
-                not. `flex` on the wrapper is load-bearing, not cosmetic; a block
-                parent would add the inline-block's descender to its height and
-                shift the percentage pivot off the anchor. */}
-            <div
-              data-scroll="nori-sway"
-              className="flex"
-              style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.sit.y}` }}
-            >
-              <div className="nori-idle">
-                <Nori pose="sit" size={112} animated={false} />
-              </div>
-            </div>
-          </div>
-
-        <div
-          data-scroll="pan"
-          style={{ ["--pan" as string]: "calc(var(--spacing-gutter, 24px) * 0.9)" }}
-        >
-          {/* A grid, not flex-wrap: the old wrap produced nine names then a
-              lone orphan at desktop, and 3/4/2/1 at 390px. */}
-          {/* The names used to arrive on a one-shot `Reveal` and then sit still
-              for good. Each now runs off its own scroll range, so the roster
-              keeps working on the way back up.
-
-              The travel is VERTICAL, which is not a stylistic choice: the row
-              these names sit in already pans 120px sideways, and that number was
-              picked against the narrowest grid as the most the outer columns can
-              move before their text leaves the container. A horizontal entrance
-              composes with an ancestor's horizontal transform and spends a
-              margin someone measured. Down the same axis is free.
-
-              Staggered by COLUMN (`i % 5`) rather than by index. The rows are
-              already offset from each other by the plain fact that they sit at
-              different heights, so an index stagger would compound with that
-              and turn a sweep into a slow cascade — by the last name the
-              opening ones would be long finished. Modulo the widest column
-              count gives a clean left-to-right sweep at `md`, and something
-              close to one at the narrower counts, which is as much as a
-              breakpoint-blind number can promise. */}
-          <ul className="grid grid-cols-2 items-baseline gap-x-8 gap-y-3 border-t border-hairline py-10 sm:grid-cols-3 md:grid-cols-5 md:gap-x-12">
-            {customers.map((name, i) => (
-              <li
-                key={name}
-                data-scroll="enter"
-                style={{
-                  ['--enter-y' as string]: '24px',
-                  ['--scrub-from' as string]: `cover ${10 + (i % 5) * 4}%`,
-                  ['--scrub-to' as string]: `cover ${10 + (i % 5) * 4 + 28}%`,
-                }}
-                className="text-[clamp(1.125rem,0.9rem+0.9vw,1.75rem)] font-medium tracking-[-0.02em] text-ink-2"
-              >
-                {name}
-              </li>
-            ))}
-          </ul>
-        </div>
-        </div>
-
-        {/* Cases, as a pile.
-
-            THE ONE IDEA TAKEN FROM THE REFERENCE. Everything else it showed —
-            the avatar, the star rating, the "$250m revenue added" — is either
-            unlicensed or invented, and the eight sections around this one are
-            already built out of full-bleed bands and ruled rows. A pile is a
-            silhouette this page does not otherwise have (§1.5), and it is an
-            object sitting on a plane, which is what the radius rule sanctions.
-
-            NO PERSON ON THE CARD. Three of the four cases name nobody, and the
-            one that does — Skanska — is written ABOUT Artturi Kantanen in the
-            third person. A ruled row carried that safely because it read as a
-            case entry; a card with a name and a face at the top asserts "this
-            person said this", which would manufacture an endorsement that does
-            not exist. That is the same class of dishonesty as the `href="#work"`
-            this file already demoted.
-
-            The attribution itself stays, as a caption under the quote where it
-            already was. It is sourced content, and losing real text to a
-            styling change is the outcome this section's provenance rules exist
-            to prevent.
-
-            WHAT WAS REPLACED. Four full-width ruled rows, each uncovered left
-            to right on its own scroll range. The rows were not broken; they
-            were the ninth repetition of band-container-rule on one page, which
-            is the §1.5 defect the whole redesign is answering. `data-scroll=
-            "uncover"` still has a consumer in Thinking, so no CSS went dead.
-
-            The mechanism, and every way to stop it, is in `CardStack`. */}
-        <div className="mt-12 md:mt-16">
-          <CardStack
-            label="Customer cases"
-            items={cases.map((c) => ({
-              id: c.id,
-              picker: c.client,
-              eyebrow: c.sector,
-              title: c.client,
-              lede: c.title,
-              body: c.quote,
-              note: 'attribution' in c && c.attribution ? c.attribution : undefined,
-            }))}
-          />
-        </div>
-
-        <p className="caption mt-8 text-ink-3">
-          Case summaries quoted from Norrin&rsquo;s published customer cases.
-        </p>
       </Container>
     </section>
   )

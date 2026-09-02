@@ -1516,30 +1516,31 @@ html.js [data-reveal='lines']:not([data-revealed]) {
      follows it for free. */
   --stack-step: var(--radius-panel);
 
-  /* The one real number here, and it was derived from a measurement rather
-     than picked: `2 * step / cardWidth` at the desktop card, which renders at
-     776px. That puts the depth-1 side inset at 14.0px — exactly the vertical
-     step — so at the width this page is designed at, the pile shrinks by the
-     same amount on both axes.
+  /* The one real number here, and it is a measurement rather than a taste:
+     `2 * step / cardWidth` at the desktop card, which renders at 547.5px. That
+     puts the depth-1 side inset at 14.0px — exactly the vertical step — so at
+     the width this page is designed at, the pile shrinks by the same amount on
+     both axes.
 
      IT IS PROPORTIONAL BELOW THAT, ON PURPOSE. A scale factor cannot equal
-     `2 * step / width` at every breakpoint, and it should not: the same
-     constant gives 11.6px of inset at the 688px laptop card and 5.1px at the
-     342px phone card. Holding the inset at a flat 14px instead would spend 8%
-     of a phone card's width on each side and turn the pile into a funnel. A
-     smaller card gets a smaller inset, which is what a scaled stack does.
+     `2 * step / width` at every breakpoint, and it should not: holding the inset
+     at a flat 14px would spend 8% of a phone card's width on each side and turn
+     the pile into a funnel. A smaller card gets a smaller inset, which is what a
+     scaled stack does.
 
-     The first draft of this was 0.03, estimated against a card width of 928px
-     that does not exist — the card is 776px because the stack takes seven of
-     twelve columns, not the whole measure. #styleguide prints the measured
-     inset so the next person to move the page measure sees the number move
-     rather than discovering it a year later. */
-  --stack-shrink: 0.036;
+     IT HAS NOW BEEN WRONG TWICE, AND BOTH TIMES THE READOUT FOUND IT. First at
+     0.03, estimated against a 928px card that never existed. Then at 0.036,
+     correct for the 776px card of a six-column layout — and stale the moment the
+     pile moved to five columns and 547.5px. Neither was visible by looking; both
+     showed up as a side inset that no longer matched the step on `#styleguide`,
+     which is the entire reason that number is printed there instead of trusted
+     here. */
+  --stack-shrink: 0.051;
 
   /* Transforms are out of flow, so the pile's back edges would fall outside the
      section's `overflow-clip` box and be cut. This reserves exactly the travel
-     the deepest card takes. */
-  padding-block-end: calc(var(--stack-step) * (var(--stack-count) - 1));
+     the deepest card takes — at the TOP, because that is where the pile grows. */
+  padding-block-start: calc(var(--stack-step) * (var(--stack-count) - 1));
 }
 
 [data-cardstack] > li {
@@ -1549,30 +1550,102 @@ html.js [data-reveal='lines']:not([data-revealed]) {
      of ragged. */
   grid-area: 1 / 1;
 
-  /* BOTTOM-CENTRE. Scaling from here leaves the bottom edge exactly where the
-     translate put it, so the peek is precisely `--stack-step` per depth. A
-     centre origin gives about 3px, which is a rendering artefact rather than a
-     pile, and lets the back cards poke out of the top as well. */
-  transform-origin: 50% 100%;
-  transform: translateY(calc(var(--d) * var(--stack-step)))
+  /* TOP-CENTRE, AND THE PILE GROWS UPWARD. Scaling from here leaves the top
+     edge exactly where the translate put it, so the peek is precisely
+     `--stack-step` per depth. A centre origin gives about 3px, which is a
+     rendering artefact rather than a pile, and lets the back cards show at both
+     ends at once.
+
+     Upward rather than downward because the card is read from the top: the
+     eyebrow and the client name are the first things in it, and a pile stacked
+     below puts its own edges under the last line of the quote, where the eye
+     has just finished. Above the heading they read as the cards still to come,
+     which is what they are. */
+  transform-origin: 50% 0%;
+  transform: translateY(calc(var(--d) * var(--stack-step) * -1))
     scale(calc(1 - var(--d) * var(--stack-shrink)));
 
   z-index: calc(var(--stack-count) - var(--d));
-  transition: transform 0.42s var(--ease-ui);
+  transition: transform 0.34s var(--ease-ui);
 }
 
-/* THE CARD GOING BACK. Its z-index drops on the same frame its depth does, so
-   it travels behind the pile — but for the first frames it is still wider and
-   taller than the card replacing it and its type shows over the top. So it
-   collapses FASTER than the incoming card grows: the exposure inverts and
-   closes instead of being visible for the whole transition.
+/* THE CARD LEAVING THE FRONT IS DEALT OUT, NOT COLLAPSED.
 
-   Selected by an attribute because CSS cannot match on a custom property's
-   value, and the back position is the only one ever ARRIVED AT from the front
-   — so this needs no timer and no extra state. */
-[data-cardstack] > li[data-back] {
-  transition-duration: 0.3s;
-  transition-timing-function: var(--ease-entrance);
+   Sliding it back into the pile is the honest default and it is what this did
+   first, but it hides the one moment the section has: the card that has been
+   read leaves, and the next one is already underneath. So it travels — right,
+   past the container edge, out of the frame — and the section's `overflow-clip`
+   takes it. That is the page's second frame-break (§1.6), and it is why the
+   pile sits in the right-hand column with nothing but gutter beyond it.
+
+   RIGHT, NOT LEFT. The reading matter is in the left column. A card leaving
+   leftward would cross the paragraph it belongs to.
+
+   AN ANIMATION, NOT A TRANSITION, because the path has a waypoint: out, then
+   back to the deepest position. A transition can only interpolate between two
+   values and would cut the corner straight into the pile.
+
+   NOTHING FADES. The card carries text, and §3 is unambiguous that text is
+   never faded for effect — ancestor opacity folds into contrast maths. The card
+   leaves by moving, and it disappears because the frame ends, which is a fact
+   about the page rather than a filter over the type.
+
+   `z-index` steps rather than eases — it is an integer, and it has to hold the
+   card above the pile for the whole outward leg and drop it behind before the
+   return, or the card would slide back over the top of its own replacement. */
+[data-cardstack] > li[data-leaving] {
+  animation: cardstack-deal 0.56s var(--ease-ui) both;
+}
+
+/* THE RETURN HAPPENS WHERE IT CANNOT BE SEEN, and getting that wrong is what
+   the first version of these keyframes did.
+
+   Sending the card out to the right and then easing it back to the bottom of
+   the pile means it travels back across the frame, behind the others but plainly
+   visible for a third of the animation. Screenshotted at eight points through
+   the timeline, it read as a card being thrown away and then changing its mind.
+
+   So the card does not travel back. At the moment its z-index drops it is
+   moved, in one frame, to the FRONT card's footprint at the back card's scale —
+   bottom edges aligned, ~11% narrower and shorter on every side, which puts it
+   entirely inside the front card's rectangle with a lower z-index. It is
+   invisible there. From that hidden position it slides straight down into the
+   deepest slot, emerging from under the pile as one more hairline edge.
+
+   Read as motion it is: the card is dealt off to the right, and a beat later the
+   deck has one more card at the bottom. Which is what a deck does. */
+@keyframes cardstack-deal {
+  0% {
+    z-index: calc(var(--stack-count) + 1);
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+
+  /* Out. The rotation is small and away from the pile, which is what makes it
+     read as a card being dealt rather than a panel being slid. */
+  46% {
+    z-index: calc(var(--stack-count) + 1);
+    transform: translate(118%, calc(var(--stack-step) * -0.7)) scale(0.97) rotate(2.4deg);
+  }
+
+  /* Hidden behind the new front card. One frame, and nothing is on screen to
+     show the jump: the front card is at most a couple of pixels short of home
+     at this point in its own transition, and this card is smaller than that on
+     every edge. */
+  47% {
+    z-index: 0;
+    transform: translate(0, 0) scale(calc(1 - (var(--stack-count) - 1) * var(--stack-shrink)))
+      rotate(0deg);
+  }
+
+  /* Up into the deepest slot. The scale is already correct, so this leg is a
+     pure vertical settle — the same position `> li` resolves to at the deepest
+     depth, so the animation hands over to the transition without a step when
+     `data-leaving` moves on to the next card. */
+  100% {
+    z-index: 0;
+    transform: translate(0, calc((var(--stack-count) - 1) * var(--stack-step) * -1))
+      scale(calc(1 - (var(--stack-count) - 1) * var(--stack-shrink))) rotate(0deg);
+  }
 }
 
 /* ==========================================================================
@@ -1733,22 +1806,6 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       animation-timeline: view();
       animation-range: entry 0% entry 100%;
       --drift: 26px;
-    }
-
-    /* Sideways travel — the roster slides as you read past it. */
-    [data-scroll='pan'] {
-      animation: scroll-pan linear both;
-      animation-timeline: view();
-      animation-range: entry 0% exit 100%;
-    }
-
-    @keyframes scroll-pan {
-      from {
-        transform: translateX(var(--pan, 60px));
-      }
-      to {
-        transform: translateX(calc(var(--pan, 60px) * -1));
-      }
     }
 
     /* A slow lean. Capped low on purpose: past about 3deg text stops looking

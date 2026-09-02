@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Container, Eyebrow } from '@/components/primitives/Layout'
+import { Container, Grid, Eyebrow } from '@/components/primitives/Layout'
 import { Photo } from '@/components/primitives/Photo'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { useTheme } from '@/hooks/useTheme'
@@ -204,13 +204,19 @@ function StackSpec() {
   }, [theme])
 
   return (
+    // THE SPECIMEN GETS THE SECTION'S REAL GEOMETRY, not the full measure.
+    // Rendered edge to edge the card came out 1347px wide and the readout below
+    // reported a 24px side inset against a 14px step — a discrepancy invented by
+    // the guide rather than found in the page.  is a ratio, so a
+    // specimen at the wrong width measures the wrong thing and this readout is
+    // the one place that must not lie.
     <div ref={host}>
+      <Grid>
+        <div className="col-span-4 md:col-span-5 md:col-start-8">
       <CardStack
-        label="Customer cases, on the style guide"
-        startPaused
+        paused
         items={cases.map((c) => ({
           id: c.id,
-          picker: c.client,
           eyebrow: c.sector,
           title: c.client,
           lede: c.title,
@@ -218,6 +224,8 @@ function StackSpec() {
           note: 'attribution' in c && c.attribution ? c.attribution : undefined,
         }))}
       />
+        </div>
+      </Grid>
       <ul className="mt-12 border-t border-hairline-strong">
         {rows.map((r) => (
           <li
@@ -403,10 +411,10 @@ export function StyleGuide() {
             <h2 className="display-3 mb-3">The stack</h2>
             <p className="body-serif measure-serif mb-12 text-reading">
               Four cards in one grid cell, offset by exactly one corner radius each, so what shows
-              of a card behind is precisely its rounded corner. It rotates on a timer, and it stops
-              for a hover, for keyboard focus, for a backgrounded tab, and for the pause control —
-              which is sticky, and which is not rendered at all when the reader prefers reduced
-              motion, because a control that does nothing is a fabricated affordance. Shown here
+              of a card behind is precisely its rounded corner. It rotates on a timer, dealing the
+              front card out past the frame; it stops for a mouse and for a backgrounded tab, and
+              never starts at all under reduced motion. It carries no controls, so it does not meet
+              WCAG 2.2.2 — recorded here rather than left to be discovered. Shown here
               paused, so it can be compared rather than watched.
             </p>
             <StackSpec />
