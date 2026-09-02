@@ -4,7 +4,9 @@ import { Photo } from '@/components/primitives/Photo'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { useTheme } from '@/hooks/useTheme'
 import { measure } from '@/lib/contrast'
-import { photos } from '@/data/norrin'
+import { Card } from '@/components/primitives/Card'
+import { CardStack } from '@/components/primitives/CardStack'
+import { cases, photos, roles } from '@/data/norrin'
 
 /**
  * The style guide — a gate, not a document.
@@ -39,7 +41,9 @@ const PAPER: Pair[] = [
   { fg: '--accent', bg: '--ground', label: 'accent / ground', min: 4.5 },
   { fg: '--ink', bg: '--surface', label: 'ink / surface', min: 4.5 },
   { fg: '--ink-3', bg: '--surface', label: 'ink-3 / surface', min: 4.5 },
+  { fg: '--reading', bg: '--surface', label: 'reading / surface', min: 4.5 },
   { fg: '--hairline', bg: '--ground', label: 'hairline / ground', min: 1.2 },
+  { fg: '--hairline', bg: '--surface', label: 'hairline / surface', min: 1.2 },
   { fg: '--hairline-strong', bg: '--ground', label: 'hairline-strong / ground', min: 1.6 },
 ]
 
@@ -162,6 +166,73 @@ function Rule({ children }: { children: ReactNode }) {
   )
 }
 
+/**
+ * The pile's geometry, read off the live DOM.
+ *
+ * `--stack-shrink` is the one number in the stack that is not derived from
+ * another token, and the quantity it actually controls — the side inset at
+ * depth 1, in pixels — is a function of the rendered card width. That width is
+ * seven of twelve columns of the page measure, and the page measure has already
+ * moved twice (1512 -> 1200 -> 1440). The first draft of this constant was
+ * estimated against a card width that did not exist and was out by 20%.
+ *
+ * So the number is printed rather than asserted. If someone moves the measure
+ * or the column span, the inset stops matching the step here, visibly, on a
+ * page a human is already looking at.
+ */
+function StackSpec() {
+  const theme = useTheme()
+  const host = useRef<HTMLDivElement>(null)
+  const [rows, setRows] = useState<{ label: string; value: string }[]>([])
+
+  useEffect(() => {
+    const ol = host.current?.querySelector('[data-cardstack]')
+    const card = ol?.querySelector('.card')
+    if (!ol || !card) return
+    const cs = getComputedStyle(ol)
+    const step = parseFloat(cs.getPropertyValue('--stack-step'))
+    const shrink = parseFloat(cs.getPropertyValue('--stack-shrink'))
+    const width = card.getBoundingClientRect().width
+    setRows([
+      { label: '--stack-step', value: `${step}px — one --radius-panel` },
+      { label: '--stack-shrink', value: String(shrink) },
+      { label: 'card width, measured', value: `${width.toFixed(1)}px` },
+      { label: 'depth-1 side inset', value: `${((width * shrink) / 2).toFixed(2)}px` },
+      { label: 'depth-1 vertical step', value: `${step}px` },
+      { label: 'list overflow', value: cs.overflow },
+    ])
+  }, [theme])
+
+  return (
+    <div ref={host}>
+      <CardStack
+        label="Customer cases, on the style guide"
+        startPaused
+        items={cases.map((c) => ({
+          id: c.id,
+          picker: c.client,
+          eyebrow: c.sector,
+          title: c.client,
+          lede: c.title,
+          body: c.quote,
+          note: 'attribution' in c && c.attribution ? c.attribution : undefined,
+        }))}
+      />
+      <ul className="mt-12 border-t border-hairline-strong">
+        {rows.map((r) => (
+          <li
+            key={r.label}
+            className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-hairline-strong py-3"
+          >
+            <span className="label">{r.label}</span>
+            <span className="label text-ink-3">{r.value}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export function StyleGuide() {
   return (
     <>
@@ -243,7 +314,7 @@ export function StyleGuide() {
               tokens are for.
             </p>
 
-            <h3 className="display-4 mb-5">Radius means you can touch it</h3>
+            <h3 className="display-4 mb-5">Radius means it is an object, not a plane</h3>
             <div className="mb-14 flex flex-wrap items-end gap-6">
               <div className="rounded-action border border-hairline-strong bg-overlay px-6 py-3">
                 <span className="label">action · 999px</span>
@@ -292,6 +363,58 @@ export function StyleGuide() {
                 destination does not exist is the same class of dishonesty as a fake number.
               </Rule>
             </ul>
+          </Container>
+        </section>
+
+        {/* ON `--ground`, NOT ON `--surface`. The section above is a surface
+            band, and the card's own fill is `--surface` — specimens shown there
+            would have had their fill cancelled and only the hairline would have
+            survived, which is a picture of a card that does not exist anywhere
+            on the page. Scope and the customer stack both sit on the ground, so
+            this is where the card gets reviewed. */}
+        <section data-shot="card" className="border-t border-hairline py-16 md:py-24">
+          <Container>
+            <h2 className="display-3 mb-3">The card</h2>
+            <p className="body-serif measure-serif mb-12 text-reading">
+              One component, filled two ways. Scope takes the body and the floor; the customer
+              stack takes the eyebrow, the heading, the lede and the body. Both specimens carry the
+              real strings they carry on the page &mdash; a card filled with placeholder copy tells
+              you nothing about the thing this component exists to solve, which is four ragged copy
+              lengths sharing a floor.
+            </p>
+            <div className="grid grid-cols-1 items-stretch gap-5 md:grid-cols-2">
+              <Card body={roles[0].claim} floor={roles[0].role} />
+              <Card
+                eyebrow={cases[0].sector}
+                title={cases[0].client}
+                lede={cases[0].title}
+                body={cases[0].quote}
+              />
+            </div>
+            <p className="caption mt-4 text-ink-3">
+              Left: Scope. Right: the customer stack, shown flat &mdash; the stacking geometry is
+              the section below, not the card.
+            </p>
+          </Container>
+        </section>
+
+        <section data-shot="stack" className="border-t border-hairline py-16 md:py-24">
+          <Container>
+            <h2 className="display-3 mb-3">The stack</h2>
+            <p className="body-serif measure-serif mb-12 text-reading">
+              Four cards in one grid cell, offset by exactly one corner radius each, so what shows
+              of a card behind is precisely its rounded corner. It rotates on a timer, and it stops
+              for a hover, for keyboard focus, for a backgrounded tab, and for the pause control —
+              which is sticky, and which is not rendered at all when the reader prefers reduced
+              motion, because a control that does nothing is a fabricated affordance. Shown here
+              paused, so it can be compared rather than watched.
+            </p>
+            <StackSpec />
+            <p className="caption mt-4 text-ink-3">
+              Measured off the live DOM on every theme change. The side inset should equal the
+              vertical step at the desktop measure; if it does not, the page measure or the
+              column span moved and <code>--stack-shrink</code> needs re-deriving.
+            </p>
           </Container>
         </section>
 

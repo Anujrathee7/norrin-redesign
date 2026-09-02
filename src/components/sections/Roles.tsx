@@ -1,4 +1,5 @@
 import { Container, Grid, SectionHeader } from '@/components/primitives/Layout'
+import { Card } from '@/components/primitives/Card'
 import { roles } from '@/data/norrin'
 
 /**
@@ -173,13 +174,15 @@ export function Roles() {
                   ['--scrub-from' as string]: `cover ${14 + i * 5}%`,
                   ['--scrub-to' as string]: `cover ${14 + i * 5 + 26}%`,
                 }}
-                className="flex flex-col rounded-panel border border-hairline bg-surface p-7 md:p-8"
               >
-                <p className="body-serif text-reading">{r.claim}</p>
-                {/* `mt-auto` puts the name on the card's floor; `pt-10` is the
-                    closest it will ever sit to the claim above it, which is the
-                    card whose claim is thirty-two characters long. */}
-                <h3 className="display-4 mt-auto pt-10 text-ink">{r.role}</h3>
+                {/* The box, the padding, the hairline and the floor rule now
+                    live in `.card` / `Card.tsx`, shared with the customer
+                    stack. The values moved across unchanged, so this is a
+                    refactor with a zero-pixel diff and not a restyle — proved
+                    with `--clip=roles` before and after, not asserted. What
+                    stays on the `<li>` is what the `<li>` owns: the grid cell
+                    and its own arrival. */}
+                <Card body={r.claim} floor={r.role} />
               </li>
             ))}
           </ul>

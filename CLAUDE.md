@@ -217,9 +217,23 @@ These are being decided with the user, on rendered options, not chosen unilatera
 - **Palette.** Departing from Norrin's extracted moss/sun/forest tokens. Three
   directions to be rendered on `#styleguide` and picked from. Until then, no rule here
   hardcodes a hue, and `tools/palette.mjs` still gates the *current* tokens.
-- **Radius.** The standing rule is *"radius means you can touch it — structure stays
-  square."* Adopting inset panels needs radius on structure. **Amend this rule here,
-  in the open, or do not adopt panels.** Do not break it quietly.
+- **Radius. SETTLED — moved out of this section.** The rule was amended in the open, in
+  `src/index.css`, and now reads: **"radius means it is an object, not a plane."** A plane
+  is the page itself — a full-bleed band, the ground, a rule, a timeline — and planes have
+  no corners because they have no edges you are meant to see. An object sits on a plane
+  and has a shape. Structure that is plane stays square: the production line, the eyebrow
+  rules, the ruled tables, the timeline nodes.
+
+  This entry had gone stale: it still quoted the retired *"radius means you can touch
+  it"* wording months after `index.css` was amended, and after `Roles` had already shipped
+  `--radius-panel` cards under the new rule. The old phrasing was a lossy summary of its
+  own scale even when it was current — `--radius-panel` was always documented as
+  "anything that opens **or frames**", and the Thinking frame neither opens nor is
+  pressable. `#styleguide` carried the same stale headline and has been corrected too.
+
+  Cards and the customer stack are adopted under this rule and needed no further
+  amendment. The one step still unspent is `--radius-section`; it stays declared and
+  flagged in `index.css` until a section actually floats.
 - **Display face.** Open-licence candidates to be rendered at real size in the real h1.
 
 ---

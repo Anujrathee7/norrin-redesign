@@ -947,6 +947,55 @@
     background-color: var(--inverse-overlay);
   }
 
+  /* The one card anatomy on this page. Scope's 2x2 and the customer stack are
+     the same object filled differently, which is the only thing that makes
+     "one component in two sections" true rather than aspirational.
+
+     NOT `.panel`. A panel is something that OPENS — the locale list — so it
+     takes the stronger hairline and `--overlay`, a ground that reads as lifted
+     off the page. A card is page content that happens to have edges: the
+     ordinary hairline, and `--surface`, which is one step off `--ground` and no
+     more (#f8f7f3 -> #f1f0ea light, #0e120f -> #161b17 dark).
+
+     NO SHADOW. §2.7 allows one only for a genuinely floating layer, and neither
+     consumer is one. Separation is the hairline, exactly as it is everywhere
+     else on this page.
+
+     The values are byte-identical to the utility string Roles.tsx carried
+     before this class existed (`rounded-panel border border-hairline bg-surface
+     p-7 md:p-8`), so adopting it there is a refactor with a zero-pixel diff —
+     which is the check, not the hope. */
+  .card {
+    display: flex;
+    flex-direction: column;
+    /* The stack lays four cards in one grid area and lets the tallest set the
+       row height; without this the three shorter ones keep their own heights
+       and the pile's bottom edges scatter instead of stacking. Roles gets the
+       same effect for free from its stretched grid, so this is one declaration
+       serving both. */
+    height: 100%;
+    border-radius: var(--radius-panel);
+    border: 1px solid var(--hairline);
+    background-color: var(--surface);
+    padding: 1.75rem;
+  }
+
+  @media (min-width: 48rem) {
+    .card {
+      padding: 2rem;
+    }
+  }
+
+  /* The floor. Stated once here rather than as `mt-auto pt-10` at each call
+     site, because it is an argument, not a spacing choice: pinning the name to
+     the card's floor turns four ragged copy lengths into air rather than into a
+     column that failed to fill, and it makes a card read as a statement
+     resolving into the name for it. See the header comment in Roles.tsx. */
+  .card > .card-floor {
+    margin-block-start: auto;
+    padding-block-start: 2.5rem;
+  }
+
   /* ------------------------------------------------------------------------
      THE CONTOUR FIELD'S QUIET ZONE.
 
@@ -1422,6 +1471,108 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   [data-deck] > [data-deck-card] {
     --deck-card-h: max(94svh, calc(632px + 6vh + clamp(120px, 17vh, 190px)));
   }
+}
+
+/* ==========================================================================
+   THE CARD STACK
+   --------------------------------------------------------------------------
+   Four case cards in one grid cell, offset into a pile. `--d` is the depth
+   written per item from React; 0 is the front.
+
+   NAMED `cardstack`, NOT `deck`. `[data-deck]` is already the hero-to-Gap seam
+   forty lines above this and has nothing to do with cards. Two unrelated
+   mechanisms under one attribute is one careless selector away from breaking
+   both at once.
+
+   WHY THIS IS NOT A CAROUSEL. A scroll-snap track is a scroll container, and
+   this section is `overflow-clip` precisely because a `view()` timeline
+   measured against a scroll container it sits inside freezes at 0% forever
+   (see Work.tsx, and `.line-mask` in Layout.tsx for the same trap). The
+   roster directly above pans on such a timeline. So the pile is transforms in
+   a grid: no `overflow`, no `scroll-snap`, no scrollport, nothing for the
+   roster's timeline to resolve against by accident.
+
+   WHY IT IS NOT IN `@layer components`. Tailwind's `utilities` layer wins over
+   `components`, so a `transform` declared there could be silently overridden by
+   any utility a later edit puts on a card. `[data-reveal]`, `.line-mask` and
+   `[data-deck-hold]` all sit outside `@layer` for that reason; this follows
+   them.
+
+   WHY IT IS NOT INSIDE THE `@supports` BLOCK BELOW. That block is gated on
+   scroll-timeline support AND on `prefers-reduced-motion: no-preference`.
+   The pile's resting geometry is LAYOUT, not motion — it has to exist in every
+   browser and at every motion preference, or three of the four cards land on
+   top of each other and three real customer cases become unreadable. Only the
+   travel between positions is motion, and the global reduced-motion reset
+   already flattens that.
+   ========================================================================== */
+
+[data-cardstack] {
+  display: grid;
+
+  /* NOT A NEW NUMBER. The visible band of a card behind is exactly one corner
+     radius tall, so what shows is precisely that card's rounded corner and
+     never a straight sliver of surface. If the radius scale moves, the pile
+     follows it for free. */
+  --stack-step: var(--radius-panel);
+
+  /* The one real number here, and it was derived from a measurement rather
+     than picked: `2 * step / cardWidth` at the desktop card, which renders at
+     776px. That puts the depth-1 side inset at 14.0px — exactly the vertical
+     step — so at the width this page is designed at, the pile shrinks by the
+     same amount on both axes.
+
+     IT IS PROPORTIONAL BELOW THAT, ON PURPOSE. A scale factor cannot equal
+     `2 * step / width` at every breakpoint, and it should not: the same
+     constant gives 11.6px of inset at the 688px laptop card and 5.1px at the
+     342px phone card. Holding the inset at a flat 14px instead would spend 8%
+     of a phone card's width on each side and turn the pile into a funnel. A
+     smaller card gets a smaller inset, which is what a scaled stack does.
+
+     The first draft of this was 0.03, estimated against a card width of 928px
+     that does not exist — the card is 776px because the stack takes seven of
+     twelve columns, not the whole measure. #styleguide prints the measured
+     inset so the next person to move the page measure sees the number move
+     rather than discovering it a year later. */
+  --stack-shrink: 0.036;
+
+  /* Transforms are out of flow, so the pile's back edges would fall outside the
+     section's `overflow-clip` box and be cut. This reserves exactly the travel
+     the deepest card takes. */
+  padding-block-end: calc(var(--stack-step) * (var(--stack-count) - 1));
+}
+
+[data-cardstack] > li {
+  /* One cell, four occupants. Still contributes to intrinsic height, unlike
+     absolute positioning, so the row is as tall as the tallest card and all
+     four stretch to it — which is what makes the pile's edges parallel instead
+     of ragged. */
+  grid-area: 1 / 1;
+
+  /* BOTTOM-CENTRE. Scaling from here leaves the bottom edge exactly where the
+     translate put it, so the peek is precisely `--stack-step` per depth. A
+     centre origin gives about 3px, which is a rendering artefact rather than a
+     pile, and lets the back cards poke out of the top as well. */
+  transform-origin: 50% 100%;
+  transform: translateY(calc(var(--d) * var(--stack-step)))
+    scale(calc(1 - var(--d) * var(--stack-shrink)));
+
+  z-index: calc(var(--stack-count) - var(--d));
+  transition: transform 0.42s var(--ease-ui);
+}
+
+/* THE CARD GOING BACK. Its z-index drops on the same frame its depth does, so
+   it travels behind the pile — but for the first frames it is still wider and
+   taller than the card replacing it and its type shows over the top. So it
+   collapses FASTER than the incoming card grows: the exposure inverts and
+   closes instead of being visible for the whole transition.
+
+   Selected by an attribute because CSS cannot match on a custom property's
+   value, and the back position is the only one ever ARRIVED AT from the front
+   — so this needs no timer and no extra state. */
+[data-cardstack] > li[data-back] {
+  transition-duration: 0.3s;
+  transition-timing-function: var(--ease-entrance);
 }
 
 /* ==========================================================================

@@ -1,6 +1,7 @@
 import { Container, Grid, SectionHeader } from '@/components/primitives/Layout'
 import { Nori } from '@/components/mascot/nori/Nori'
 import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
+import { CardStack } from '@/components/primitives/CardStack'
 import { cases, customers, customersIntro } from '@/data/norrin'
 
 /**
@@ -162,57 +163,49 @@ export function Work() {
         </div>
         </div>
 
-        {/* Cases, as full-width rows. Each row is uncovered left to right, in
-            sequence — a wipe suits a ruled row better than a fade, because the
-            rule above it is already a horizontal gesture. */}
-        {/* Each row uncovers against its OWN scroll range rather than against a
-            shared one. These rows are tall — four of them run close to a
-            viewport and a half — and staging them inside one container range
-            would mean the last row's slot opens while it is still well below
-            the fold. Timed against itself, a row uncovers exactly as it is
-            reached, at any height and any viewport, and re-covers on the way
-            back up. */}
-        <ol className="mt-12 md:mt-16">
-          {cases.map((c, i) => (
-            <li
-              key={c.id}
-              data-scroll="uncover"
-              style={{
-                ['--scrub-from' as string]: 'cover 14%',
-                ['--scrub-to' as string]: 'cover 44%',
-              }}
-            >
-              <article className="block border-t border-hairline py-9 last:border-b md:py-11">
-                <div className="grid grid-cols-4 items-baseline gap-x-6 md:grid-cols-12">
-                  <span
-                    className="label col-span-1 text-ink-3 tabular-nums max-md:hidden"
-                    aria-hidden="true"
-                  >
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
+        {/* Cases, as a pile.
 
-                  <div className="col-span-4 md:col-span-3">
-                    <h3 className="display-4">{c.client}</h3>
-                    <p className="label mt-2 text-ink-3">{c.sector}</p>
-                  </div>
+            THE ONE IDEA TAKEN FROM THE REFERENCE. Everything else it showed —
+            the avatar, the star rating, the "$250m revenue added" — is either
+            unlicensed or invented, and the eight sections around this one are
+            already built out of full-bleed bands and ruled rows. A pile is a
+            silhouette this page does not otherwise have (§1.5), and it is an
+            object sitting on a plane, which is what the radius rule sanctions.
 
-                  {/* One column width for every row. The old branch narrowed
-                      this to make room for a figure only Caruna has, which moved
-                      the body column's right edge ~250px between row 1 and rows
-                      2-4 inside a full-width-ruled table. */}
-                  <div className="col-span-4 mt-4 md:col-span-7 md:col-start-6 md:mt-0">
-                    <p className="text-ink">{c.title}</p>
-                    <p className="body-serif measure-serif mt-3 text-reading">{c.quote}</p>
-                    {'attribution' in c && c.attribution ? (
-                      <p className="caption mt-3 text-ink-3">{c.attribution}</p>
-                    ) : null}
-                  </div>
+            NO PERSON ON THE CARD. Three of the four cases name nobody, and the
+            one that does — Skanska — is written ABOUT Artturi Kantanen in the
+            third person. A ruled row carried that safely because it read as a
+            case entry; a card with a name and a face at the top asserts "this
+            person said this", which would manufacture an endorsement that does
+            not exist. That is the same class of dishonesty as the `href="#work"`
+            this file already demoted.
 
-                </div>
-              </article>
-            </li>
-          ))}
-        </ol>
+            The attribution itself stays, as a caption under the quote where it
+            already was. It is sourced content, and losing real text to a
+            styling change is the outcome this section's provenance rules exist
+            to prevent.
+
+            WHAT WAS REPLACED. Four full-width ruled rows, each uncovered left
+            to right on its own scroll range. The rows were not broken; they
+            were the ninth repetition of band-container-rule on one page, which
+            is the §1.5 defect the whole redesign is answering. `data-scroll=
+            "uncover"` still has a consumer in Thinking, so no CSS went dead.
+
+            The mechanism, and every way to stop it, is in `CardStack`. */}
+        <div className="mt-12 md:mt-16">
+          <CardStack
+            label="Customer cases"
+            items={cases.map((c) => ({
+              id: c.id,
+              picker: c.client,
+              eyebrow: c.sector,
+              title: c.client,
+              lede: c.title,
+              body: c.quote,
+              note: 'attribution' in c && c.attribution ? c.attribution : undefined,
+            }))}
+          />
+        </div>
 
         <p className="caption mt-8 text-ink-3">
           Case summaries quoted from Norrin&rsquo;s published customer cases.

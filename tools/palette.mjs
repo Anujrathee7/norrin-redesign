@@ -18,6 +18,11 @@ const TINT_D = '#1b2119' // accent 8% over dark ground
 const pairs = [
   // --- light: ink ramp on every paper ground ---------------------------------
   { note: 'L ink       / ground ', fg: '#14170f', bg: '#f8f7f3', min: 4.5 },
+  // The card puts the full ink ramp on --surface in two sections at once, so
+  // the top of that ramp is now load-bearing there and not just on paper. It
+  // was measured on #styleguide and never enforced here, which is the gap this
+  // closes: the guide reports, the gate refuses.
+  { note: 'L ink       / surface', fg: '#14170f', bg: '#f1f0ea', min: 4.5 },
   { note: 'L ink-2     / ground ', fg: '#4a4d42', bg: '#f8f7f3', min: 4.5 },
   { note: 'L ink-3     / ground ', fg: '#696d5f', bg: '#f8f7f3', min: 4.5 },
   // Reading ink — the lichen-derived serif colour. Gated on BOTH the ground and
@@ -41,6 +46,7 @@ const pairs = [
 
   // --- dark: ink ramp --------------------------------------------------------
   { note: 'D ink       / ground ', fg: '#f2f2ec', bg: '#0e120f', min: 4.5 },
+  { note: 'D ink       / surface', fg: '#f2f2ec', bg: '#161b17', min: 4.5 },
   { note: 'D ink-2     / ground ', fg: '#b4b8ac', bg: '#0e120f', min: 4.5 },
   { note: 'D reading   / ground ', fg: '#a8b09b', bg: '#0e120f', min: 4.5 },
   { note: 'D reading   / surface', fg: '#a8b09b', bg: '#161b17', min: 4.5 },
