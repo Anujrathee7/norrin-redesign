@@ -4,8 +4,15 @@
    Fonts — self-hosted, latin subset only, woff2 only.
    Three families, three files. The mono is used at a single weight (500) and
    the two text faces are variable, so one file each covers the whole range.
-   Newsreader's italic is deliberately absent: it would have been a second
-   ~55 kB face serving four headings.
+
+   NEWSREADER IS GONE. It held the serif slot — thesis, lead, body copy — until
+   Fraunces was chosen for display. Two serifs with different axes of contrast
+   doing adjacent jobs reads as an accident, so Fraunces took the whole serif
+   voice rather than sitting beside it. The face and its file are deleted rather
+   than left declared: an unused `@font-face` costs a reader nothing (nothing
+   requests it) but costs the next person reading this file, and a font that is
+   present but unreferenced is exactly the kind of thing that gets re-adopted by
+   accident later.
    ========================================================================== */
 
 @font-face {
@@ -19,21 +26,54 @@
 }
 
 @font-face {
-  font-family: 'Newsreader Variable';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 200 800;
-  src: url('/fonts/newsreader-latin-wght-normal.woff2') format('woff2-variations');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
-    U+2122, U+2191, U+2193, U+2212, U+2215;
-}
-
-@font-face {
   font-family: 'IBM Plex Mono';
   font-style: normal;
   font-display: swap;
   font-weight: 500;
   src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+/* ==========================================================================
+   DISPLAY CANDIDATES — under review, not in the page.
+   --------------------------------------------------------------------------
+   Three faces being judged as a replacement for Schibsted Grotesk in the
+   display roles. They are declared here so `#fonts` can render them at real
+   size in the real headline; NOTHING on the homepage references them yet.
+
+   Whichever wins stays and the other two get deleted along with these blocks.
+   A font that is declared but unused still costs a reader nothing — `swap` only
+   fetches a face something actually asks for — but it costs the next person
+   reading this file, so they should not outlive the decision.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Fraunces Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/fraunces-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Familjen Grotesk Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url('/fonts/familjen-grotesk-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/bricolage-grotesque-latin-wght-normal.woff2') format('woff2-variations');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
     U+2122, U+2191, U+2193, U+2212, U+2215;
 }
@@ -51,9 +91,20 @@
    bar, the accent changing family between themes is a thing the reader can
    watch happen. The accent is green on both grounds — see --accent.
 
-   Two structural rules hold the whole thing together:
-     1. Separation is carried by 1px hairlines. There are no box-shadows.
-     2. Sun is a signal, never a surface.
+   Two structural rules hold the whole thing together. Both have since been
+   amended in the open; the amendments below ARE the rules:
+     1. Separation is carried by 1px hairlines. The single exception is the one
+        §2.7 always allowed — a genuinely floating layer. The customer pile is
+        four sheets physically resting on one another, and carries a 1px
+        contact edge plus an 18px cast at .06 alpha, the band Solita's own
+        elevation scale uses. Nothing else on this page has a shadow.
+     2. Sun may carry a CARD. It is still never a band, a section ground, or a
+        flooded plane. This read "sun is a signal, never a surface" and the code
+        broke it three times before the rule moved rather than the code — the
+        customer pile, the tone lab and Scope each set a whole card on sun. The
+        line is scale, not permission: a card is an object whose edges you can
+        see, and a viewport flooded with #f6f279 is a different claim entirely.
+        Anything sitting on sun still takes fixed dark ink in both themes.
 
    Declared ONCE, via light-dark(). This was previously three blocks — a light
    :root, a prefers-color-scheme copy, and an explicit [data-theme] copy — with
@@ -113,6 +164,31 @@
      they cannot say it is the right plane. */
   --inverse: light-dark(#123e28, #16452c);
 
+  /* THE NIGHT BAND — Work's ground, and the first plane on this page that does
+     not flip with the theme.
+
+     WHY FIXED. The pile that sits on it is four sheets of paper separated by
+     tone, and a ground that flips takes the separation with it: in dark theme
+     `--surface` (#161b17) measures 1.04:1 against the darkest card tone under
+     consideration, which is not a pile, it is one card. A card is a physical
+     object and a physical object does not change colour when the room does.
+     Sun already works this way and this file already explains why.
+
+     WHY THIS VALUE AND NOT DARKER. It is `--ground`'s own dark branch, pinned.
+     Deeper was tried, and it buys nothing worth what it costs: at #0a0d0b the
+     inverse hairline drops to 1.25:1 and at #060807 both hairlines fail their
+     parity bar — so the page's one separating device stops reading in order to
+     rescue about a tenth of a ratio behind a card. At #0e120f the whole inverse
+     ladder clears (16.40 / 10.16 / 6.78, hairlines 1.26 and 1.87), a paper card
+     reads at 16.54:1 and a sun card at 16.09:1.
+
+     WHAT IT COSTS, STATED PLAINLY: no dark card can sit on it. The four
+     directions in the tone lab measure 1.04, 1.21, 1.25 and 1.22:1 against it.
+     That is not a defect in the band or in the tones — a dark plane on a dark
+     plane is not a thing tone can separate — and it is the decision the tone lab
+     now has to be looked at for. */
+  --band-night: #0e120f;
+
   /* Ink ------------------------------------------------------------------ */
   --ink: light-dark(#14170f, #f2f2ec);
   --ink-2: light-dark(#4a4d42, #b4b8ac);
@@ -141,6 +217,31 @@
      lichen's own 2.92:1 instead. */
   --inverse-inactive: color-mix(in srgb, var(--inverse-ink) 38%, transparent);
 
+  /* THE LADDER THAT SITS ON SUN.
+
+     SUN IS FIXED IN BOTH THEMES, so everything written on it has to be fixed
+     too. `.on-signal` already stated the top rung as a bare hex with a comment
+     explaining that inheriting `--ink` puts near-white type on yellow in dark
+     mode; this is that argument carried down the rest of the ladder, because the
+     customer pile now sets a whole CARD on sun, and a card needs three rungs and
+     a rule rather than one colour.
+
+     SOLVED, NOT PICKED, the same way the inverse ramp was: these are the alphas
+     that clear AA on sun, and the next step down — 0.58 — measures 4.21:1 and
+     does not. `tools/palette.mjs` prints all four.
+
+     ONE ENTRY EACH IN THE GATE, NOT TWO. Every other ink in this file is a
+     `light-dark()` pair and is measured twice. These are single values on a
+     single background, so one measurement is the whole truth about them. */
+  --on-signal-ink: #14170f;
+  --on-signal-ink-2: color-mix(in srgb, var(--on-signal-ink) 74%, transparent);
+  --on-signal-ink-3: color-mix(in srgb, var(--on-signal-ink) 66%, transparent);
+  --on-signal-hairline: color-mix(in srgb, var(--on-signal-ink) 20%, transparent);
+  /* Sun's stand-in for the accent, and it is the LIGHT accent in BOTH themes.
+     Moss on sun measures 7.67:1; the dark theme's lichen accent on sun measures
+     1.86:1, which is the same trap `.on-signal` was written to close. */
+  --on-signal-accent: #1a5335;
+
   /* Structure ------------------------------------------------------------ */
   /* Solved against --surface, not just --ground. The gate measured both of
      these on the page ground only, but Pillars and Thinking are `bg-surface`
@@ -154,6 +255,81 @@
      structure, and they were the ones sitting on surface. */
   --hairline: light-dark(#d8d7cc, #292f2a);
   --hairline-strong: light-dark(#b3b3a5, #404841);
+
+  /* THE ONLY SHADOW IN THE SYSTEM, and §2.7 is the reason it is stated here
+     rather than written at the one call site that uses it: a shadow is a
+     colour, and §2.4 says a call site never writes one.
+
+     It exists for the customer pile and nothing else. §2.7 permits a shadow
+     only for "a genuinely floating layer"; four cards physically resting on one
+     another is that case, and the page has no other. If a second consumer ever
+     appears, it is an argument to be had, not a token to be reused quietly.
+
+     Not gated by `tools/palette.mjs`, and that is not an oversight: the gate
+     measures foreground/background PAIRS, and a shadow is neither. It carries
+     no meaning, so there is no ratio it has to clear — the hairline underneath
+     it is what separates the card, and that pair is measured on both grounds.
+
+     Light is .06, the alpha band Solita's four-step elevation scale actually
+     ships. Dark is higher for the same apparent depth, because black on a
+     near-black ground does almost nothing at .06 — same shadow, different
+     exposure, which is the argument `--inverse` already makes about the
+     forest band. */
+  --stack-shadow-contact: light-dark(rgb(20 23 15 / 0.06), rgb(0 0 0 / 0.34));
+  --stack-shadow-cast: light-dark(rgb(20 23 15 / 0.14), rgb(0 0 0 / 0.55));
+
+  /* THE CONTOUR FIELD'S OWN PAIR, and it is separate from the hairlines above
+     for a reason that is easy to lose.
+
+     The field used to draw with `--hairline` / `--hairline-strong` at
+     `opacity: 0.5` on the group. Those tokens are solved to read as STRUCTURE —
+     a rule you are meant to notice as an edge — and halving them turned the
+     survey into something you had to hunt for, particularly in dark where
+     `#292f2a` is only a few steps off `#0e120f`.
+
+     These are white in dark rather than a lifted grey. That is the whole
+     difference: a near-white at low alpha reads as a drawn line on a dark
+     ground, where a grey of the same luminance reads as noise in the plate.
+     The alphas are the inverse-hairline rungs (10% and 22% of `--inverse-ink`),
+     which is the same relationship the inverse bands already use, so this is
+     not a new grey invented for one component.
+
+     Light keeps pigment rather than white — white on paper is invisible — and
+     goes DARKER than `--hairline` to compensate for the group opacity that is
+     no longer there.
+
+     Decoration only: `aria-hidden`, no text on them, so they are outside the
+     contrast gate by policy rather than by omission. Nothing readable is ever
+     drawn in these. */
+  --contour: light-dark(#cfcec2, color-mix(in srgb, var(--inverse-ink) 10%, transparent));
+  --contour-strong: light-dark(#a8a89a, color-mix(in srgb, var(--inverse-ink) 22%, transparent));
+
+  /* READING INK — long-form serif passages, and the one place on this page where
+     the ink is allowed to carry a hue.
+
+     It is LICHEN, derived from Norrin's own `--color-lichen: #88967e`, shifted
+     to a reading weight in each theme: 8.41:1 on the dark ground, 7.09:1 on the
+     light one. Both are far above the 4.5 floor, which matters because reading
+     text is the last thing that should be sitting near a threshold.
+
+     WHY NOT `--ink-2`, which is what these passages used. Two reasons, and the
+     second is the real one.
+
+     The neutral measured 9.35:1 on the dark ground, and a near-white serif at
+     reading size on a near-black field blooms — the glyph edges halate and the
+     eye keeps refocusing. Coming DOWN in contrast is the fix for that, not going
+     up, which is the opposite of the instinct.
+
+     The better reason is that it is a choice rather than an absence. `--ink-2`
+     is a neutral grey doing a job by default. Lichen is in the same family as
+     `--accent`, so the page stays one temperature and the reading text reads as
+     ink with a cast rather than as a dimmer version of the headline.
+
+     IT IS NOT USED FOR EMPHASIS. The Gap's station quotes are `--ink` on
+     purpose — they are the loudest copy in the section — and they stay there.
+     This token is for passages you read, not passages you are meant to notice. */
+  --reading: light-dark(#4d5744, #a8b09b);
+
 
   /* The plane a floating control opens onto — the locale list, and anything
      that joins it. There are no shadows in this system, so "above the page" has
@@ -257,14 +433,26 @@
    softening pass over everything — it is a distinction, and the distinction is
    the point:
 
-     RADIUS MEANS YOU CAN TOUCH IT.
+     RADIUS MEANS IT IS AN OBJECT, NOT A PLANE.
 
-   Structure stays square. Hairlines separate rather than contain, and a rule
-   has no corners; the production line, the eyebrow rules, the ruled tables, the
-   section bands, the timeline nodes and the sun terminus are all unchanged. So
-   the only rounded shapes on the page are the ones that respond, and the eye
-   finds every action without anything having to be coloured louder. That is
-   what makes this subtractive rather than decorative.
+   AMENDED, and deliberately rather than quietly. The rule used to read "radius
+   means you can touch it", which was a lossy summary of its own scale even
+   then: `--radius-panel` was already documented below as "anything that opens
+   OR FRAMES", and it was already carried by the Thinking frame, which neither
+   opens nor is pressable. Framing was sanctioned; the headline sentence had just
+   stopped describing the thing underneath it.
+
+   Stating it as object-vs-plane covers both cases honestly and answers the one
+   the page now needs: inset section panels. A PLANE is the page itself — a
+   full-bleed band, the ground, the forest, a rule, a timeline. Planes have no
+   corners because they have no edges you are meant to see. An OBJECT sits on a
+   plane, and an object has a shape.
+
+   Structure that is plane stays square: the production line, the eyebrow rules,
+   the ruled tables, the full-bleed bands, the timeline nodes and the sun
+   terminus are all unchanged. What this permits that the old wording did not is
+   a section that floats rather than spans — which is the single move that breaks
+   the nine-identical-bands rhythm the page was criticised for.
 
    The geometry was taken from the sea mark this page used to carry: its float
    was `rect w=3.6 rx=1.8` — a capsule, fully rounded — and its mast cap was a
@@ -280,8 +468,26 @@
                        silhouette of the thing the whole page is about.
      --radius-control  the mast cap. Anything pressable that is not the action:
                        nav items, the locale trigger, menu options, skip link.
-     --radius-panel    anything that opens or frames: the locale list, the
-                       Thinking rungs.
+     --radius-panel    anything that opens or frames at component scale: the
+                       locale list, the Thinking rungs.
+     --radius-section  a whole section lifted off the ground as a floating
+                       panel. Its own step because 14px on a 1400px-wide block
+                       is the rasterising artefact the 2px scale was — a radius
+                       has to scale with the thing carrying it or it reads as a
+                       rendering error rather than a shape.
+
+                       CURRENTLY UNUSED, and left in place deliberately rather
+                       than deleted. Roles was its only consumer; that panel
+                       has been removed because it shared `--surface` with the
+                       2112px band directly beneath it, so the "floating
+                       object" and the plane under it computed to the same
+                       colour. This step is what the standing radius rule —
+                       "radius means you can touch it, structure stays square"
+                       — was amended in the open to allow, so retiring the step
+                       means un-amending the rule, and CLAUDE.md §4 puts that
+                       decision with the user rather than in a cleanup. It
+                       stays declared, and it stays flagged, until that is
+                       decided rather than drifted into.
 
    Not rounded, deliberately: the nav drawer. It is the header temporarily
    getting taller — it shares the bar's ground and takes the bar's own border as
@@ -302,10 +508,14 @@
 /* The flip is instant, and it has to be told to be.
    Most of the page repaints on the frame the attribute changes, but a handful
    of elements carry their own `transition-colors` for reasons that have nothing
-   to do with theming — the header cross-fades over 500ms as it enters a forest
-   band, nav items over 200ms on hover. Left alone, switching theme made the bar
-   lag half a second behind the page underneath it and the nav labels arrive a
-   beat after the bar. Suppressed for one frame around the write, so the whole
+   to do with theming — the header's own ground and bottom rule move over 300ms,
+   nav items over 200ms on hover. (That header transition used to be 500ms, and
+   used to be a cross-fade into forest as the bar entered an inverted band. The
+   bar has its own ground now and no longer changes colour anywhere on the page;
+   what is left is the hairline appearing, timed to the 300ms condense so the
+   edge and the height arrive together.) Left alone, switching theme made the bar
+   lag behind the page underneath it and the nav labels arrive a beat after the
+   bar. Suppressed for one frame around the write, so the whole
    page changes exposure at once. `*` is affordable here because it is applied
    for a single frame and removed on the next. */
 :root.theme-switching,
@@ -325,6 +535,7 @@
   --color-ground: var(--ground);
   --color-surface: var(--surface);
   --color-inverse: var(--inverse);
+  --color-band-night: var(--band-night);
   --color-inverse-ink: var(--inverse-ink);
   --color-inverse-ink-2: var(--inverse-ink-2);
   --color-inverse-ink-3: var(--inverse-ink-3);
@@ -337,6 +548,7 @@
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
+  --color-reading: var(--reading);
 
   --color-hairline: var(--hairline);
   --color-hairline-strong: var(--hairline-strong);
@@ -347,16 +559,39 @@
   --color-tint: var(--tint);
   --color-inverse-tint: var(--inverse-tint);
 
-  /* Exposed as utilities (rounded-control, rounded-panel, rounded-action) so a
-     radius cannot be typed as an arbitrary value at a call site — which is
-     exactly how the old scale drifted to `rounded-[2px]` in six files. */
+  /* Exposed as utilities (rounded-control, rounded-panel, rounded-action,
+     rounded-section) so a radius cannot be typed as an arbitrary value at a
+     call site — which is exactly how the old scale drifted to `rounded-[2px]`
+     in six files. */
+  /* THE UI TEXT SIZE, DECLARED ONCE BECAUSE TWO THINGS SET IT. `.ui` and
+     `.btn` both need it, and `.btn` used to hardcode the value with a
+     `/* .ui *\/` comment beside it claiming that was where it came from. It
+     was not: reducing `.ui` left every button a size behind, and the comment
+     made the drift look intentional. A token cannot disagree with itself. */
+  --text-ui: 0.875rem;
+
   --radius-control: 8px;
   --radius-panel: 14px;
   --radius-action: 999px;
+  --radius-section: 24px;
+
+  /* THE CARD PILE’S OWN CORNER. Bigger than --radius-panel and NOT part of the
+     object scale above: --radius-panel is Scope’s radius too, and moving it to
+     suit the pile would move a section this has no business touching. It lives
+     here rather than on the pile because #styleguide’s tone lab draws the same
+     shell and needs the same corner. */
+  --radius-stack: 22px;
 
   --font-sans:
     'Schibsted Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-serif: 'Newsreader Variable', ui-serif, Georgia, 'Times New Roman', serif;
+  /* FRAUNCES IS THE SERIF NOW, replacing Newsreader outright rather than
+     sitting beside it. Picking a serif for display made the old pairing
+     untenable: Fraunces at 94px over Newsreader at 17px is two serifs with
+     different axes of contrast doing adjacent jobs, which reads as an
+     accident rather than a system. One serif covering display AND the
+     argument copy is the arrangement Reaktor uses (Larken over Scto), and it
+     leaves three voices instead of four. */
+  --font-serif: 'Fraunces Variable', ui-serif, Georgia, 'Times New Roman', serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
   /* Motion. Three easings, on purpose. */
@@ -366,6 +601,99 @@
 
   /* Layout */
   --spacing-gutter: clamp(1.5rem, 1rem + 2vw, 3rem);
+}
+
+/* ==========================================================================
+   THE SHADCN BRIDGE
+   --------------------------------------------------------------------------
+   §2.2 says a library's default theme is never shipped, and the reason is not
+   taste: shadcn's stock neutral-zinc palette is on tens of thousands of sites,
+   which is the exact problem this whole file exists to answer. So every
+   variable an adopted component reads is aliased to a token that was already
+   here and already measured.
+
+   NOTHING BELOW IS A NEW COLOUR. Each line is a rename, so `tools/palette.mjs`
+   still measures every pair a shadcn component can produce — `primary` on
+   `background` is `accent` on `ground`, `primary-foreground` on `primary` is
+   `ground` on `accent`, and both are in the gate.
+
+   THE COLLISIONS, BECAUSE TWO OF THEM WOULD HAVE BEEN SILENT AND ONE OF THEM
+   WOULD HAVE BEEN A THIRD FOCUS-RING BUG.
+
+   `--accent` is the sharp one. shadcn means a near-white hover wash by it; this
+   repo has meant a brand green by it since the palette was extracted, and
+   `:focus-visible` draws its outline in it. Declaring `--color-accent` from
+   shadcn's value would have greyed out every `text-accent` on the page AND the
+   focus ring on every control, and §5 is explicit that axe does not test focus
+   contrast — a clean audit would have shipped it. So shadcn's `accent` role is
+   NOT declared here. The components that want it are pointed at `bg-tint` and
+   `text-ink-2`, which is the same wash this repo's own `.control:hover` uses,
+   and the `ink-2`-not-`ink-3` part is deliberate: the note beside `--tint`
+   records `--ink-3` on the light wash at 4.53:1, a pass with no margin, and
+   this is not the place to spend it.
+
+   `--card`, `--popover`, `--secondary` and `--muted` all resolve onto surfaces
+   this system already has, so they are aliases rather than new planes.
+
+   `--destructive` IS DELIBERATELY ABSENT. There is no red in this palette and
+   inventing one would put an unmeasured pair on the page. A component that
+   needs it does not get adopted until the palette has one — §2.6.
+
+   Only what an adopted component actually reads is declared, which is the same
+   rule the bridge above states: if a colour is not here, it is not in the
+   system.
+   ========================================================================== */
+
+@theme inline {
+  --color-background: var(--ground);
+  --color-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--overlay);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--ground);
+  --color-secondary: var(--surface);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--surface);
+  --color-muted-foreground: var(--ink-3);
+  --color-border: var(--hairline);
+  --color-input: var(--hairline-strong);
+  --color-ring: var(--accent);
+
+  /* shadcn's radius scale, resolved onto ours. `rounded-md` is what a Badge
+     draws, and a badge is an object sitting on a plane, so it takes the object
+     scale's smallest step rather than a number of its own. */
+  --radius-sm: var(--radius-control);
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-panel);
+  --radius-xl: var(--radius-section);
+}
+
+/* THE `dark:` VARIANT, REDEFINED — AND IT IS A SILENT-FAILURE FIX, NOT A
+   FEATURE.
+
+   Tailwind's stock `dark:` matches `.dark` on an ancestor. This project has
+   never used that class: the theme is `[data-theme]` on `<html>`, defaulting to
+   the OS preference, and every token is a `light-dark()` pair that resolves off
+   `color-scheme`. So a `dark:` utility pasted in from a library would match
+   nothing, produce no error, and quietly never apply — which is the worst shape
+   a bug can have.
+
+   Redefined, it matches what the page actually means by dark. It is deliberately
+   not needed by anything here — the tokens do the work, and that is why there is
+   no second colour block below — but a variant that is wrong is worse than a
+   variant that is unused. */
+@custom-variant dark {
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme='light']) *, :root:not([data-theme='light'])) {
+      @slot;
+    }
+  }
 }
 
 /* ==========================================================================
@@ -493,32 +821,58 @@
 /* ==========================================================================
    Typographic roles
    Fluid sizes are clamped against a 360 → 1512px viewport range.
+   --------------------------------------------------------------------------
+   THE SCALE WAS COMPRESSED AT THE TOP AND HELD AT THE BOTTOM. The display end
+   came down roughly 20%; nothing from `lead` down moved at all.
+
+     display-1  120 → 96px      metric   96 → 76px
+     display-2   72 → 58px      thesis   52 → 44px
+     display-3   48 → 40px      lead / body / body-serif / ui / caption /
+     display-4   32 → 28px      label / wordmark — unchanged
+
+   WHY NOT A UNIFORM MULTIPLIER, which is what "make it smaller everywhere"
+   sounds like it means. `.label` is 11px mono and is used 122 times — every
+   eyebrow, the hero's statistics strip, PILOT / PRODUCTION. A uniform 0.85
+   takes it to 9.4px and a uniform 0.75 to 8.25px, and uppercase mono at those
+   sizes is not small, it is unreadable. The bottom of a scale has a floor that
+   the top does not.
+
+   Compressing the top is also what actually reads as "smaller": perception of
+   scale is dominated by the largest thing on screen, so cutting the h1 by a
+   fifth changes the whole page's density while every word stays legible. It is
+   the ratio between steps that tightened, not the type.
+
+   EVERY CLAMP WAS RE-SOLVED, not just its ceiling. Each one keeps its original
+   minimum and its original crossover viewport, with the slope recomputed so the
+   curve still reaches the new maximum at the same width it used to reach the
+   old one. Editing only the third argument would have left the middle of the
+   range scaling on the old slope and hitting the cap early.
    ========================================================================== */
 
 @layer components {
   .display-1 {
-    font-family: var(--font-sans);
-    font-size: clamp(2.75rem, 1.55rem + 6.6vw, 7.5rem);
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 2.07rem + 4.23vw, 5.875rem);
     font-weight: 500;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.02em;
     line-height: 0.94;
     text-wrap: balance;
   }
 
   .display-2 {
-    font-family: var(--font-sans);
-    font-size: clamp(2.125rem, 1.5rem + 3.6vw, 4.5rem);
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 1.86rem + 1.51vw, 3.125rem);
     font-weight: 500;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.018em;
     line-height: 1;
     text-wrap: balance;
   }
 
   .display-3 {
-    font-family: var(--font-sans);
-    font-size: clamp(1.625rem, 1.3rem + 2vw, 3rem);
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 1.49rem + 0.82vw, 2.1875rem);
     font-weight: 500;
-    letter-spacing: -0.022em;
+    letter-spacing: -0.014em;
     line-height: 1.08;
     text-wrap: balance;
   }
@@ -528,10 +882,10 @@
      `.display-3` and then overrode its font-size, keeping only the tracking —
      which silently coupled those files to a role they were not using. */
   .display-4 {
-    font-family: var(--font-sans);
-    font-size: clamp(1.375rem, 1.15rem + 0.9vw, 2rem);
+    font-family: var(--font-serif);
+    font-size: clamp(1.25rem, 1.31rem + 0.27vw, 1.5625rem);
     font-weight: 500;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.012em;
     line-height: 1.15;
     text-wrap: balance;
   }
@@ -539,7 +893,7 @@
   /* The wordmark lockup. Identical in the bar and the footer, so it is a role
      rather than the same three arbitrary values written out twice. */
   .wordmark {
-    font-size: 1.0625rem;
+    font-size: 1rem;
     font-weight: 500;
     letter-spacing: -0.02em;
   }
@@ -548,13 +902,13 @@
      It shipped 14 times as an arbitrary value with no name, so the next person
      to add a button had to guess. */
   .ui {
-    font-size: 0.9375rem;
+    font-size: var(--text-ui);
     line-height: 1.5;
   }
 
   .metric {
     font-family: var(--font-sans);
-    font-size: clamp(2.5rem, 1.9rem + 4.2vw, 6rem);
+    font-size: clamp(2.25rem, 2.24rem + 1.8vw, 4rem);
     font-weight: 400;
     letter-spacing: -0.045em;
     line-height: 0.88;
@@ -567,7 +921,7 @@
      most people use. The floor now clears display-3 at every width. */
   .thesis {
     font-family: var(--font-serif);
-    font-size: clamp(1.875rem, 1.35rem + 2.2vw, 3.25rem);
+    font-size: clamp(1.75rem, 1.68rem + 0.8vw, 2.375rem);
     font-weight: 300;
     letter-spacing: -0.012em;
     line-height: 1.24;
@@ -579,7 +933,7 @@
      nearly the same size exactly where the hierarchy is needed most. */
   .lead {
     font-family: var(--font-serif);
-    font-size: clamp(1.3125rem, 1.08rem + 0.65vw, 1.5rem);
+    font-size: clamp(1.25rem, 1.235rem + 0.22vw, 1.375rem);
     font-weight: 400;
     letter-spacing: -0.006em;
     line-height: 1.48;
@@ -588,7 +942,7 @@
 
   .body-serif {
     font-family: var(--font-serif);
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
     line-height: 1.62;
     text-wrap: pretty;
   }
@@ -596,7 +950,7 @@
   /* No baked colour: ten of its fourteen uses immediately overrode it, and a
      type role has no business deciding ink. Callers set it. */
   .caption {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
     text-wrap: pretty;
   }
@@ -604,7 +958,7 @@
   /* The "production" voice: indices, units, addresses, telemetry. */
   .label {
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: 0.65625rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.14em;
@@ -645,7 +999,7 @@
        label, so 1.5rem measured at the widest point leaves the first and last
        glyph sitting in the arc. */
     padding: 0.875rem 1.75rem;
-    font-size: 0.9375rem; /* .ui */
+    font-size: var(--text-ui);
     line-height: 1.5;
     font-weight: 500;
     white-space: nowrap;
@@ -779,6 +1133,124 @@
   [data-tone='inverse'] .panel {
     border-color: var(--inverse-hairline-strong);
     background-color: var(--inverse-overlay);
+  }
+
+  /* The one card anatomy on this page. Scope's 2x2 and the customer stack are
+     the same object filled differently, which is the only thing that makes
+     "one component in two sections" true rather than aspirational.
+
+     NOT `.panel`. A panel is something that OPENS — the locale list — so it
+     takes the stronger hairline and `--overlay`, a ground that reads as lifted
+     off the page. A card is page content that happens to have edges: the
+     ordinary hairline, and `--surface`, which is one step off `--ground` and no
+     more (#f8f7f3 -> #f1f0ea light, #0e120f -> #161b17 dark).
+
+     NO SHADOW. §2.7 allows one only for a genuinely floating layer, and neither
+     consumer is one. Separation is the hairline, exactly as it is everywhere
+     else on this page.
+
+     The values are byte-identical to the utility string Roles.tsx carried
+     before this class existed (`rounded-panel border border-hairline bg-surface
+     p-7 md:p-8`), so adopting it there is a refactor with a zero-pixel diff —
+     which is the check, not the hope. */
+  .card {
+    display: flex;
+    flex-direction: column;
+    /* The stack lays four cards in one grid area and lets the tallest set the
+       row height; without this the three shorter ones keep their own heights
+       and the pile's bottom edges scatter instead of stacking. Roles gets the
+       same effect for free from its stretched grid, so this is one declaration
+       serving both. */
+    height: 100%;
+    border-radius: var(--radius-panel);
+    border: 1px solid var(--hairline);
+    background-color: var(--surface);
+    padding: 1.75rem;
+  }
+
+  @media (min-width: 48rem) {
+    .card {
+      padding: 2rem;
+    }
+  }
+
+  /* The floor. Stated once here rather than as `mt-auto pt-10` at each call
+     site, because it is an argument, not a spacing choice: pinning the name to
+     the card's floor turns four ragged copy lengths into air rather than into a
+     column that failed to fill, and it makes a card read as a statement
+     resolving into the name for it. See the header comment in Roles.tsx. */
+  .card > .card-floor {
+    margin-block-start: auto;
+    padding-block-start: 2.5rem;
+  }
+
+  /* ------------------------------------------------------------------------
+     THE CONTOUR FIELD'S QUIET ZONE.
+
+     A GROUND GETS OUT OF THE WAY OF READING MATTER. That is the whole rule
+     here, and it is the reason this is a mask on the DRAWING rather than a
+     panel behind the paragraph or a heavier ink on it.
+
+     The field was strengthened deliberately — see `--contour` above, which
+     exists because the old `opacity: 0.5` on the group turned the survey into
+     something you had to hunt for. That change bought presence everywhere and
+     charged for it in exactly one place: the hero lede, three sentences of
+     18px serif in the right-hand column with survey lines crossing the
+     letterforms. Display type at 80px shrugs those off; body serif does not.
+
+     WHAT THIS IS NOT. It is not a contrast fix — the contours are decorative,
+     sit at `-z-10` behind the type, and `--reading` on `--ground` is gated in
+     `tools/palette.mjs`. axe passes either way. It is a legibility fix, which
+     is the kind the gates cannot catch and only looking can.
+
+     THE FEATHER IS MOST OF THE VALUE. `transparent` to `black` across a wide
+     band, not a hard stop: a sharp edge would read as a rectangle cut out of
+     the drawing, which is worse than the problem. The field thins toward the
+     reading column and recovers before it reaches the frame.
+
+     PERCENTAGES, AND WHY THEY ARE CLOSE ENOUGH. The paragraph is placed by the
+     grid inside the page measure (`Container`, currently 1440), so above that
+     width the container centres and the column drifts inward relative to the
+     viewport. One ellipse cannot track that exactly, but with this much feather
+     it does not need to: every width in the table below sits inside the
+     falloff. The measure is not a constant — it has already moved 1512 → 1200 →
+     1440 — so if it moves again, re-measure rather than assume.
+
+     TWO ELLIPSES, BECAUSE THE PARAGRAPH IS IN TWO DIFFERENT PLACES. Below the
+     breakpoint the aside is not a right-hand column at all — it is full width
+     and sits under the buttons. Reusing the desktop ellipse there would have
+     put the hole over the headline and left the lede exactly as it was, which
+     is moving the problem rather than fixing it.
+
+     Both are placed from measured positions rather than guessed. The lede's
+     box, as a percentage of the hero:
+
+       390px    x  6–94%    y 49.5–66%     (full width, lower middle)
+       834px    x 67–96%    y 17.7–48.9%   (right column, upper)
+       1512px   x 66–97%    y ~17–47%
+       1900px   x 60–91%    y ~17–47%
+
+     Each ellipse's radii cover its own range with the feather to spare. Re-measure
+     if the copy column's spans change — the numbers above are the check.
+     ------------------------------------------------------------------------ */
+  .contour-field {
+    mask-image: radial-gradient(
+      ellipse 66% 22% at 50% 58%,
+      transparent 40%,
+      rgb(0 0 0 / 0.55) 68%,
+      black 100%
+    );
+  }
+
+  @media (min-width: 48rem) {
+    .contour-field {
+      mask-image: radial-gradient(
+        ellipse 42% 34% at 79% 27%,
+        transparent 38%,
+        rgb(0 0 0 / 0.55) 62%,
+        black 84%
+      );
+    }
   }
 }
 
@@ -967,6 +1439,16 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   [data-scene-part] {
     animation: none !important;
     transform: none !important;
+    /* The artefact field animates the INDIVIDUAL transform properties rather
+       than the `transform` shorthand (see scene-converge), and those are a
+       separate cascade — `transform: none` does not touch them. Killing the
+       animation already leaves all three at their initial values, so this is
+       the same belt-and-braces the clip-path line below is, not a fix for a
+       live bug. It is here so that a part which later sets one of these
+       statically cannot quietly survive reduced motion. */
+    translate: none !important;
+    rotate: none !important;
+    scale: none !important;
     opacity: 1 !important;
     /* `animation: none` already drops the keyframed clip, but the uncover
        parts end on `inset(0 0 0 0)` and this states the resting value rather
@@ -1106,6 +1588,13 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    still crossing it. */
 :root {
   --deck-hold: 0px;
+
+  /* `--hero-band` lived here and is gone with the band it measured. It was
+     declared once because two things read it — the photographs in `Hero.tsx`
+     and the `--deck-card-h` model below — and that pairing was the right call
+     while it existed. With the photographs removed it has no consumers, and a
+     variable with no consumers is a comment pretending to be code. The same
+     reasoning retired `--mark` in `TheGap`. */
 }
 
 [data-deck-hold] {
@@ -1121,28 +1610,842 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     --deck-hold: 100svh;
   }
 
+  /* RE-MEASURED after the hero gained its full-bleed image band, and the shape
+     of the model changed as well as the numbers.
+
+     THE `6vh` TERM IS GONE, and it is gone by cancellation rather than by being
+     dropped. The section still carries `pt-[calc(72px+6vh)]`, but the band is
+     pulled back up by exactly `-mt-[6vh]` so it butts the nav — so the two
+     annihilate and the card's height no longer depends on that term at all.
+     What is left is: a fixed part, plus the band, plus the bottom padding.
+
+     The fixed part was solved from measurement, not arithmetic — see
+     `.shots/probe/deck-h.mjs`, which lays the page out at six widths and two
+     viewport heights and prints it. Checked at 800px and 950px tall: the fixed
+     part agrees to within 1px across both, which is what proves it is actually
+     fixed and not absorbing a vh term. Predicted heights at 800 matched measured
+     to 1049/1050, 962/962, 941/942, 971/971.
+
+     It errs SHORT on purpose. `top` is `min(0px, 100svh - card)`, so overstating
+     the card rides it too high and opens a gap under its bottom edge;
+     understating only means the top scrolls off slightly less. One of those is
+     visible and the other is not. */
   [data-deck] > [data-deck-card] {
     position: sticky;
-    --deck-card-h: max(94svh, calc(624px + 6vh + clamp(120px, 17vh, 190px)));
+    --deck-card-h: max(94svh, calc(634px + 6vh + clamp(120px, 17vh, 190px)));
     top: min(0px, calc(100svh - var(--deck-card-h)));
   }
 }
 
+/* 1024 CARRIES THE SAME NUMBER AS 768 and that is a measurement, not a
+   copy-paste. They used to differ by 87px because the station log was a
+   six-row column: the narrower the grid, the taller that column made the
+   hero. The log is a full-width strip now, so between 768 and 1280 nothing
+   about the hero's height depends on width at all. The rule is kept rather
+   than deleted so the two can diverge again without re-deriving the cascade. */
 @media (min-width: 1024px) and (min-height: 800px) {
   [data-deck] > [data-deck-card] {
-    --deck-card-h: max(94svh, calc(682px + 6vh + clamp(120px, 17vh, 190px)));
+    --deck-card-h: max(94svh, calc(583px + 6vh + clamp(120px, 17vh, 190px)));
   }
 }
 
 @media (min-width: 1280px) and (min-height: 800px) {
   [data-deck] > [data-deck-card] {
-    --deck-card-h: max(94svh, calc(696px + 6vh + clamp(120px, 17vh, 190px)));
+    --deck-card-h: max(94svh, calc(613px + 6vh + clamp(120px, 17vh, 190px)));
   }
 }
 
 @media (min-width: 1440px) and (min-height: 800px) {
   [data-deck] > [data-deck-card] {
-    --deck-card-h: max(94svh, calc(728px + 6vh + clamp(120px, 17vh, 190px)));
+    --deck-card-h: max(94svh, calc(632px + 6vh + clamp(120px, 17vh, 190px)));
+  }
+}
+
+/* ==========================================================================
+   THE CARD STACK
+   --------------------------------------------------------------------------
+   Four case cards in one grid cell, offset into a pile. `--d` is the depth
+   written per item from React; 0 is the front.
+
+   NAMED `cardstack`, NOT `deck`. `[data-deck]` is already the hero-to-Gap seam
+   above this and has nothing to do with cards. Two unrelated mechanisms under
+   one attribute is one careless selector away from breaking both at once.
+
+   WHY THIS IS NOT A CAROUSEL. A scroll-snap track is a scroll container, and a
+   `view()` timeline measured against a scroll container it sits inside freezes
+   at 0% forever. The roster in this same section pans on such a timeline. So
+   the pile is transforms in a grid: no `overflow`, no `scroll-snap`, no
+   scrollport for anything to resolve against by accident.
+
+   WHY IT IS NOT IN `@layer components`. Tailwind's `utilities` layer wins over
+   `components`, so a `transform` declared there could be silently overridden by
+   any utility a later edit puts on a card. `[data-reveal]`, `.line-mask` and
+   `[data-deck-hold]` all sit outside `@layer` for that reason.
+
+   WHY IT IS NOT INSIDE THE `@supports` BLOCK BELOW. That block is gated on
+   scroll-timeline support AND on `prefers-reduced-motion: no-preference`. The
+   pile's resting geometry is LAYOUT — it has to exist in every browser and at
+   every motion preference, or three of the four cards land on top of each other
+   and three real customer cases become unreadable. Only the travel between
+   positions is motion, and the global reduced-motion reset flattens that.
+
+   THE DECK IS SQUARE AGAIN. It was fanned and tilted for a while; the rotation
+   is gone, and every card now sits parallel and steps down and to the right.
+   `--stack-fan` and `--stack-tilt` are deleted rather than set to zero, because
+   a token at zero is a mechanism waiting to be switched back on by accident.
+   ========================================================================== */
+
+/* THE REGION IS THE PILE PLUS ITS POSITION ROW, and it exists because the dots
+   have to be measured against the FRONT CARD rather than against the column.
+   They were centred on the wrapper, which is wider than the card, so the row sat
+   65px left of the card's centre line — visible in every screenshot and read as
+   a alignment accident, which it was.
+
+   Every number the two children share is declared here, once. --stack-count is
+   written onto this element from React, so it is in scope for both. */
+[data-cardstack-region] {
+  /* THE STEP IS NO LONGER DERIVED FROM `--radius-panel`, AND THAT DERIVATION IS
+     THE DEFECT THIS FIXES.
+
+     It used to read `--stack-step: var(--radius-panel)`, on the argument that a
+     step of exactly one corner radius means what shows of the card behind is
+     precisely its rounded corner and never a straight sliver. That argument is
+     sound about the CORNER and says nothing about the PILE, and the pile is the
+     thing being drawn: at 14px down and 2.4% (9px) right, four cards read as one
+     card with a slightly thick edge. The reviewer's words were that the stack
+     "barely reads".
+
+     The two numbers were never the same measurement. A radius is the size of a
+     corner on one card; a step is how far apart two cards are. Tying them meant
+     the only way to make the pile legible was to round every panel on the page
+     harder, which is why the number sat wrong for so long. They are separate
+     now, and the radius below is set for this card rather than taken from the
+     scale for the same reason.
+
+     26px is ~7% of the card's 368px, which is the proportion the reference
+     holds. It is a length and not a percentage because the same token also sets
+     the horizontal drift, and a percentage means the element's own width in a
+     `translate()` and its CONTAINING BLOCK's width in `max-inline-size` — two
+     different measurements under one name, which is how the vertical and
+     horizontal steps came apart in the first place.
+
+     THE SMALL VALUE IS THE DEFAULT AND THE LARGE ONE IS THE OPT-IN, because the
+     step is paid for out of the card's own width (see `max-inline-size` below)
+     and only a wide column can afford it. Written the other way round — 26px
+     everywhere, narrowed by a `max-width` query — the tablet column silently
+     bought a 78px pile with a 306px budget and rendered a 179px card, which is
+     two words a line. Measured, not guessed: 64rem is the first width at which
+     the column clears 23rem plus the travel. */
+  --stack-step: 16px;
+
+  /* Down and right by the same amount. This was a percentage of the card's own
+     width while the vertical step was a length, so the two axes drifted apart
+     at every viewport; a deck of paper steps evenly. */
+  --stack-drift: var(--stack-step);
+
+  /* The corner. Bigger than `--radius-panel` and set here rather than in the
+     scale, because `--radius-panel` is Scope's radius too and moving it would
+     move a section this change has no business touching. The pile is the one
+     object on the page seen as a physical stack, and a stack of paper with a
+     14px corner on a 368px card reads as cardboard. */
+  /* Declared on :root beside the rest of the radius scale, because the tone
+     lab on #styleguide draws the same shell and a token scoped to the region was
+     invisible there — which is why those specimens rendered square. */
+
+  /* DEPTH WAS DRAWN BY SINKING ONE SURFACE TOWARD THE PAGE GROUND — 26% closer
+     per step. Three real tones do it now, so `--stack-sink` is deleted rather
+     than left at zero: a token at zero is a mechanism waiting to be switched
+     back on by accident. */
+
+  /* LEFT-ALIGNED IN ITS CELL, and this is load-bearing rather than a placement
+     preference. `max-inline-size` below sizes the FRONT card so that the front
+     card plus the pile's travel fits the column — a promise that only holds if
+     the pile grows into the column's own slack. Right-aligned, the front card's
+     right edge was the column's right edge and the three behind it stepped
+     straight out past it: at 390 the deepest card ended 24px outside the
+     viewport and the section's `overflow-clip` sheared its whole right edge
+     off, which is the opposite of the thing being drawn. */
+  margin-inline-end: auto;
+
+  /* NO SCALE. THE CARDS BEHIND ARE THE SAME SIZE, JUST OFFSET.
+
+     Every earlier version shrank them, and with the origin moved to the top-left
+     corner that quietly cancelled the whole pile: a card 6% smaller and 9px to
+     the right has its right edge INSIDE the card in front, so nothing peeked and
+     the deck rendered as a single card. Same-size cards offset down and right is
+     what a deck of paper actually looks like, and it is what the design shows.
+
+     `--stack-shrink` is deleted rather than set to zero — a token at zero is a
+     mechanism waiting to be switched back on by accident — which also retires
+     the number that had been wrong three separate times. */
+
+  /* Portrait, and held off the right edge of its cell.
+
+     THE REGION IS SIZED TO THE FRONT CARD, NOT TO THE PILE. The deepest card
+     sits `(count - 1) * step` further right, so a front card sized to the full
+     column puts the back of the pile outside it — which the section's
+     `overflow-clip` would then shear off, and on a phone that is the whole right
+     edge of three cards. Subtracting the travel first makes the pile, not the
+     card, the thing that fits. On a wide column 27rem wins and the column's own
+     slack absorbs the rest.
+
+     IT WAS 23rem. A display-sized title needs measure or it shreds: "Computer
+     vision across an 87,300-kilometer grid" at 28px in the 304px a 23rem card
+     leaves is five lines. 27rem leaves 368px and takes it to three. The column
+     was checked first — at 1512 it is 547px wide, so 432px of card plus 78px of
+     pile still lands 37px inside it. */
+  max-inline-size: min(27rem, 100% - (var(--stack-count) - 1) * var(--stack-step));
+}
+
+/* The full step, where the column can pay for it out of its own slack without
+   taking the width off the card. */
+@media (min-width: 64rem) {
+  [data-cardstack-region] {
+    --stack-step: 26px;
+  }
+}
+
+[data-cardstack] {
+  display: grid;
+
+  /* Transforms are out of flow, so the pile's back edges would fall outside the
+     section's `overflow-clip` box and be cut. This reserves the travel the
+     deepest card takes, so the caption below clears the pile and not just the
+     front card. */
+  padding-block-end: calc(var(--stack-step) * (var(--stack-count) - 1));
+}
+
+[data-cardstack] > li,
+[data-cardstack] > li[data-tone='paper'] {
+  --tone-surface: var(--role-paper);
+  --tone-hairline: var(--role-paper-hairline);
+  --tone-ink: var(--role-paper-ink);
+  --tone-reading: var(--role-paper-reading);
+  --tone-ink-3: var(--role-paper-ink-3);
+  --tone-accent: #1a5335;
+}
+
+/* THE STRONG HAIRLINE, NOT THE PLAIN ONE, and it is the whole answer to "can a
+   dark card sit on a dark band". As a FIELD it cannot: #14170f on #0e120f is
+   1.04:1, and no band value fixes that — pushing the band to #0a0d0b drops the
+   inverse hairline to 1.25:1 and #060807 fails both hairlines, so the page's one
+   separating device would stop reading to buy a tenth of a ratio. As an OUTLINED
+   OBJECT it reads fine: --inverse-hairline-strong measures 1.87:1 on the band,
+   the same weight of rule this page draws everything with. The dark card is a
+   drawn edge with a filled interior, which is a thing this system already knows
+   how to make. */
+[data-cardstack] > li[data-tone='dark'] {
+  --tone-surface: var(--role-dark);
+  --tone-hairline: var(--inverse-hairline-strong);
+  --tone-ink: var(--inverse-ink);
+  --tone-reading: var(--inverse-ink-2);
+  --tone-ink-3: var(--inverse-ink-3);
+  --tone-accent: var(--signal);
+}
+
+/* Stone. Sun for the accent, not moss: moss on stone measures 1.04:1, which is
+   the same failure moss has on every dark plane in this system. */
+[data-cardstack] > li[data-tone='stone'] {
+  --tone-surface: var(--role-stone);
+  --tone-hairline: var(--role-stone-hairline);
+  --tone-ink: var(--inverse-ink);
+  --tone-reading: var(--inverse-ink-2);
+  --tone-ink-3: var(--role-stone-ink-3);
+  --tone-accent: var(--signal);
+}
+
+[data-cardstack] > li[data-tone='signal'] {
+  --tone-surface: var(--signal);
+  --tone-hairline: var(--on-signal-hairline);
+  --tone-ink: var(--on-signal-ink);
+  --tone-reading: var(--on-signal-ink-2);
+  --tone-ink-3: var(--on-signal-ink-3);
+  --tone-accent: var(--on-signal-accent);
+}
+
+[data-cardstack] > li {
+  /* One cell, four occupants. Grid items in the same area still contribute to
+     the row's intrinsic height, unlike absolute positioning, so the row is as
+     tall as the tallest card and all four stretch to it — which is what keeps
+     the pile's edges parallel instead of ragged. */
+  grid-area: 1 / 1;
+
+  /* TOP-LEFT ORIGIN. The pile grows down and right, so pinning the corner it
+     grows away from keeps the step exactly `--stack-step` per depth: scaling
+     from the centre would eat half of it back and leave a 3px peek, which is a
+     rendering artefact rather than a deck. */
+  transform-origin: 0% 0%;
+  transform: translate(calc(var(--d) * var(--stack-drift)), calc(var(--d) * var(--stack-step)));
+
+  z-index: calc(var(--stack-count) - var(--d));
+  transition: transform 0.34s var(--ease-ui);
+}
+
+/* THE CARD BEHIND IS THE SAME CARD IN A DIFFERENT COLOUR.
+
+   Same shell, same size, same radius. Depth used to be drawn by sinking one
+   surface toward the page ground; each case owns a tone now, so what separates
+   two cards is that they are different colours and there is a hairline between
+   them.
+
+   THE SHADOW, AGAINST §2.7. That rule allows one for "a genuinely floating
+   layer" and refuses it everywhere else, and four sheets of paper physically
+   resting on one another is the strongest case the page has: the exposed strip
+   of the card behind is where a real pile shows its only shading, and without it
+   the tonal step alone has to carry the whole read. It is deliberately small —
+   a 1px contact edge and one soft 18px spread, at .06 on paper, which is the
+   alpha band Solita's own elevation scale uses. Dark carries more alpha for the
+   same apparent depth because the shadow is black on a near-black ground.
+
+   It is on the card and not on the `li`, so it never lands under the dealt
+   card's blur filter. */
+/* THE PILE TAKES THE SAME TONE SYSTEM SCOPE DOES, direction A, fixed in both
+   themes. The tokens, the five `--tone-*` slots and the argument for pinning them
+   to the light ramp are all at the tail of this file, written for
+   `[data-rolecards]`; this is the second consumer and it re-declares nothing.
+
+   WHY FIXED, IN ONE NUMBER: with the pale tone following the theme it resolves
+   to #161b17 in dark, which is 1.04:1 from the dark tone — three tones rendering
+   as one. A card is a physical object and a physical object does not change
+   colour when the room does.
+
+   ONE TONE PER CASE, IN ARRAY ORDER — see CardStack.tsx. It was keyed to depth
+   first, which pinned the front card to one tone forever and buried every
+   coloured card behind it. Because no card changes tone any more, nothing here
+   transitions and nothing has to be hidden inside the deal animation.
+
+   THE DEPTH SINK IS GONE WITH IT. It mixed one surface toward the ground to fake
+   depth; three real tones do the job, and mixing them toward anything would
+   muddy them.
+
+   `--tone-accent` IS THE PILE'S OWN ADDITION to those five, because Scope's card
+   has no accent phrase in its title and this one does. Moss on paper is 7.88:1
+   and moss on sun is 7.67:1; on the dark tone moss is 2.01:1 and fails, so the
+   dark card takes sun — the same substitution this file already makes for the
+   focus ring on a dark plane. */
+[data-cardstack] .card {
+  background-color: var(--tone-surface);
+  border-color: var(--tone-hairline);
+  color: var(--tone-ink);
+  border-radius: var(--radius-stack);
+  box-shadow:
+    0 1px 1px var(--stack-shadow-contact),
+    0 10px 18px -10px var(--stack-shadow-cast);
+}
+
+/* ---------------------------------------------------------------------------
+   THE QUOTE CARD
+   ---------------------------------------------------------------------------
+   A different composition from Scope's card, on the same `.card` shell. They
+   share the box — radius, hairline, surface, padding — and nothing else, which
+   is the honest arrangement: forcing one slot API to produce both a claim/name
+   card and a quote card would have made a component that is two
+   components wearing a trench coat.
+
+   CENTRED, AND THE MARK RIDES THE TOP EDGE. Every part of it shares one centre
+   line: the mark, the case title, the quote, the client and its sector. The
+   mark is pulled up out of the padding box so it straddles the card's top
+   border rather than sitting inside the corner — it reads as a seal on the card
+   rather than as the first character of the text, which is what stops a
+   decorative glyph from being mistaken for content.
+
+   This was briefly left-aligned with the mark tucked inside the top-left
+   corner. That was a misreading of a cropped reference and it is reverted here;
+   the note is kept so the same crop does not produce the same edit twice.
+
+   HOW THE VERTICAL WORKS, because it is the whole point of this block. All four
+   cards sit in one grid cell, so the longest case sets the height and the three
+   shorter ones are stretched to match it. That slack has to go somewhere, and
+   where it used to go was between the quote and the client's name: the
+   attribution was pinned to the card's floor with `margin-block-start: auto`,
+   which opened a dead band above the company name on every case shorter than
+   the longest one.
+
+   So the slack is now spent outside the text rather than inside it. The mark
+   holds the top-left corner and never moves — it is the card's ornament, and a
+   glyph that bobbed as the pile rotated would draw the eye to the wrong thing.
+   Everything else is one block, `.quote-set`, with `margin-block: auto`, which
+   splits the leftover space evenly above and below it. The quote therefore sits
+   where its own length puts it, and the gap between its last line and the
+   client's name is a fixed 1.5rem on all four cases.
+
+   THERE IS NO AVATAR, and that is not an omission to be filled in later. We
+   hold no licence to client headshots — `norrin.ts` records it — and three of
+   the four cases name no individual at all. What sits in that slot is the
+   client and the sector, which is what this card is actually about: a company
+   and a piece of work, not a person and a job title.
+   --------------------------------------------------------------------------- */
+
+/* The mark straddles the card's top edge, centred. It is `aria-hidden` on the
+   element: it is punctuation, and the source of the text is stated under the
+   pile.
+
+   THE TWO NUMBERS BELOW ARE ONE MOVE, NOT TWO. `“` hangs from the top of its em
+   box, so a normal line box leaves a tall void under the glyph and none above
+   it; `line-height: 0.5` collapses the box onto the glyph so the negative
+   margin is measured against the ink rather than against the leading. The
+   margin then lifts it clear of the card's top padding and over the border.
+
+   It is not clipped, because `.card` has a radius and no `overflow` — the one
+   place on this page where that combination is load-bearing rather than
+   incidental. Nothing else may add `overflow: hidden` to `.card`. */
+.quote-mark {
+  font-family: var(--font-serif);
+  font-size: clamp(2.75rem, 2.4rem + 1.4vw, 3.5rem);
+  line-height: 0.5;
+  margin-block-start: -3.4rem;
+  /* It hangs entirely above the card, so it is drawn on the night band and takes
+     the band's muted rung rather than the card's. */
+  color: var(--inverse-ink-3);
+
+  /* ONLY THE FRONT CARD KEEPS ITS MARK, and this is the price of hanging the
+     glyph over the top edge rather than a preference.
+
+     The ink of `“` sits about 27px above the element's own line box, so a card
+     one step back paints its mark 27px minus one step above the FRONT card's
+     top edge. At the desktop step of 26px that is 1px and invisible; at the
+     16px step the narrow columns use it is 11px, and the tablet rendered a
+     second quotation mark floating over the ground beside the first. Nothing
+     else of a card behind shows except its paper edge, and the mark was the one
+     exception.
+
+     `--d` is a plain number, so the front card can be picked out in arithmetic
+     rather than by matching on an inline style — 0 for the front, 1 for
+     everything behind it.
+
+     NO TRANSITION, deliberately. Every card carries the mark at the same place
+     in the same cell, so when the pile rotates the outgoing card's mark
+     disappears in the same frame the incoming card's appears, in the same
+     pixels — the composite does not change. Fading it would put the front
+     card's own mark at partial opacity for a third of a second, which is the
+     only version of this a reader would notice. */
+  opacity: calc(1 - min(var(--d), 1));
+}
+
+/* The extra top padding is room for the mark to hang into. Everything else is
+   the centre line. */
+[data-cardstack] .card {
+  align-items: center;
+  text-align: center;
+  padding-block-start: 2.5rem;
+}
+
+/* The block that floats. `auto` on both sides splits the card's slack evenly
+   above and below it. The padding is the floor for the longest case, where the
+   autos resolve to zero and there is no slack left to split.
+
+   `align-self: stretch` because the card is now `align-items: center`, which
+   would otherwise shrink this to its own max-content width — a paragraph's
+   max-content width is the whole quote on one line, so the measure would be
+   decided by which case happened to be longest rather than by the card. */
+.quote-set {
+  align-self: stretch;
+  margin-block: auto;
+  padding-block-start: 1.5rem;
+}
+
+/* THE CASE TITLE IS THE CARD'S DISPLAY LINE.
+
+   IT WAS THE SMALLEST THING ON THE CARD AND IT IS NOW THE LARGEST, and that is
+   the whole change. Four elements in one sans face between 13px and 17px is not
+   a hierarchy, it is a list, and §1.2's check is explicit: remove the display
+   face and see whether the page still looks the same. On this card the display
+   face was not present at all, so the check could not even be run.
+
+   The quote used to lead and now supports. That is the honest order for what
+   these actually are: the title is Norrin's own line about the piece of work,
+   the quote is a summary of it. A summary set larger than the thing it
+   summarises reads as a testimonial, which is a claim this card is careful not
+   to make.
+
+   FRAUNCES, AT ITS OWN SIZE RATHER THAN AT `.display-4`'S. The rung is right —
+   `.display-4` tops out at 25px and this tops out at 28px — but its 1.15 leading
+   is set for one or two lines of heading, and a title this long runs to three on
+   a 432px card. Multi-line copy at 1.15 sets solid. 1.2 is the smallest leading
+   that still opens.
+
+   THE CLAMP IS TUNED AGAINST THE NARROW CARD, not the wide one. The pile's step
+   is paid for out of the card's width, so a 306px tablet column leaves a 258px
+   card and a 194px measure; at 28px this title would break into six lines
+   there. The floor is 21px for that reason and not because 21px is a size
+   anybody chose. */
+.quote-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.3125rem, 1.05rem + 0.85vw, 1.75rem);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  line-height: 1.2;
+  color: inherit;
+  text-wrap: balance;
+}
+
+/* THE LAST WORDS, IN THE ACCENT. Which words is decided in CardStack.tsx, from
+   position rather than from authored data — the note there carries the argument
+   and the filler-word guard.
+
+   `--accent` on `--surface` measures 7.88:1 on paper and 8.00:1 in dark, both
+   already in `tools/palette.mjs`, so this is a colour the gate was watching
+   before it was used here. It is the same green the rest of the page uses for
+   the one thing colour is allowed to do to type. */
+.quote-title-tail {
+  color: var(--tone-accent);
+}
+
+/* THE QUOTE, DEMOTED TO SUPPORTING COPY. Smaller than the title and a rung down
+   the ink ladder, which is the second half of the same decision: a hierarchy
+   needs something to be lower as well as something to be higher.
+
+   `--ink-2`, AND IT IS A COLOUR RATHER THAN AN OPACITY. §3 is unambiguous that
+   text is never faded for effect — ancestor opacity folds into the contrast
+   maths, so faded copy genuinely fails it rather than merely looking quieter.
+   `--ink-2` on `--surface` measures 7.56:1 on paper and 8.64:1 in dark, and the
+   pair is now declared in `tools/palette.mjs`; it had never been, despite the
+   card already putting the full ink ramp on that surface in two sections. */
+.quote-body {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--tone-reading);
+  margin-block-start: 1rem;
+  /* `pretty` and not `balance`, unlike the title above: this runs to six lines
+     on the longest case, and balancing a paragraph that long only trims the
+     measure. `pretty` still takes the orphan off the last line. */
+  text-wrap: pretty;
+}
+
+/* A plain gap after the last line of the quote — not `margin-block-start: auto`
+   and a 2.5rem floor pad, which is what pinned this to the bottom of the card
+   and opened the dead band described above. Fixed, so the distance from the
+   quote to the client's name is the same on all four cases; the slack that
+   differs between them is spent by the autos on `.quote-set`, outside the
+   text. */
+.quote-who {
+  margin-block-start: 2.25rem;
+}
+
+.quote-who-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+.quote-who-role {
+  font-size: 0.8125rem;
+  color: var(--tone-ink-3);
+  margin-block-start: 0.125rem;
+}
+
+/* THE POSITION INDICATOR, ON THE ADOPTED PROGRESS.
+
+   IT WAS FOUR DOTS AND IT IS NOW ONE BAR. The dots were hand-drawn spans that
+   had to be argued into not looking pressable; a bar has no such problem,
+   because nobody has ever tried to click a quarter of a progress bar. That is
+   the §2.1 argument in its cheapest form — the primitive removes the failure
+   mode rather than documenting it.
+
+   `aria-hidden` is set at the call site with the reasoning beside it; the short
+   version is that `role="progressbar"` means task completion, and all four
+   cases are already in the accessibility tree in source order.
+
+   ABOVE THE PILE. The dots sat below the front card's bottom edge, pulled up
+   over the three sheets behind with relative positioning so the row still
+   reserved its flow height — a mechanism that existed only because the row was
+   in the wrong place. Above the card it needs none of it: it belongs to the
+   front card, it sits on the front card's own plane, and the pile below it is
+   untouched.
+
+   NARROWER THAN THE CARD, and centred on it. The region is the front card's
+   width, so `margin-inline: auto` centres against the card and not against the
+   column — which is the bug the dots had for as long as they existed, sitting
+   65px left of the card's centre line because they were centred on a wrapper
+   nobody had measured.
+
+   THE TRACK IS 3px, NOT THE 8px THE COMPONENT SHIPS. Eight pixels of moss over
+   a 368px card is a loading bar on a page that is not loading; three is a rule
+   with a filled portion, which is the weight every other line on this page is
+   drawn at. Height is not colour and not behaviour, so this is the class layer
+   doing exactly what §2.3 says it is for. */
+/* THE TRACK AND THE FILL ARE TOKENS, NOT CLASSES ON THE COMPONENT, and that is
+   the fix for a real defect: shadcn's Progress hardcodes `bg-primary/20` and
+   `bg-primary` into its own class strings, so the indicator's colour was decided
+   inside a library component and could not follow anything. It is decided here
+   now, on the region, which is where the pile's other decisions live.
+
+   WHEN A CARD TONE IS PICKED, THIS FOLLOWS IT WITHOUT BEING TOUCHED. The four
+   directions in the tone lab are still being chosen between, so today the pile
+   is one surface and these resolve to one pair. The hook is a single override
+   per tone on the region — `[data-cardstack-region][data-active-tone='sun']` and
+   so on — and it is deliberately NOT shipped empty: an attribute that can only
+   ever hold one value is a mechanism waiting to be believed.
+
+   WHY THE TRACK IS `--hairline-strong` AND NOT SOMETHING LOUDER. It was measured
+   rather than eyeballed, and nothing that can be a track clears 3:1 against the
+   page ground: the accent at 20% is 1.39:1 light and 1.44:1 dark, at 45% it is
+   still 2.24:1 and 2.67:1, and by then it is no longer reading as the UNFILLED
+   remainder. That is not a colour problem, it is what a track is — it has to sit
+   quieter than the fill, and the fill is 8.40:1 and 8.66:1.
+
+   3:1 is also the wrong bar to be reaching for. It is the non-text bar for parts
+   REQUIRED to identify a component; this bar is `aria-hidden` decoration whose
+   whole content — which of four cases is in front — is already in the
+   accessibility tree in source order, and nothing on this page can be operated
+   through it. The bar that does apply is the one this file sets for every other
+   rule it draws: parity, at 1.8, which `--hairline-strong` meets on both grounds
+   (1.98:1 and 2.00:1) and which `tools/palette.mjs` already gates. It is also
+   exactly what the four dots this replaced used, so the swap changed the shape
+   of the indicator and not the weight of it. */
+.stack-progress {
+  /* Both sit on the night band, so both take the band's ladder rather than the
+     page's: --inverse-hairline-strong is 1.87:1 there, the same weight of rule
+     the band draws everywhere else, and sun is 16.09:1. */
+  --stack-track: var(--inverse-hairline-strong);
+  --stack-fill: var(--signal);
+
+  background-color: var(--stack-track);
+  block-size: 3px;
+  inline-size: 5rem;
+  margin-inline: auto;
+
+  /* CLEAR OF THE QUOTATION MARK, which is the number this had wrong first time.
+     The mark's ink rises about 27px above the card's top edge, so a 24px gap put
+     the bar through the middle of it. 3rem leaves 21px of air between the two. */
+  margin-block-end: 3rem;
+
+  /* Both ends of the bar cross-fade over the same 0.34s the pile's transforms
+     take, so a tone change arrives with the card that caused it rather than a
+     frame before or after it. */
+  transition: background-color 0.34s var(--ease-ui);
+}
+
+.stack-progress > [data-slot='progress-indicator'] {
+  background-color: var(--stack-fill);
+  transition:
+    background-color 0.34s var(--ease-ui),
+    transform 0.34s var(--ease-ui);
+}
+
+/* ==========================================================================
+   THE TONE LAB — four directions for the card pile, rendered rather than
+   described
+   --------------------------------------------------------------------------
+   §4 says the palette is under revision, that three directions are to be
+   rendered on `#styleguide` and picked from, and that no rule may hardcode a hue
+   until then. This is that, with four.
+
+   IT EXISTS BECAUSE A TONE WAS COMMITTED TO THE PILE AND REJECTED ON SIGHT. The
+   forest green went onto the real cards, was looked at, and came off. That round
+   trip is the argument for this block: a tone that is going to be judged by
+   looking at it should be looked at HERE, where withdrawing it costs a deleted
+   specimen rather than a reverted section.
+
+   WHAT VARIES AND WHAT DOES NOT. Every direction is three card surfaces — a dark
+   one, paper, sun. Paper and sun are constant across all four; only the dark
+   tone changes. So the choice being put is exactly one colour wide.
+
+   THE SURFACES ARE FIXED IN BOTH THEMES, and that is the answer to "what are the
+   dark-theme counterparts". Sun already is — `--signal` is one value in both
+   themes and this file explains why. Making the other two fixed as well is what
+   makes a direction a DIRECTION: three cards that are the same three cards
+   whatever the page around them is doing, the way a printed card does not change
+   colour when the room does. The consequence is stated rather than hidden — in
+   light the paper card nearly matches the page ground, and in dark the dark card
+   nearly matches it (1.04:1 for direction A) — so in either theme one of the
+   three is carried by its hairline alone.
+
+   THE ACCENT PHRASE ON A DARK CARD IS SUN, NOT MOSS. Moss measures 1.68–2.01:1
+   on these four and fails on every one of them, which is the same failure this
+   file already records for moss on forest. Sun measures 12.90–15.44:1.
+
+   NOTHING HERE IS A TOKEN IN THE SYSTEM. The four candidates are declared on
+   this block and nowhere else, so no section can reach one by accident, and
+   `tools/palette.mjs` is deliberately not taught them: gating a colour is what
+   you do when a colour has been chosen.
+   ========================================================================== */
+
+[data-tonelab] {
+  /* The two constants. */
+  --lab-paper: #f1f0ea;
+  --lab-sun: var(--signal);
+}
+
+[data-tonelab='a'] {
+  --lab-dark: #14170f;
+}
+[data-tonelab='b'] {
+  --lab-dark: #2a221c;
+}
+[data-tonelab='c'] {
+  --lab-dark: #1c2733;
+}
+[data-tonelab='d'] {
+  --lab-dark: #2d1f33;
+}
+
+[data-tonelab] .card {
+  border-radius: var(--radius-stack);
+  box-shadow:
+    0 1px 1px var(--stack-shadow-contact),
+    0 10px 18px -10px var(--stack-shadow-cast);
+}
+
+/* The dark card. It takes the inverse ink ladder, which is the ladder this
+   system already owns for reading on a dark plane, and sun for the accent. */
+/* The dark card, twice: as a plane, and outlined. The pair is the whole
+   question this lab now asks — on the night band a dark plane is 1.04-1.25:1
+   away from its ground, which is at best exactly one hairline's worth of
+   separation, so the ruled version is the one that has an edge to see. */
+[data-tonelab] .card[data-lab='dark'],
+[data-tonelab] .card[data-lab='dark-ruled'] {
+  background-color: var(--lab-dark);
+  border-color: transparent;
+}
+
+[data-tonelab] .card[data-lab='dark-ruled'] {
+  border-color: var(--inverse-hairline-strong);
+}
+[data-tonelab] :is(.card[data-lab='dark'], .card[data-lab='dark-ruled']) .quote-title,
+[data-tonelab] :is(.card[data-lab='dark'], .card[data-lab='dark-ruled']) .quote-who-name {
+  color: var(--inverse-ink);
+}
+[data-tonelab] :is(.card[data-lab='dark'], .card[data-lab='dark-ruled']) .quote-body {
+  color: var(--inverse-ink-2);
+}
+[data-tonelab] :is(.card[data-lab='dark'], .card[data-lab='dark-ruled']) .quote-who-role {
+  color: var(--inverse-ink-3);
+}
+[data-tonelab] :is(.card[data-lab='dark'], .card[data-lab='dark-ruled']) .quote-title-tail {
+  color: var(--signal);
+}
+
+/* The paper card. Fixed light values, so its ink is the light ramp in both
+   themes — every pair here is already in the gate against #f1f0ea. */
+[data-tonelab] .card[data-lab='paper'] {
+  background-color: var(--lab-paper);
+  border-color: #d8d7cc;
+}
+[data-tonelab] .card[data-lab='paper'] .quote-title,
+[data-tonelab] .card[data-lab='paper'] .quote-who-name {
+  color: #14170f;
+}
+[data-tonelab] .card[data-lab='paper'] .quote-body {
+  color: #4a4d42;
+}
+[data-tonelab] .card[data-lab='paper'] .quote-who-role {
+  color: #696d5f;
+}
+[data-tonelab] .card[data-lab='paper'] .quote-title-tail {
+  color: #1a5335;
+}
+
+/* The sun card, on the solved fixed ladder. */
+[data-tonelab] .card[data-lab='sun'] {
+  background-color: var(--lab-sun);
+  border-color: var(--on-signal-hairline);
+}
+[data-tonelab] .card[data-lab='sun'] .quote-title,
+[data-tonelab] .card[data-lab='sun'] .quote-who-name {
+  color: var(--on-signal-ink);
+}
+[data-tonelab] .card[data-lab='sun'] .quote-body {
+  color: var(--on-signal-ink-2);
+}
+[data-tonelab] .card[data-lab='sun'] .quote-who-role {
+  color: var(--on-signal-ink-3);
+}
+[data-tonelab] .card[data-lab='sun'] .quote-title-tail {
+  color: var(--on-signal-accent);
+}
+
+/* The specimen's own type, one rung down from the section's, because three of
+   these sit side by side in a column the real card has to itself. */
+[data-tonelab] .quote-title {
+  font-size: 1.25rem;
+}
+[data-tonelab] .quote-body {
+  font-size: 0.9375rem;
+}
+
+/* SCOPE TAKES THE SAME COMPOSITION. Centred copy, name on the floor at the
+   left — the customer card's arrangement, on the same shell, so the two read as
+   one component rather than two that happen to share a border radius.
+
+   It does not take the quotation mark: those claims are Norrin's own words
+   about itself, and marking them as quoted would be a false statement about
+   where they came from.
+
+   Scoped to an attribute on the list rather than to `.card`, because Scope and
+   the stack are the only two consumers and a third would want to opt in
+   deliberately. */
+[data-rolecards] .card {
+  align-items: center;
+  text-align: center;
+}
+
+[data-rolecards] .card-floor {
+  align-self: stretch;
+  text-align: start;
+}
+
+/* THE CARD LEAVING THE FRONT IS DEALT OUT, NOT COLLAPSED.
+
+   Sliding it back into the pile is the honest default and it is what this did
+   first, but it hides the one moment the section has. So it travels — right,
+   past the container edge, out of the frame — and the section's `overflow-clip`
+   takes it. That is the page's second frame-break (§1.6).
+
+   AN ANIMATION, NOT A TRANSITION, because the path has a waypoint: out, then
+   back to the deepest position. A transition can only interpolate between two
+   values and would cut the corner straight into the pile.
+
+   NOTHING FADES. The card carries text and §3 is unambiguous that text is never
+   faded for effect. The blur is a statement about speed rather than a filter
+   over readable type: it resolves before the card is anywhere a reader could be
+   reading it, and it is gone entirely by the time the card is back on screen. */
+[data-cardstack] > li[data-leaving] {
+  animation: cardstack-deal 0.62s var(--ease-ui) both;
+}
+
+@keyframes cardstack-deal {
+  0% {
+    z-index: calc(var(--stack-count) + 1);
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    filter: blur(0);
+  }
+
+  /* Anticipation — the beat that makes the exit read as a throw rather than a
+     slide, and what turns a straight path into an arc. */
+  20% {
+    z-index: calc(var(--stack-count) + 1);
+    transform: translate(-3%, calc(var(--stack-step) * -0.8)) scale(1.005) rotate(-2.5deg);
+    filter: blur(0);
+  }
+
+  50% {
+    z-index: calc(var(--stack-count) + 1);
+    transform: translate(128%, calc(var(--stack-step) * 1.2)) scale(0.94) rotate(9deg);
+    filter: blur(7px);
+  }
+
+  /* Hidden behind the new front card, sharp again. One frame, and nothing on
+     screen shows the jump: the front card is a pixel or two from home at this
+     point in its own transition, and this card is smaller than it on every
+     edge. */
+  51% {
+    z-index: 0;
+    transform: translate(0, 0) rotate(0deg);
+    filter: blur(0);
+  }
+
+  /* Into the deepest slot — the same position `> li` resolves to at that depth — which is what lets the
+     animation hand over to the transition without a step when `data-leaving`
+     moves on to the next card. */
+  100% {
+    z-index: 0;
+    transform: translate(
+        calc((var(--stack-count) - 1) * var(--stack-drift)),
+        calc((var(--stack-count) - 1) * var(--stack-step))
+      )
+      rotate(0deg);
+    filter: blur(0);
   }
 }
 
@@ -1306,22 +2609,6 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       --drift: 26px;
     }
 
-    /* Sideways travel — the roster slides as you read past it. */
-    [data-scroll='pan'] {
-      animation: scroll-pan linear both;
-      animation-timeline: view();
-      animation-range: entry 0% exit 100%;
-    }
-
-    @keyframes scroll-pan {
-      from {
-        transform: translateX(var(--pan, 60px));
-      }
-      to {
-        transform: translateX(calc(var(--pan, 60px) * -1));
-      }
-    }
-
     /* A slow lean. Capped low on purpose: past about 3deg text stops looking
        alive and starts looking broken. */
     [data-scroll='tilt'] {
@@ -1377,20 +2664,36 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
     }
 
-    /* The header condenses once the page has moved. Deliberately NOT touching
-       the bottom rule: that rule already encodes which section you are reading,
-       and two meanings on one line is one too many. */
-    [data-scroll='condense'] {
-      animation: scroll-condense linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 220px;
-    }
+    /* `condense` USED TO LIVE HERE AND WAS REMOVED FOR PERFORMANCE. It is the
+       one effect in this file that was measurably expensive, and it is worth
+       recording exactly why so it is not rebuilt the same way.
 
-    @keyframes scroll-condense {
-      to {
-        --header-shrink: 1;
-      }
-    }
+       It animated a CUSTOM PROPERTY — `--header-shrink: 0 → 1` on
+       `scroll(root) 0 220px` — which two inline styles in `Nav.tsx` read as
+       `height: calc(72px - 16px * var(--header-shrink))`.
+
+       Two things were wrong with that, and only together do they explain the
+       symptom. First, custom-property animations are NEVER composited: there is
+       no fast path, so every frame goes through style recalculation. Second, the
+       property fed a LAYOUT property, so every one of those frames also ran
+       layout and paint across the entire fixed header subtree — wordmark, five
+       nav items and their rule segments, theme toggle, locale menu, contact
+       button, hamburger.
+
+       That ran for the first 220px of every scroll, which is the hero and
+       nothing else. It is why the reported sluggishness was local to the first
+       screen: it overlapped the deck pin engaging, the curtain scaling 94px of
+       type, four Counter rAF loops and the contour field's own repaints, all in
+       the same band.
+
+       The bar still condenses. It now reads the `scrolled` boolean that
+       `useNavState` was already computing for the bar's bottom rule (`edged`,
+       once the solid/transparent cross-fade it was named for went away),
+       so the height is one 300ms transition on a state flip rather than 220px of
+       per-frame layout. If a scrubbed version is ever wanted back, the only
+       cheap way to build it is a `translateY` on the bar's CONTENTS against a
+       fixed-height bar — never an animated `height`, and never a custom property
+       feeding one. */
 
     /* ======================================================================
        SCENES — one section's scroll range driving several of its elements.
@@ -1529,6 +2832,88 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
       to {
         transform: none;
+      }
+    }
+
+    /* ── CLOSING IN ────────────────────────────────────────────────────────
+       Something that starts scattered and ends in line.
+
+       The reference was a landing-page loop of little cards drifting around a
+       logo forever. Drifting forever is decoration: it sits on top of whatever
+       a section is arguing and says nothing about it. So the drift here
+       RESOLVES, and in the Gap the resolution is the argument — the three
+       stations straighten and take their places over the same scroll ranges the
+       rule reaches them, so "production" is something you watch happen rather
+       than a word printed under a line.
+
+       That also settles the fail-safe question the same way every other part in
+       this file settles it. `from` is the scatter and `to` is the resting
+       layout, so the finished state IS the tidy one: a browser with no scroll
+       timelines, or a reader who asked for less motion, gets the aligned
+       composition rather than a heap that never got tidied.
+
+       IT NEVER TOUCHES OPACITY, and unlike `land` it does not get to. `land`
+       may fade because it only ever animates decorative, `aria-hidden` marks; a
+       scrubbed fade on TEXT would hold body copy at every partial opacity
+       between 0 and 1 as a function of scroll position, and axe folds ancestor
+       opacity into its contrast maths. This part carries paragraphs, so the
+       travel is the whole of the arrival.
+
+       INDIVIDUAL `translate` / `rotate` / `scale`, NOT `transform`, and this is
+       the one place in the file that gets to avoid a workaround the rest of it
+       needs. The Gap's crossing mark is built as two nested boxes for exactly
+       one reason — an animation on `transform` REPLACES a class-based
+       `transform` on the same element instead of composing with it, so the
+       centring translate had to move to a parent. The individual properties
+       compose, so a converging element can carry a utility transform (an
+       `origin-*`, a `-translate-*`) and still be animated. Two boxes are still
+       used at the call site, but for a different and better reason — the float
+       and the converge run on different ranges, and one element can hold only
+       one `animation-range`. */
+    [data-scene-part='converge'] {
+      animation-name: scene-converge;
+      --scrub-ease: var(--ease-entrance);
+      animation-range: var(--scene-from, contain 62%) var(--scene-to, contain 92%);
+    }
+
+    @keyframes scene-converge {
+      from {
+        translate: var(--adrift-x, 0) var(--adrift-y, 0);
+        rotate: var(--adrift-rot, 0deg);
+        scale: var(--adrift-scale, 1);
+      }
+      to {
+        translate: 0 0;
+        rotate: 0deg;
+        scale: 1;
+      }
+    }
+
+    /* The parallax underneath it. Each element is given its own `--float-from`
+       / `--float-to`, which is the whole of the depth effect: things moving at
+       different rates read as different distances from the reader, with no
+       perspective, no z translation and nothing for a compositor to think
+       about.
+
+       It runs the FULL `contain` range while `converge` runs only a window
+       inside it, so for most of the hold the elements are simply adrift and the
+       closing-in is a distinct, late event rather than something that was
+       happening all along.
+
+       Rest is 0, deliberately — no static `translate` outside the keyframes.
+       With no timeline the element sits exactly where layout put it, which is
+       the settled composition the contract above promises. */
+    [data-scene-part='float'] {
+      animation-name: scene-float;
+      animation-range: var(--scene-from, contain 0%) var(--scene-to, contain 100%);
+    }
+
+    @keyframes scene-float {
+      from {
+        translate: 0 var(--float-from, 0px);
+      }
+      to {
+        translate: 0 var(--float-to, 0px);
       }
     }
 
@@ -1716,57 +3101,6 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
     }
 
-    /* ANCHORED MASCOTS, MOVING WITHOUT LEAVING THEIR ANCHOR.
-       -------------------------------------------------------------------
-       Every mascot that touches something on this page is rendered
-       `animated={false}`, and `anchors.ts` explains why: the idle float in
-       nori.css TRANSLATES the drawing vertically, so a figure placed to rest on
-       a rule spends most of its cycle about 8px off it — at a 112px mascot that
-       is most of the contact. The rule was right and its conclusion was too
-       broad. What breaks an anchor is not motion, it is motion that MOVES THE
-       CONTACT POINT.
-
-       A rotation about that point leaves it fixed, exactly, at every angle.
-       So the pivot is the anchor: `--pivot` takes the same measured value the
-       placement already uses to put the figure there — the seat line for `sit`,
-       the sole for a standing pose, the bottom edge for `peek` — and the figure
-       rocks around the thing it is holding on to instead of drifting off it.
-
-       Scroll-driven rather than idle, like everything else here: it rocks
-       because you are moving, which is a character reacting to the page rather
-       than a decoration running on a timer. One full cycle across the whole
-       pass, so it is never caught mid-lurch at rest.
-
-       The wrapper carrying this MUST be `flex` (or otherwise not a plain block
-       around an inline-block). `<Nori>` renders an inline-block, a block parent
-       adds the line box's descender to its own height, and `transform-origin`
-       percentages resolve against that inflated box — which silently moves the
-       pivot off the anchor. Same trap the Gap stations hit when their feet came
-       out 7px above the rail. */
-    [data-scroll='nori-sway'] {
-      animation: nori-sway linear both;
-      animation-timeline: view();
-      animation-range: entry 0% exit 100%;
-      transform-origin: var(--pivot, 50% 100%);
-    }
-
-    /* TWO cycles across the pass, not one. At one cycle the figure turns 4.8deg
-       over a thousand pixels of scroll, which does not read as a character
-       rocking — it reads as a drawing slowly going crooked. Repetition is what
-       separates "alive" from "drifting", and it is the same reason the idle
-       float this replaces was a loop rather than a lean. */
-    @keyframes nori-sway {
-      0%,
-      50%,
-      100% {
-        transform: rotate(var(--sway, 3deg));
-      }
-      25%,
-      75% {
-        transform: rotate(calc(var(--sway, 3deg) * -1));
-      }
-    }
-
     /* SEAM 2 — the dark block leaving.
        -------------------------------------------------------------------
        `01 The gap` cannot be a deck card. It is 300svh+ tall because of the
@@ -1922,13 +3256,1143 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       transform-origin: left top;
     }
 
+    /* TRANSLATE ONLY. The `scale(0.93)` that used to be here is gone, and it is
+       the single most expensive thing this seam was doing.
+
+       A transform is normally free — the compositor moves a cached texture and
+       never repaints. Scaling TEXT is the exception: glyphs are rasterised at a
+       given size, so a container being scaled through 100%→93% has to re-raster
+       its type at a new size on every frame it can be bothered to. This
+       container holds `display-1` at up to 94px of Fraunces, which is the
+       largest and most expensive text on the page, and it was being re-rastered
+       throughout the first 60svh of scroll — exactly the stretch where the deck
+       is also pinning and the section above is riding over.
+
+       Losing the scale costs almost nothing to look at. The content still lifts
+       away as the card holds, which is the whole gesture; it simply stops
+       pretending to recede in z at the same time. One idea, done cheaply, beats
+       two ideas that make the page stutter. */
     @keyframes scroll-curtain {
       from {
         transform: none;
       }
       to {
-        transform: translateY(-40px) scale(0.93);
+        transform: translateY(-40px);
       }
     }
+  }
+}
+
+/* ==========================================================================
+   THE CONTOUR FIELD
+   --------------------------------------------------------------------------
+   Colour lives in the `--contour` tokens at the top of this file. There is no
+   motion here any more, and the removal is the fix for a real, reported problem
+   rather than a tidy-up — so what was here and why it went is recorded.
+
+   IT USED TO DRIFT. Two time-based loops: the dashed contours marched their
+   dash pattern (`stroke-dashoffset`, 90s), and the whole field breathed 0.4% of
+   scale (40s). The intent was a ground you cannot catch moving — you only
+   notice, coming back, that it is not quite the same picture.
+
+   BOTH WERE EXPENSIVE IN THE WORST POSSIBLE PLACE.
+
+     - `stroke-dashoffset` is a PAINT property. It has no compositor fast path,
+       so all 58 dashed paths repainted on every frame.
+     - The breathe scaled the `<svg>`, whose paths carry
+       `vector-effect: non-scaling-stroke`. Stroke width then has to be re-solved
+       in device space at each new scale, which defeats layer caching and forces
+       a full re-raster of all 87 paths.
+     - Both were `infinite`, and they sit behind a card that is `position:
+       sticky` for a 100svh deck hold. So the hero repainted continuously for the
+       entire time it was on screen — which is precisely the hero-to-Gap
+       transition that was reported as sluggish.
+
+   The field is static now and looks the same in every still frame. If drifting
+   is ever wanted back, the only affordable version is a `transform: translate`
+   on a group with a plain stroke — never a dash offset, and never a scale on a
+   non-scaling-stroke tree.
+   ========================================================================== */
+
+/* ==========================================================================
+   THE TRACK RECORD TIMELINE  (#proof)
+   --------------------------------------------------------------------------
+   A horizontal rail with the stations' cards alternating above and below it,
+   falling back to a vertical rail below 768px. Written here rather than as
+   utilities at the call site because §2.4 is absolute: `Proof.tsx` names no
+   colour, and the rail's whole argument is carried in colour and dash.
+
+   WHO OWNS WHICH SEGMENT. Each station owns the segment LEAVING it, toward the
+   next station. That is the only ownership that lets the dash be driven off the
+   `future` flag rather than off an index: the segment leading TO 2027 belongs to
+   2025, and it is dashed because *the station it arrives at has not happened*.
+   Read the other way round — each station owning its incoming segment — the
+   flag would sit on the right item, but the last station would then own a
+   segment pointing at nothing.
+
+   THREE STATES, AND THEY ARE NOT DECORATION.
+
+     solid + dim      `--hairline-strong`. The track as built. Always painted,
+                      never animated, so the rail exists at scroll offset zero
+                      and in every browser.
+     solid + accent   the fill. Scroll-driven, scaleX/scaleY from 0 to 1, and it
+                      exists ONLY on the two segments that end at 2024 and 2025.
+                      It cannot reach 2027 because there is nothing there to
+                      reach.
+     dashed           `--inactive`, static. 2025 to 2027, and the trail past
+                      2027. Nothing about it can ever fill.
+
+   That is a §3 honesty constraint wearing a stylesheet. A progress line that
+   ran to the end of the rail would assert a completed public listing.
+
+   FAIL-SAFE. The dim rail, the dashes, the nodes and the pills are all static
+   CSS. The only animated things are the accent fill (scaleX from 0, on top of a
+   line that is already there) and the cards' clip-path wipe, both of which live
+   inside the `@supports (animation-timeline: view())` block above and are
+   killed outright by the reduced-motion block. In a browser with no scroll
+   timelines, and for a reader who asked for less motion, the rail renders
+   complete: full accent fill through 2025, dashed thereafter, four cards. There
+   is no state in which a milestone is hidden by something that failed to run.
+
+   WHY THIS IS CSS AND NOT A COMPONENT. Named once, here, so that a future
+   reader of a repo that is adopting shadcn does not "fix" this by reaching for
+   a primitive that cannot do the job. Checked against the live registry with
+   the repo owner, and decided with them:
+
+     - shadcn ships NO Timeline component, and nothing that draws an axis.
+     - Separator is a `<div role="separator">` with no behaviour and no fill. It
+       cannot be a progress track at all.
+     - Progress is visually right and mechanically wrong: its fill is driven by
+       a JS `value` prop. Feeding that from scroll position needs a scroll
+       listener, which is the precise failure class §3 keeps the ban for — the
+       stranding defect lives in scroll, not in component state.
+     - Keeping Progress's markup and driving its fill from CSS instead of its
+       `value` prop is forking the component's behaviour, which §2.3 bans
+       outright: a patched component stops receiving upstream fixes.
+     - The nodes have no shadcn equivalent either — there is no dot primitive —
+       so a fully-componentised timeline is not reachable even in principle.
+
+   So the track, its fill, the dashed segment and the nodes are CSS, driven by
+   the named `--scene` timeline. That is a decision, not a hand-roll by default.
+
+   RADIUS, AND A CONFLICT WITH CLAUDE.md §4 THAT IS BEING RECORDED RATHER THAN
+   QUIETLY RESOLVED. §4 lists "the timeline nodes" among the things that stay
+   square, on the grounds that the rail is a PLANE. The nodes here are CIRCLES,
+   at the repo owner's explicit instruction, and the argument for it is that a
+   circle is not a radiused rectangle: a station on a line is a POINT, and a
+   point has no corners to round off in the first place. `border-radius: 999px`
+   on an equal-sided box is how you draw a disc in CSS, not how you soften a
+   square into an object. The plane/object distinction survives — the rail's own
+   ends stay square, and nothing else here gained a corner — but §4's sentence
+   naming timeline nodes as square is now out of date and should be amended in
+   the open, the way the radius entry itself was. Flagged, not edited from here.
+
+   The pills and the cards are objects on the plane, and take `--radius-action`
+   and `--radius-panel` respectively.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   THE NARROW BRANCH — vertical, and it is the default rather than the
+   override. Four cards cannot sit across a 390px phone; below 768px the same
+   device turns ninety degrees, which is how TheGap already handles its own
+   narrow fallback.
+   -------------------------------------------------------------------------- */
+
+.tl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tl-item {
+  /* The positioned ancestor for the VERTICAL segment. `.tl-mark` is left
+     static in this branch on purpose: the segment has to reach from this
+     station's node to the next one, and the <li> is the only box that knows how
+     far that is. In the wide branch the mark becomes the positioned ancestor
+     instead and the same element spans one column. */
+  position: relative;
+  padding-block-end: 2.25rem;
+}
+
+.tl-item:last-child {
+  padding-block-end: 0;
+}
+
+/* The station itself: node, then date pill, on the line.
+   The fixed 1.5rem height is load-bearing, not a round number — half of it is
+   where the rail sits, in both orientations, and both segment offsets below are
+   written as `0.75rem`. A pill that could grow would move the rail. */
+.tl-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  block-size: 1.5rem;
+}
+
+/* A DISC, 14px across — see the radius note in the block header. Equal sides
+   plus `--radius-action`, which is the 999px pill token doing what it does on a
+   square box: draw a circle. Not `border-radius: 50%` on an arbitrary
+   rectangle, and not a value typed at the call site.
+
+   14px against a 1px rail is deliberate. At 9px the stations read as ticks on
+   the line rather than as points ON it, which is the note that sent this back.
+   Its centre is 7px from the leading edge, which is where the vertical segment
+   is drawn.
+
+   The rail passes THROUGH it, not into it: the segment leaving a station is
+   inset to 0 — the node's own leading edge — so it runs behind the disc
+   (`z-index` 0 against the node's 1) and emerges on the far side, while the
+   segment arriving from the previous station ends at that same edge. Line in
+   one side, line out the other. */
+.tl-node {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  box-sizing: border-box;
+  inline-size: 14px;
+  block-size: 14px;
+  border-radius: var(--radius-action);
+  background-color: var(--accent);
+}
+
+/* HOLLOW, for the station that has not happened: a ring of the same diameter,
+   no fill, and opaque enough that the rail still disappears behind it and comes
+   out the other side.
+
+   A border rather than an inset box-shadow: §2.7 bans shadows outright, and "it
+   is only being used as a border" is exactly the argument that gets one
+   shipped. 1.5px so the ring holds its weight at 14px — a hairline ring on the
+   light ground reads as a smudge. */
+.tl-item[data-ahead] .tl-node {
+  border: 1.5px solid var(--inactive);
+  background-color: var(--ground);
+}
+
+/* An object on the rail, so it is radiused — and it is opaque, so the line
+   passes behind it rather than through the type. */
+.tl-pill {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  block-size: 1.5rem;
+  padding-inline: 0.5rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-action);
+  background-color: var(--surface);
+  color: var(--accent);
+}
+
+.tl-item[data-ahead] .tl-pill {
+  color: var(--ink-3);
+}
+
+/* The un-filled rail. Painted always, in every browser, at every scroll
+   offset — the fill is a second element on top of this one, never a
+   replacement for it. */
+.tl-seg {
+  position: absolute;
+  z-index: 0;
+  inset-block: 0.75rem -0.75rem;
+  /* The node's centre: half of its 14px. Not a nudged number. */
+  inset-inline-start: 6.5px;
+  inline-size: 1px;
+  background-color: var(--hairline-strong);
+}
+
+/* Nothing after the last station in this branch. The trailing dash is a
+   wide-branch device for §1.6 and there is no container edge to run off here. */
+.tl-item:last-child .tl-seg {
+  display: none;
+}
+
+/* A gradient rather than `border-style: dashed`, so the dash direction is set
+   per orientation without the box changing size — a dashed border would need
+   `height: 0` in one branch and `width: 0` in the other, and the fill inside it
+   would then have nothing to fill. */
+.tl-seg[data-dash] {
+  background-color: transparent;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--inactive) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+/* The accent fill. Two elements, not one responsive element, for the reason the
+   rail already had: `rule` and `rule-v` are different keyframes (scaleX vs
+   scaleY) and a `data-*` value cannot be switched at a breakpoint. Exactly one
+   is displayed at a given width. */
+.tl-fill {
+  position: absolute;
+  inset: 0;
+  background-color: var(--accent);
+}
+
+.tl-fill-h {
+  display: none;
+}
+
+.tl-card {
+  margin-block-start: 0.75rem;
+  margin-inline-start: 1.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-panel);
+  background-color: var(--surface);
+  padding: 1.125rem 1.25rem 1.25rem;
+}
+
+.tl-title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.tl-body {
+  margin-block-start: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+/* --------------------------------------------------------------------------
+   THE WIDE BRANCH — horizontal, from 768px.
+   -------------------------------------------------------------------------- */
+
+@media (min-width: 48rem) {
+  /* Three rows: cards above, the rail, cards below. The outer two are `1fr` so
+     they resolve EQUAL, which puts the rail at exactly 50% of the block's
+     height and makes the composition symmetric about the line rather than
+     leaning to whichever side happened to draw the taller card. (H = 2R + 2G +
+     1.5rem, so H/2 = R + G + 0.75rem, the mark row's centre. It is arithmetic,
+     not a nudge.)
+
+     `column-gap` is ZERO and cannot be anything else: the nodes sit at each
+     column's leading edge and each segment spans its own column, so a column
+     gap would leave a hole in the rail between every pair of stations. The gap
+     between cards is paid by the card's own trailing margin instead. */
+  .tl {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+    row-gap: 1.5rem;
+    column-gap: 0;
+  }
+
+  /* `subgrid` so the rail row is the SAME row for all four items. Without it
+     each <li> would split its own height and the four segments would sit at
+     four different heights. If a browser drops it the item is still a grid, the
+     card and the mark still stack in the right order, and every milestone is
+     still legible — it just stops being a straight line. */
+  .tl-item {
+    grid-row: 1 / -1;
+    display: grid;
+    grid-template-rows: subgrid;
+    padding-block-end: 0;
+  }
+
+  .tl-mark {
+    grid-row: 2;
+    /* Now the positioned ancestor, so the segment spans one column: node to
+       node, exactly. */
+    position: relative;
+  }
+
+  .tl-seg {
+    inset-block: 0.75rem auto;
+    inset-inline: 0;
+    inline-size: auto;
+    block-size: 1px;
+  }
+
+  .tl-seg[data-dash] {
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--inactive) 0 4px,
+      transparent 4px 8px
+    );
+  }
+
+  /* §1.6, break the frame. The rail does not stop politely inside the
+     container: past the last station it runs on, dashed and fading, through the
+     gutter and off the container's edge. It asserts nothing — there is no
+     station on it — which is the point. It says the line is unfinished.
+
+     The mask is alpha, not colour: a mask gradient's channels are discarded and
+     only its alpha is read, so `rgb(0 0 0)` here means "opaque", not black. */
+  .tl-item:last-child .tl-seg {
+    display: block;
+    inset-inline: 0 calc(-1 * var(--spacing-gutter));
+    mask-image: linear-gradient(to right, rgb(0 0 0) 0 20%, rgb(0 0 0 / 0) 100%);
+  }
+
+  .tl-fill-h {
+    display: block;
+  }
+
+  .tl-fill-v {
+    display: none;
+  }
+
+  /* ALTERNATION. Even stations above the rail, odd below — the horizontal
+     translation of the reference's left/right alternation, and the thing that
+     stops this section tracing the same rectangle as its neighbours (§1.5). A
+     four-across card row is a band; this is not. */
+  .tl-item[data-side='above'] .tl-card {
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .tl-item[data-side='below'] .tl-card {
+    grid-row: 3;
+    align-self: start;
+  }
+
+  .tl-card {
+    margin-block-start: 0;
+    margin-inline-start: 0;
+    /* The column gap, paid here rather than by `column-gap` — see above. */
+    margin-inline-end: 1.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .tl-card {
+    padding: 1.5rem;
+  }
+
+  .tl-title {
+    font-size: 1.125rem;
+  }
+}
+
+/* ==========================================================================
+   SCOPE — THE FOUR ROLES, IN THREE TONES
+   --------------------------------------------------------------------------
+   The row used to be four cards on one surface. It is now a set: a dark card, a
+   pale card and a sun card, with the pale one repeating. Which card takes which
+   tone, and why the repeat is the quiet one, is argued in `Roles.tsx` at THE ROW
+   IS A SET OF TONES — that is a composition decision and it belongs beside the
+   composition. What lives here is every colour behind those three names, so the
+   call site can say `data-tone="signal"` and write no colour at all (§2.4).
+
+   IT REUSES `data-tone`, WHICH THIS FILE ALREADY HAS. There was a live
+   temptation to invent `data-cardtone` and end up with two attributes meaning
+   the same thing. The existing machinery is `[data-tone='inverse']` — the
+   forest bands, which carry the inverse ink sets and the sun focus ring. These
+   are new VALUES on that attribute, not a parallel system, and the values are
+   deliberately not `inverse`: everything that reads the attribute matches it
+   exactly, and a 368px card is not a reason to claim a whole plane has flipped.
+   `tools/audit.mjs` and `tools/shot.mjs` query the same exact string and are
+   equally unaffected.
+
+   THE NAV NO LONGER READS IT AT ALL. `useNavState` used to observe
+   `[data-tone="inverse"]` and flip the header's palette to match whatever was
+   under it; the bar has its own `--ground` now and that observer is gone. The
+   attribute stays on the sections, which is where it was always doing the real
+   work.
+
+   --------------------------------------------------------------------------
+   THE DARK TONE IS A PLACEHOLDER, AND THIS IS THE FLAG (§4)
+   --------------------------------------------------------------------------
+   The palette is under revision and the dark tone is the value being chosen.
+   Four candidates are rendered on `#styleguide` as `[data-tonelab]` a-d:
+
+     a  ink        #14170f   — the light theme's own `--ink`, a near-black green
+     b  espresso   #2a221c
+     c  slate      #1c2733
+     d  aubergine  #2d1f33
+
+   `--role-dark` below is candidate A, because it is the one value of the four
+   that this system already ships (it is `--ink`'s light value and
+   `--on-signal-ink` verbatim), so the placeholder introduces no colour that is
+   not already in the file. WHEN THE PICK LANDS THIS IS A ONE-LINE EDIT, and the
+   only other thing it touches is the four `role-dark` entries in
+   `tools/palette.mjs`, which have to be re-measured against the new value. All
+   four candidates clear the whole inverse ladder — measured, not assumed:
+   `--inverse-ink-3` is the tightest rung and runs 5.97:1 (slate) to 6.65:1
+   (ink), and `--inverse-hairline-strong` runs 1.91:1 to 2.09:1 against the same
+   bar the paper hairlines are solved to.
+
+   --------------------------------------------------------------------------
+   THE TONES ARE FIXED IN BOTH THEMES, AND THAT IS THE DECISION HERE
+   --------------------------------------------------------------------------
+   `--signal` is already a single value in both themes — the file says so and
+   `--on-signal-*` exists because of it. The other two tones are now the same,
+   and the alternative was tried first and does not survive contact with the dark
+   theme: leave the pale tone as `--surface` and it computes to #161b17 in dark,
+   while `--role-dark` computes to #14170f, and the two tones the row is built on
+   measure 1.04:1 apart. Three tones collapse into "one yellow card and three
+   black ones". A set whose members change their relationship to each other when
+   the theme flips is not a set.
+
+   So the row is a fixed composition on a theme-following page, the way a
+   photograph is (§1.8 is the same instinct pointed at imagery). §1.1 asks a
+   surface to commit or get out of the way; this commits.
+
+   THE PALE TONE IS THE LIGHT RAMP, WHOLE. Not a new ink ladder — `#f1f0ea` is
+   `--surface`'s light value and #14170f / #4d5744 / #696d5f / #d8d7cc are the
+   light `--ink` / `--reading` / `--ink-3` / `--hairline`, every pair of which is
+   already gated against exactly that background. The dark tone takes the
+   `--inverse-*` ladder, which is the ladder this system already owns for reading
+   on a dark plane, and the sun tone takes `--on-signal-*`, which exists for
+   precisely this and nothing else.
+
+   ON "SUN IS A SIGNAL, NEVER A SURFACE", stated at the head of this file. That
+   line was already superseded before this block: `--on-signal-ink-2/-3` and
+   `--on-signal-hairline` were added with a note saying they exist because "the
+   customer pile now sets a whole CARD on sun", and `#styleguide`'s tone lab
+   renders a sun card in every one of its four directions. This is the third
+   consumer of a rule that has been false for a while. It is flagged rather than
+   edited here because this block is append-only by agreement; the header line at
+   the top of the file is the thing that needs the amendment.
+
+   NO SHADOW (§2.7). Three tones and a hairline are the separation. The one
+   shadow in this system belongs to the customer pile and is not reachable here.
+   ========================================================================== */
+
+:root {
+  /* Candidate A. See the flag above. One line to swap. */
+  --role-dark: #14170f;
+  /* The pale tone, fixed. The same values the tone lab holds fixed. */
+  --role-paper: #f1f0ea;
+  --role-paper-hairline: #d8d7cc;
+  --role-paper-ink: #14170f;
+  --role-paper-reading: #4d5744;
+  --role-paper-ink-3: #696d5f;
+
+  /* THE FOURTH TONE, AND IT IS NOT A NEW COLOUR. Four cases and three tones
+     meant paper appeared twice, so two of the four cards were the same white.
+     `--ink-2`'s light value is a warm dark grey that already exists in this
+     system, is not green, and sits between paper and `--role-dark`, so the four
+     cards read as a ladder instead of three tones and a repeat. §4 has the
+     palette under revision and this expands nothing: the hue is one the file
+     already declares, used as a surface rather than as ink.
+
+     ITS TWO ALPHAS ARE SOLVED, NOT PICKED, which is the same thing this file
+     does for `--inverse-inactive` and for the sun ladder. On stone the inverse
+     ramp's third rung measures 4.02:1 and the strong hairline 1.73:1 — both
+     under their bars — so each is re-solved against this ground: 0.72 gives
+     4.79:1 and 0.28 gives 2.00:1. The hue is `--inverse-ink` in both cases.
+
+     STONE SEPARATES AS A FIELD, which the dark tone does not: 2.19:1 from the
+     night band and 2.10:1 from the dark card. It still draws its rule, because
+     every other card here draws one and a card that stopped would read as a
+     different kind of object. */
+  --role-stone: #4a4d42;
+  --role-stone-hairline: color-mix(in srgb, var(--inverse-ink) 28%, transparent);
+  --role-stone-ink-3: color-mix(in srgb, var(--inverse-ink) 72%, transparent);
+}
+
+/* The tone is declared on the `<li>` and consumed on the `.card` inside it, so
+   the grid cell carries the name and the object carries the paint. Five
+   variables, one per thing a card can colour; a tone that left one unset would
+   inherit the page's theme-following value and break the fixed-composition rule
+   above, so all three tones set all five. */
+[data-rolecards] > li,
+[data-rolecards] > li[data-tone='paper'] {
+  --tone-surface: var(--role-paper);
+  --tone-hairline: var(--role-paper-hairline);
+  --tone-ink: var(--role-paper-ink);
+  --tone-reading: var(--role-paper-reading);
+  --tone-ink-3: var(--role-paper-ink-3);
+}
+
+/* The strong hairline, not the plain one. On the pale and sun tones the card's
+   edge is drawn against a ground far away from it in lightness and the ordinary
+   rule is enough; the dark card on the dark ground measures 1.04:1 as a field,
+   and its edge is the only thing that says a card is there at all. */
+[data-rolecards] > li[data-tone='dark'] {
+  --tone-surface: var(--role-dark);
+  --tone-hairline: var(--inverse-hairline-strong);
+  --tone-ink: var(--inverse-ink);
+  --tone-reading: var(--inverse-ink-2);
+  --tone-ink-3: var(--inverse-ink-3);
+}
+
+[data-rolecards] > li[data-tone='signal'] {
+  --tone-surface: var(--signal);
+  --tone-hairline: var(--on-signal-hairline);
+  --tone-ink: var(--on-signal-ink);
+  --tone-reading: var(--on-signal-ink-2);
+  --tone-ink-3: var(--on-signal-ink-3);
+}
+
+/* Unlayered, so these beat the `text-reading` / `text-ink` utilities `Card.tsx`
+   sets — Tailwind's utilities live inside `@layer utilities`, and an unlayered
+   rule outranks a layered one whatever the specificity says. That is the same
+   mechanism `[data-rolecards] .card` above already relies on, not a new trick.
+
+   `.card` itself is untouched. The customer stack shares that shell and every
+   declaration here is scoped behind `[data-rolecards]`. */
+[data-rolecards] > li > .card {
+  background-color: var(--tone-surface);
+  border-color: var(--tone-hairline);
+}
+
+[data-rolecards] > li > .card > .body-serif {
+  color: var(--tone-reading);
+}
+
+[data-rolecards] > li > .card > .card-floor {
+  color: var(--tone-ink);
+}
+
+/* Scope renders no `note` today. The rung is bound anyway because a tone that
+   colours four of a card's five slots is a trap for whoever fills the fifth,
+   and all three values are gated. */
+[data-rolecards] > li > .card > .caption {
+  color: var(--tone-ink-3);
+}
+
+/* ==========================================================================
+   SCOPE — THE ROW
+   --------------------------------------------------------------------------
+   The four roles used to be a 2x2. They are now a three-across row: one card
+   popped out at the front, one legible card either side of it with a real gap
+   between them, one card hidden behind the front one, and real controls under
+   the row. `CardSlider.tsx` carries the argument for the shape and for the
+   accessibility posture; what lives here is the arithmetic, the tone, and the
+   two rules the arithmetic is solved against.
+
+   --------------------------------------------------------------------------
+   IT IS THE CUSTOMER PILE'S OPPOSITE, ON PURPOSE (§1.5)
+   --------------------------------------------------------------------------
+   `[data-cardstack]` above steps four cards down and to the right from
+   `transform-origin: 0% 0%`, all at one size, all overlapping, and deals the
+   leaving card off the right edge of the page. Every one of those is inverted
+   here: the origin is the centre, the composition is symmetric about a vertical
+   line, the cards do not overlap at all, they differ in size, and nothing leaves
+   the frame. Two sections tracing one outline is the failure §1.5 calls the most
+   important line in the file, and `#work` is on this page already.
+
+   --------------------------------------------------------------------------
+   NOTHING RECEDES BY FADING (§3). THIS IS THE TONE THAT REPLACES THE OPACITY
+   --------------------------------------------------------------------------
+   The reference this row was directed from fades its side cards toward white.
+   That is not available: ancestor opacity folds into the contrast maths, so
+   faded copy does not merely look weaker, it genuinely fails.
+
+   So the flanking cards recede on three things that are not opacity — SIZE (a
+   scale step per depth), a real measured SURFACE, and a BLUR (see
+   `--slide-blur`, which is the one that resolves what the other two could not).
+   The surface is measured rather than guessed. `--role-muted` is `--hairline`'s
+   light value, #d8d7cc — a value this system already ships, which is the same
+   discipline the three tones above were chosen under. Against it:
+
+     ink      #14170f  12.52:1     the role name on the card floor
+     ink-2    #4a4d42   5.97:1     the third rung, see below
+     reading  #4d5744   5.25:1     the claim, in serif
+     edge     #88967e   2.16:1     the card's own hairline
+
+   All four are in `tools/palette.mjs` and all four must keep passing. They are
+   what the RESTING, SHARP card is measured at — which is every card in the
+   reduced-motion layout, and every card that reaches the front here. The blur
+   does not retire them and must not be used as an argument for retiring them: a
+   filter changes no ratio, and the layout it does not apply to is a reading
+   surface.
+
+   THE THIRD RUNG IS ink-2, NOT ink-3, AND THAT IS A MEASUREMENT. `--ink-3`
+   (#696d5f) lands at 3.67:1 on this surface and fails. Scope renders no
+   `.caption` today, so nothing paints it — but a tone that leaves one of a
+   card's five slots bound to a failing value is a trap for whoever fills the
+   fifth, so the rung resolves one step up the same ladder to a value that
+   passes. It is a real colour from the real ramp, not a nudged hex.
+
+   ON THE MUTED TONE BEING FIXED IN BOTH THEMES. It is, like the three tones
+   above it and for the reason argued there: a set whose members change their
+   relationship to each other when the theme flips is not a set. #d8d7cc reads
+   as set-back on the light ground (1.35:1 against it, so the card is a field
+   rather than an outline) and as a grey plate on the dark one (13.05:1), and in
+   both cases it is unmistakably quieter than the sun card beside it.
+
+   --------------------------------------------------------------------------
+   THE TONES ARE THE SECTION'S OWN, RE-KEYED FROM GRID POSITION TO DEPTH
+   --------------------------------------------------------------------------
+   The three tones bound above under SCOPE — THE FOUR ROLES, IN THREE TONES are
+   the FLAT layout's composition and are untouched, including the dark tone's §4
+   flag: `--role-dark` remains candidate A and remains a one-line swap. What this
+   block adds is a fourth tone and a second keying — `data-depth` rather than
+   `data-tone` — which applies only while the row is a row.
+
+   These rules sit AFTER that block with the same specificity (0,2,1), so source
+   order decides and depth wins over grid position, which is the whole reason
+   this file is appended to rather than edited in place.
+
+   WHY DEPTH AND NOT THE ITEM. If the tone travelled with the card, the row would
+   be a different arrangement of colour every five seconds. Keyed to depth, the
+   composition holds still and the cards move through it. It also makes the
+   repeated tone repeat for a structural reason rather than a chosen one: the two
+   flanking cards are the same depth, so they are the same tone.
+
+   SUN AT THE FRONT IS WHAT MAKES THE ACTIVE CARD UNMISTAKABLE. It is the only
+   saturated object in the section, on both grounds, because all four tones here
+   are fixed.
+
+   --------------------------------------------------------------------------
+   ONE SHADOW, AND WHY IT IS ALLOWED HERE (§2.7)
+   --------------------------------------------------------------------------
+   §2.7 permits a shadow for "a genuinely floating layer" and refuses it
+   everywhere else. The front card is asked to read as POPPED OUT of the row
+   rather than as the middle item of three, and a card lifted off a plane is that
+   case — it is the same clause the customer pile spends, for the same physical
+   reason. It is on the front card only; the two beside it separate on a hairline
+   like everything else on this page.
+
+   It is deliberately small: a 1px contact edge and one soft cast, on the tokens
+   the pile already declares, which are .06 alpha on paper — the band Solita's
+   own four-step elevation scale uses and the only band this file has ever
+   allowed. No new shadow token is minted.
+
+   --------------------------------------------------------------------------
+   THE COLOUR TRANSITION, AND WHERE ITS UGLY MIDPOINT GOES
+   --------------------------------------------------------------------------
+   Tone and position travel together over one 0.5s, because a tone that snapped
+   at t=0 would repaint the front card before it had begun to move. Interpolating
+   a background and its ink at the same time means the midpoint is not a gated
+   pair — so the question is not whether that happens but where.
+
+   Here it is bounded rather than hidden: every swap in the row is sun<->muted,
+   two light surfaces whose ink is #14170f at both ends and whose backgrounds
+   interpolate between #f6f279 and #d8d7cc. Nothing crosses, nothing inverts, and
+   the worst midpoint on that path is still a dark ink on a light field. The
+   paper/dark swap that WOULD invert only exists in the flat layout, where
+   nothing transitions at all.
+   ========================================================================== */
+
+/* THE MUTED TONE. Five variables, one per thing a card can colour, exactly like
+   the three tones above — a tone that left one unset would inherit the page's
+   theme-following value and break the fixed-composition rule they are all built
+   on. Every value is one this system already ships. */
+:root {
+  --role-muted: #d8d7cc;
+  /* Lichen, not the strong hairline. #b3b3a5 is 1.46:1 on this surface — under
+     the parity bar every rule in this file is solved to, because the surface
+     has moved down the ramp toward it. #88967e reaches 2.16:1, the same weight
+     of line the paper hairlines draw on their own grounds. */
+  --role-muted-hairline: #88967e;
+  --role-muted-ink: #14170f;
+  --role-muted-reading: #4d5744;
+  /* ink-2, not ink-3 — #696d5f is 3.67:1 here and fails. See the header. */
+  --role-muted-ink-3: #4a4d42;
+}
+
+/* --------------------------------------------------------------------------
+   THE RESTING LAYOUT IS THE GRID, AND THAT IS DELIBERATE.
+
+   Everything about the row is inside `prefers-reduced-motion: no-preference`
+   below, so this is what a reader who asked for less motion gets — the same 2x2
+   the section shipped before, with all four claims on screen at once and the
+   authored tone composition intact.
+
+   THIS IS THE ONE PLACE THIS COMPONENT DEPARTS FROM THE CUSTOMER PILE, which
+   argues the opposite: that its geometry is LAYOUT and must exist at every
+   motion preference, because a flattened pile is four cards on top of each
+   other. Both are right about their own case. A pile has no flat form. A row
+   does, and it is the grid it replaced.
+
+   THE BLUR GOES WITH IT TOO, and that is not incidental. Depth of field is a
+   statement about which card is in front, and in a 2x2 no card is: all four are
+   equal, all four are at full size, and all four are meant to be read. Blurring
+   any of them there would hide content from the one reader who has asked for the
+   least, which is the §3 guard rail exactly. It is declared inside the
+   no-preference block for that reason and nowhere else.
+
+   The controls go with it. Under reduced motion nothing rotates and every card
+   is already visible, so a previous/next arrow would be a control with nothing
+   to control — which is the fabricated-affordance problem (§3) arriving from the
+   other direction. `display: none` rather than `visibility` or `disabled`,
+   because a button that does nothing should not be in the accessibility tree at
+   all.
+
+   The tracks and gaps are the values the list carried as utilities before —
+   `grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5` — moved here so one selector owns
+   both states instead of the flat one living at the call site.
+   -------------------------------------------------------------------------- */
+[data-slidetrack] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+
+  /* THE FLAT GRID TAKES A MEASURE, NOT THE VIEWPORT. The row it replaces is
+     full-bleed because a row of three cards wants the width; a 2x2 does not.
+     Left uncapped, a reduced-motion reader at 1512 got two 950px cards holding
+     one line of serif each, which is a letterbox. 60rem puts them at 470px —
+     the width the 2x2 had when it lived in a seven-column cell. */
+  max-inline-size: 60rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 40rem) {
+  [data-slidetrack] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 48rem) {
+  [data-slidetrack] {
+    gap: 1.25rem;
+  }
+}
+
+[data-slidearrow],
+[data-slidedots] {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   THE ROW
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ONE GRID, TWO AREA MAPS. Below the three-across width the arrows sit in a
+     control row under the cards with the dots between them; above it they move
+     into the outer columns, level with the cards. Both are the same three
+     elements in the same DOM order, so the tab order — previous, the four dots,
+     next — never changes with the viewport. */
+  [data-slider] {
+    display: grid;
+    grid-template-columns: min-content minmax(0, 1fr) min-content;
+    grid-template-areas:
+      'stage stage stage'
+      'prev  dots  next';
+    align-items: center;
+    row-gap: 1.75rem;
+    column-gap: 0.75rem;
+
+    /* THE WHOLE THING IS AS WIDE AS THE CARD, until there is room for three.
+       Left at full width, the arrows sat at the wrapper's edges — 33px and
+       757px at 834 — while the card sat centred at 480px, so a reader saw two
+       controls marooned in the margins with a void between them and the thing
+       they control. Constraining the region rather than the arrows keeps the
+       control row and the card on the same edges at every narrow width, and it
+       is one declaration instead of a second placement rule. */
+    inline-size: min(100%, 30rem);
+    margin-inline: auto;
+
+    /* One scale step per depth: the flanking cards at 0.86, the hidden one at
+       0.72. 14% is enough that a card beside the front one is unmistakably a
+       smaller object, and it is the number the width arithmetic below is solved
+       against. */
+    --slide-shrink: 0.14;
+
+    /* The air between two cards. It is a real gap — the whole point of this row
+       is that nothing overlaps — and it scales with the viewport so the three
+       cards keep their proportion rather than their spacing. */
+    --slide-gap: clamp(0.75rem, 1.6vw, 1.75rem);
+
+    /* DEPTH OF FIELD. One blur step per depth, the same shape as the scale
+       step: 0 at the front, 3px on the two beside it, 6px on the one behind.
+
+       IT IS A FILTER, NOT AN OPACITY, AND THAT DISTINCTION IS THE WHOLE
+       PERMISSION. §3 refuses `opacity` on text because ancestor opacity folds
+       into the contrast maths — a faded paragraph genuinely fails a ratio. A
+       blur composites at full alpha: every pixel is still the card's own colour
+       against the card's own surface, so no ratio in `tools/palette.mjs` moves
+       by a thousandth. The precedent is already in this file: `cardstack-deal`
+       blurs the dealt card at 7px and documents it as a speed cue.
+
+       3px WAS TUNED AGAINST THE 0.86 SCALE, NOT PICKED. The brief is
+       depth-of-field, not a smear: the flanking card has to stay identifiable
+       as a card of that tone with a name on its floor. At 388px wide, 3px puts
+       the serif past reading and leaves the block, the edge and the tone intact;
+       at 6px the shape starts dissolving into the ground, which is why the
+       hidden card takes that value and the visible pair does not.
+
+       WHAT IT COSTS, STATED PLAINLY. The two flanking cards are now decorative
+       rather than readable, which is the honest end of the ~14.6px effective
+       serif they were setting at 0.86 scale — type that small was claiming to be
+       readable and was not really offering it. Their measured contrast is
+       therefore no longer load-bearing HERE. The gated pairs stay in
+       `tools/palette.mjs` and must keep passing, because the reduced-motion
+       layout renders all four cards flat, sharp and full size, and that is a
+       reading surface.
+
+       ON THE CARD, NOT ON THE `li`. A filter creates a containing block and a
+       stacking context; on the `li` it would sit on the element that owns the
+       transform and the z-index, and the controls are siblings that must never
+       inherit it. On the card it is one paint effect on one box. */
+    --slide-blur: 3px;
+
+    /* THE EXTRA PUSH THAT PARKS THE SIDE CARDS OFF-SCREEN in one-card mode.
+       Without it a phone renders 12px of the right-hand card's edge at the
+       viewport boundary — a sliver, which is precisely the thing this row exists
+       not to do. A percentage, so it scales with the card and cannot be
+       out-grown by a wider phone. Zero at the three-across width. */
+    --slide-push: 60%;
+  }
+
+  [data-slidestage] {
+    grid-area: stage;
+  }
+
+  /* ONE CARD, CENTRED, until there is room for three. 30rem is the measure the
+     claims want; below that the card takes the column. Three across at 834
+     would put each card at 270px and the longest claim at seven lines, which is
+     worse than the layout being replaced — the width where three becomes
+     better is measured below, not assumed. */
+  [data-slidetrack] {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    inline-size: 100%;
+  }
+
+  /* ONE CELL, FOUR OCCUPANTS. Grid items in the same area still contribute to
+     the row's intrinsic height, unlike absolute positioning, so the cell is as
+     tall as the longest claim and all four cards stretch to it — which is what
+     keeps the three visible cards sharing one baseline as the row rotates. */
+  [data-slidetrack] > li {
+    grid-area: 1 / 1;
+
+    /* Scale falls out of depth; the offset falls out of scale. */
+    --slide-s: calc(1 - var(--slide-depth) * var(--slide-shrink));
+
+    /* CENTRE ORIGIN — the one line that makes this symmetric rather than a
+       second copy of the customer pile.
+
+       `translate` percentages resolve against the element's own border box, so
+       `50% * (1 + s)` is exactly half the front card plus half the scaled one:
+       the two edges meet at zero and `--slide-gap` is the air between them. That
+       is why the gap in this expression is a real gap and not an approximation
+       of one.
+
+       `--slide-side` is 0 for the front card and for the one behind it, so both
+       collapse to the centre line without a second rule, and the one behind is
+       covered by the one in front because it is smaller on every edge. */
+    transform: translateX(
+        calc(
+          var(--slide-side) *
+            (50% * (1 + var(--slide-s)) + var(--slide-gap) + var(--slide-push))
+        )
+      )
+      scale(var(--slide-s));
+
+    z-index: calc(var(--slide-count) - var(--slide-depth));
+    transition: transform 0.5s var(--ease-ui);
+  }
+
+  /* THE FRONT CARD. Sun, the only saturated surface in the section. */
+  [data-slidetrack] > li[data-depth='0'] {
+    --tone-surface: var(--signal);
+    --tone-hairline: var(--on-signal-hairline);
+    --tone-ink: var(--on-signal-ink);
+    --tone-reading: var(--on-signal-ink-2);
+    --tone-ink-3: var(--on-signal-ink-3);
+  }
+
+  /* THE TWO BESIDE IT, AND THE ONE BEHIND. Same depth for the pair, therefore
+     the same tone — the repeat is structural. The hidden card takes it too: it
+     is covered, so any tone would do, and giving it a fourth would be a
+     distinction nothing can see. */
+  [data-slidetrack] > li[data-depth='1'],
+  [data-slidetrack] > li[data-depth='2'] {
+    --tone-surface: var(--role-muted);
+    --tone-hairline: var(--role-muted-hairline);
+    --tone-ink: var(--role-muted-ink);
+    --tone-reading: var(--role-muted-reading);
+    --tone-ink-3: var(--role-muted-ink-3);
+  }
+
+  /* THE FOCUS PULL. Zero at the front, one step per depth behind it.
+
+     `blur(0px)` on the front card rather than `filter: none`, and that is
+     deliberate: `none` and a blur DO interpolate in every engine that matters,
+     but the identity filter makes the two ends of the transition the same shape,
+     which is the version that cannot be got wrong by a future edit. It costs a
+     compositor layer on a card that already has one from its transform. */
+  [data-slidetrack] > li > .card {
+    filter: blur(calc(var(--slide-depth) * var(--slide-blur)));
+  }
+
+  /* Surface, edge, every ink rung AND the focus pull move together over the same
+     0.5s the card travels in, so a card sharpens as it arrives and softens as it
+     leaves rather than snapping at either end. The tone arrives with the card
+     rather than a beat before it; where its midpoint goes is argued in the block
+     header.
+
+     A TRANSITION CANNOT STRAND A CARD, which is the §3 guard rail this is
+     answering. If the timer fires, or an arrow is pressed, part-way through, the
+     running transition RETARGETS from wherever the card is — it does not restart
+     and it does not abandon. There is no end state a card can be left in except
+     one of the three the stylesheet declares, and a backgrounded tab resumes
+     mid-flight rather than freezing, because none of this is on a JS clock. */
+  [data-slidetrack] > li > .card,
+  [data-slidetrack] > li > .card > .body-serif,
+  [data-slidetrack] > li > .card > .card-floor,
+  [data-slidetrack] > li > .card > .caption {
+    transition:
+      background-color 0.5s var(--ease-ui),
+      border-color 0.5s var(--ease-ui),
+      color 0.5s var(--ease-ui),
+      box-shadow 0.5s var(--ease-ui),
+      filter 0.5s var(--ease-ui);
+  }
+
+  /* THE ONE SHADOW. See the header for the §2.7 argument; the tokens are the
+     customer pile's own, so no new value is introduced. */
+  [data-slidetrack] > li[data-depth='0'] > .card {
+    box-shadow:
+      0 1px 1px var(--stack-shadow-contact),
+      0 14px 26px -14px var(--stack-shadow-cast);
+  }
+
+  /* ------------------------------------------------------------------------
+     THE CONTROLS
+
+     Real buttons, which is the point — see `CardSlider.tsx`. What is decided
+     here is only how they look.
+     ------------------------------------------------------------------------ */
+
+  [data-slidearrow] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    /* A pill, because it is round: `--radius-action` on an equal-sided box draws
+       a circle, which is the same reading the timeline's nodes are drawn under.
+       Not a value typed here. */
+    border-radius: var(--radius-action);
+    /* THE RING IS THE HAIRLINE WEIGHT, NOT A 3:1 EDGE, and that is deliberate.
+       The 3:1 bar applies to the part REQUIRED to identify a control; here that
+       part is the chevron, which is `--ink-2` and gated at AA. The border is the
+       page's ordinary rule doing what it does everywhere else, and drawing it at
+       4.5:1 would put a heavier line around a secondary control than the section
+       draws anywhere else. */
+    border: 1px solid var(--hairline-strong);
+    color: var(--ink-2);
+    transition:
+      background-color 0.2s var(--ease-ui),
+      border-color 0.2s var(--ease-ui),
+      color 0.2s var(--ease-ui),
+      transform 0.16s var(--ease-entrance);
+  }
+
+  [data-slidearrow] > svg {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+  }
+
+  [data-slidearrow]:hover {
+    background-color: var(--tint);
+    border-color: var(--ink-3);
+    color: var(--ink);
+  }
+
+  /* Shallower than the call to action's, matching `.control:active`: this is hit
+     far more often and is worth far less each time, so the feedback confirms the
+     press without performing it. */
+  [data-slidearrow]:active {
+    transform: scale(0.96);
+  }
+
+  [data-slidearrow='prev'] {
+    grid-area: prev;
+  }
+
+  [data-slidearrow='next'] {
+    grid-area: next;
+  }
+
+  [data-slidedots] {
+    display: flex;
+    grid-area: dots;
+    align-items: center;
+    justify-content: center;
+    /* 6px, which is what the focus ring needs. The ring is 2px at the default
+       3px offset, so a 24px target rings out to 34px; at this gap the pitch is
+       30px and the offset is pulled to 0 below, which lands the ring exactly on
+       the button and clear of its neighbour. Measured, because two real focus
+       ring bugs in this repo were found by hand after a clean axe run. */
+    gap: 0.375rem;
+  }
+
+  /* 24px, which is WCAG 2.5.8's minimum target and NOT the size of the dot. The
+     dot is drawn by the pseudo-element so the thing you can hit is bigger than
+     the thing you can see — a 7px button would be a real control nobody can
+     press, which is a worse failure than the inert dots this replaces. */
+  [data-slidedots] > button {
+    display: grid;
+    place-items: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: var(--radius-action);
+  }
+
+  [data-slidedots] > button:focus-visible {
+    outline-offset: 0;
+  }
+
+  [data-slidedots] > button::before {
+    content: '';
+    display: block;
+    inline-size: 0.4375rem;
+    block-size: 0.4375rem;
+    border-radius: var(--radius-action);
+    /* --ink-3 is gated at AA on the ground in both themes, so the inactive dot
+       clears the 3:1 non-text bar with room. */
+    background-color: var(--ink-3);
+    transition:
+      inline-size 0.3s var(--ease-ui),
+      background-color 0.3s var(--ease-ui);
+  }
+
+  /* THE CURRENT ONE IS A BAR, NOT A BIGGER DOT. Four dots where one is slightly
+     larger is a difference you have to look for; a dot that has become a stroke
+     is a difference you cannot miss, and it is the same shape the customer
+     pile's progress bar uses to say the same thing. */
+  [data-slidedots] > button[aria-current]::before {
+    inline-size: 1.125rem;
+    background-color: var(--accent);
+  }
+
+  [data-slidedots] > button:hover::before {
+    background-color: var(--ink);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   THREE ACROSS, FROM 72rem.
+
+   MEASURED, NOT PICKED. The row's width arithmetic is
+   `card * (1 + 2 * flank) + 2 * gap`, so the card is what is left of the stage
+   after the two side cards and the two gaps are paid for. At 1152 that leaves a
+   347px card; at 1024 it would leave 290px and at 834 it would leave 270px,
+   which is narrower than the 2x2 this replaces and sets the longest claim to
+   seven lines. 72rem is the first width where three across is better than one,
+   which is the only reason to switch.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 72rem) {
+  [data-slider] {
+    /* The lane the arrows sit in, outside the row of cards. */
+    --slide-lane: clamp(2.75rem, 4vw, 4rem);
+    --slide-push: 0px;
+
+    /* The card cap above is a one-card measure. Three across takes the width. */
+    inline-size: 100%;
+
+    grid-template-columns: var(--slide-lane) minmax(0, 1fr) var(--slide-lane);
+    grid-template-areas:
+      'prev stage next'
+      '.    dots  .';
+    row-gap: 2rem;
+  }
+
+  /* `1 + 2 * (1 - 0.14)`, as a literal.
+
+     It is not written as a calc over `--slide-shrink` because this value is a
+     DIVISOR, and a divisor in `calc()` has to be a number — dividing by a custom
+     property that itself holds a calc is the one shape of this expression that
+     is not safe to rely on. The two numbers are tied by this comment instead of
+     by the parser: change the shrink and change this. */
+  [data-slidetrack] {
+    --slide-span: 2.72;
+
+    inline-size: calc((100% - 2 * var(--slide-gap)) / var(--slide-span));
+    max-inline-size: none;
   }
 }

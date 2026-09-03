@@ -490,6 +490,21 @@ export const careers = {
  * Writing real descriptions is a fix we are demonstrating, not a quotation, and
  * `altIsOurs` marks every one of them so the distinction survives.
  *
+ * CORRECTED 2026-09-01, AND THE ORIGINAL ERROR IS WORTH RECORDING. Three of
+ * these six descriptions were fiction. `change-management` was described as
+ * "two colleagues talking across a desk", `process` as "a working session in
+ * progress, notes and laptops on the table", and `vision-paper` as "colleagues
+ * in conversation" — while the files themselves are aerial landscapes: a river
+ * through fields, a switchback road, and a causeway across a lake. A fourth
+ * said "a Norrin team member" of a photograph containing two people.
+ *
+ * They were written from the SOURCE FILENAMES ("Change management or AI
+ * etc.jpg", "Process or change management etc.jpg") rather than from the
+ * pictures. That is the precise failure this file's own rule exists to prevent,
+ * and it is worse here than an ordinary typo: alt text is what a screen-reader
+ * user is told is on the page, so a wrong description is not a cosmetic slip.
+ * Every entry below has now been checked against the rendered image.
+ *
  * `w`/`h` are the intrinsic dimensions their CDN reports. They are here to be
  * rendered as `width`/`height` attributes — the images ship at up to 6682px
  * wide on their side, and the point of the pipeline in `tools/photos.mjs` is
@@ -501,7 +516,7 @@ export const photos = {
     src: 'https://norrin.com/hs-fs/hubfs/Change%20management%20or%20AI%20etc.jpg',
     w: 5062,
     h: 3180,
-    alt: 'Two colleagues talking across a desk in a bright meeting room.',
+    alt: 'An aerial view of a river winding between green fields and lines of trees.',
     altIsOurs: true,
   },
   portrait: {
@@ -509,7 +524,7 @@ export const photos = {
     src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-29.jpg',
     w: 3402,
     h: 4552,
-    alt: 'A Norrin consultant at work, photographed in portrait orientation.',
+    alt: 'Colleagues seated in conversation, one listening, seen past a shoulder in the foreground.',
     altIsOurs: true,
   },
   process: {
@@ -517,7 +532,7 @@ export const photos = {
     src: 'https://norrin.com/hs-fs/hubfs/Process%20or%20change%20management%20etc.jpg',
     w: 3992,
     h: 2992,
-    alt: 'A working session in progress, notes and laptops on the table.',
+    alt: 'An aerial view of a road switchbacking down a steep, scrub-covered hillside.',
     altIsOurs: true,
   },
   team: {
@@ -525,7 +540,7 @@ export const photos = {
     src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-34.jpg',
     w: 4084,
     h: 4560,
-    alt: 'A Norrin team member in the office, photographed in portrait orientation.',
+    alt: 'Two colleagues at a laptop in a meeting room, both looking toward a speaker off-frame.',
     altIsOurs: true,
   },
   vision: {
@@ -533,7 +548,7 @@ export const photos = {
     src: 'https://norrin.com/hs-fs/hubfs/AI%20or%20change%20management%20etc.jpg',
     w: 5464,
     h: 3640,
-    alt: 'Colleagues in conversation, used on Norrin’s Face of AI vision paper section.',
+    alt: 'An aerial view of a causeway crossing a forested lake, a single car part-way over.',
     altIsOurs: true,
   },
   careers: {
@@ -541,7 +556,7 @@ export const photos = {
     src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-9.jpg',
     w: 6682,
     h: 4411,
-    alt: 'The Norrin office, people working and talking across an open floor.',
+    alt: 'Three colleagues around a laptop in a bright office, talking and smiling.',
     altIsOurs: true,
   },
 } as const

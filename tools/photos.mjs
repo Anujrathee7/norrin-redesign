@@ -42,17 +42,33 @@ import { mkdirSync, writeFileSync, existsSync, statSync } from 'node:fs'
 import path from 'node:path'
 import sharp from 'sharp'
 
-/* The six images on norrin.com's homepage, with the section each sits in.
+/* Norrin's own imagery, with the page each file came from.
    Kept here rather than imported from `src/data/norrin.ts` because that file is
    TypeScript and this script is plain Node — the two are checked against each
-   other by `--verify` below rather than by a shared import. */
+   other by `--verify` below rather than by a shared import.
+
+   `group` EXISTS TO KEEP ONE NUMBER HONEST. The weight comparison at the bottom
+   measures our delivery against theirs for the SAME six pictures — the ones on
+   their homepage — and `Compare.tsx` quotes that ratio. The headshots below came
+   later, from /contact-us, and they are not part of that set. Summing them into
+   `oursServed` would silently compare eight of ours against six of theirs, which
+   is the kind of quietly-wrong number this file already warns about once. Only
+   `homepage` is compared; anything else is reported separately. */
 const PHOTOS = [
-  { file: 'change-management', src: 'https://norrin.com/hs-fs/hubfs/Change%20management%20or%20AI%20etc.jpg' },
-  { file: 'portrait-29', src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-29.jpg' },
-  { file: 'process', src: 'https://norrin.com/hs-fs/hubfs/Process%20or%20change%20management%20etc.jpg' },
-  { file: 'team-34', src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-34.jpg' },
-  { file: 'vision-paper', src: 'https://norrin.com/hs-fs/hubfs/AI%20or%20change%20management%20etc.jpg' },
-  { file: 'careers-9', src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-9.jpg' },
+  { group: 'homepage', file: 'change-management', src: 'https://norrin.com/hs-fs/hubfs/Change%20management%20or%20AI%20etc.jpg' },
+  { group: 'homepage', file: 'portrait-29', src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-29.jpg' },
+  { group: 'homepage', file: 'process', src: 'https://norrin.com/hs-fs/hubfs/Process%20or%20change%20management%20etc.jpg' },
+  { group: 'homepage', file: 'team-34', src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-34.jpg' },
+  { group: 'homepage', file: 'vision-paper', src: 'https://norrin.com/hs-fs/hubfs/AI%20or%20change%20management%20etc.jpg' },
+  { group: 'homepage', file: 'careers-9', src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-9.jpg' },
+
+  /* Named contacts, from norrin.com/contact-us. Same category as the six above —
+     Norrin's own published photographs of Norrin, shown back to Norrin — and the
+     reason `docs/research-brief.md` §7 no longer lists headshots as a gap. Only
+     the people the Contact section actually names are taken; the page publishes
+     ten and eight of them are none of our business. */
+  { group: 'contact', file: 'antti-vuolli', src: 'https://norrin.com/hs-fs/hubfs/Antti%20Vuolli%20neli%C3%B6%20(2).png' },
+  { group: 'contact', file: 'heidi-riihimaki', src: 'https://norrin.com/hs-fs/hubfs/Riihim%C3%A4ki_Heidi.jpg' },
 ]
 
 const WIDTHS = [640, 1280, 1920]
@@ -105,6 +121,7 @@ for (const photo of PHOTOS) {
   }
 
   manifest.push({
+    group: photo.group,
     file: photo.file,
     source: `${meta.width}x${meta.height}`,
     theirs: originalBytes,
@@ -116,12 +133,18 @@ for (const photo of PHOTOS) {
   )
 }
 
-const sourceBytes = manifest.reduce((a, m) => a + m.theirs, 0)
-const oursAll = manifest.reduce((a, m) => a + m.ours, 0)
+// THE COMPARABLE SET ONLY — their homepage six against our homepage six. See
+// the note on `group` above for why the headshots are excluded from this and
+// reported on their own line instead.
+const homepage = manifest.filter((m) => m.group === 'homepage')
+const extra = manifest.filter((m) => m.group !== 'homepage')
+
+const sourceBytes = homepage.reduce((a, m) => a + m.theirs, 0)
+const oursAll = homepage.reduce((a, m) => a + m.ours, 0)
 // What a 1440-wide viewport actually downloads from us: one AVIF per photo at
 // the 1280 step. Not the sum of every variant on disk — a browser fetches one.
 let oursServed = 0
-for (const m of manifest) oursServed += statSync(path.join(OUT, `${m.file}-1280.avif`)).size
+for (const m of homepage) oursServed += statSync(path.join(OUT, `${m.file}-1280.avif`)).size
 
 /**
  * THEIR SERVED WEIGHT, MEASURED — and it is not what the source files weigh.
@@ -146,5 +169,16 @@ console.log(`  ours, every variant on disk           ${kb(oursAll).padStart(10)}
 console.log(`  OURS, AS ACTUALLY SERVED AT 1280      ${kb(oursServed).padStart(10)}   avif`)
 console.log(
   `\n  ours is ${(THEIRS_SERVED / oursServed).toFixed(2)}x lighter than theirs, like for like.` +
-    `\n  Do NOT quote the source-file ratio — see the note above.\n`,
+    `\n  Do NOT quote the source-file ratio — see the note above.`,
 )
+
+if (extra.length) {
+  let extraServed = 0
+  for (const m of extra) extraServed += statSync(path.join(OUT, `${m.file}-1280.avif`)).size
+  console.log(
+    `\n  PLUS ${extra.length} image(s) outside the compared set (${extra.map((m) => m.file).join(', ')}),` +
+      `\n  ${kb(extraServed)} at the 1280 step. Not in the ratio above: they are not on their homepage,` +
+      `\n  so there is nothing of theirs to compare them against.`,
+  )
+}
+console.log('')

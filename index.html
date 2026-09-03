@@ -36,13 +36,25 @@
     <meta name="robots" content="noindex" />
 
     <!-- The face that renders the headline. Preloading removes the swap flash
-         on the one piece of type the whole page is built around. -->
+         on the one piece of type the whole page is built around.
+
+         THIS MOVED FROM SCHIBSTED TO FRAUNCES when the display roles changed
+         family, and moving it was not optional. A preload is a claim about which
+         font paints the largest text on first view; leave it pointing at the old
+         face and it stops buying anything while still costing a blocking
+         request, and the h1 — the actual LCP element — goes back to swapping in
+         late. The comment above was true of Schibsted and silently became false
+         the moment `--font-serif` changed.
+
+         Only one face is preloaded. Schibsted still sets the nav and body, but
+         those are smaller, later, and far more forgiving of a swap than 94px of
+         headline. -->
     <link
       rel="preload"
       as="font"
       type="font/woff2"
       crossorigin
-      href="/fonts/schibsted-grotesk-latin-wght-normal.woff2"
+      href="/fonts/fraunces-latin-wght-normal.woff2"
     />
 
     <meta property="og:type" content="website" />

@@ -6,37 +6,26 @@ import { cx } from '@/lib/cx'
 import { NAV, type NavItem } from './navData'
 
 /** Wordmark. Held at `production` — the mark must read at 26px in every state. */
-export function Wordmark({ inverted }: { inverted: boolean }) {
+export function Wordmark() {
   return (
-    <a
-      href="#top"
-      className={cx(
-        'flex w-fit shrink-0 items-center gap-2.5 transition-colors duration-500',
-        inverted ? 'text-signal' : 'text-accent',
-      )}
-    >
-      <span
-        className={cx(
-          'wordmark transition-colors duration-500',
-          inverted ? 'text-inverse-ink' : 'text-ink',
-        )}
-      >
-        Norrin
-      </span>
+    <a href="#top" className="flex w-fit shrink-0 items-center gap-2.5 text-accent">
+      <span className="wordmark text-ink">Norrin</span>
       <span className="sr-only">Norrin — home</span>
     </a>
   )
 }
 
-export function ContactButton({ inverted }: { inverted: boolean }) {
+export function ContactButton() {
   return (
     <a
       href="#contact"
-      // A colour swap, not an opacity fade: fading the page's most emphatic
-      // colour makes the signal go muddy under the pointer, which is backwards.
-      // Both swaps now live in .btn-signal / .btn-solid rather than as two raw
-      // hexes in two files that could not see each other.
-      className={cx('btn btn-sm', inverted ? 'btn-signal' : 'btn-solid')}
+      // `.btn-solid` in both themes and at every scroll position. It used to
+      // swap to `.btn-signal` while the bar was inverted, which was the right
+      // call on a forest bar and is meaningless on a bar that is always the
+      // page's own ground. The hover swap it was really about — a colour swap
+      // rather than an opacity fade, so the page's most emphatic colour does not
+      // go muddy under the pointer — still lives in `.btn-solid` itself.
+      className="btn btn-sm btn-solid"
     >
       Contact
     </a>
@@ -51,13 +40,12 @@ export function ContactButton({ inverted }: { inverted: boolean }) {
  * wayfinding — and when a drawer is open it is what the drawer hangs from, so
  * the pop-out is visibly attached to the word that opened it.
  */
-export function RuleSegment({ show, inverted }: { show: boolean; inverted: boolean }) {
+export function RuleSegment({ show }: { show: boolean }) {
   return (
     <span
       aria-hidden="true"
       className={cx(
-        'pointer-events-none absolute inset-x-0 -bottom-px h-px transition-opacity duration-300',
-        inverted ? 'bg-signal' : 'bg-accent',
+        'pointer-events-none absolute inset-x-0 -bottom-px h-px bg-accent transition-opacity duration-300',
         show ? 'opacity-100' : 'opacity-0',
       )}
     />
@@ -79,13 +67,11 @@ export function RuleSegment({ show, inverted }: { show: boolean; inverted: boole
  */
 export function Drawer({
   item,
-  inverted,
   onNavigate,
   onFocusTrigger,
   onExitForward,
 }: {
   item: NavItem | null
-  inverted: boolean
   onNavigate: () => void
   /** Shift+Tab off the first row goes back to the word that opened the drawer. */
   onFocusTrigger: () => void
@@ -106,9 +92,8 @@ export function Drawer({
       id="nav-drawer"
       inert={!open}
       className={cx(
-        'hidden overflow-hidden transition-[grid-template-rows] duration-200 ease-(--ease-entrance) lg:grid',
+        'hidden overflow-hidden bg-ground transition-[grid-template-rows] duration-200 ease-(--ease-entrance) lg:grid',
         open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
-        inverted ? 'bg-inverse' : 'bg-ground',
       )}
     >
       <div className="min-h-0">
@@ -135,39 +120,19 @@ export function Drawer({
                           onExitForward()
                         }
                       }}
-                      className={cx(
-                        'group/row relative grid grid-cols-[1fr_auto] items-baseline gap-8 border-b py-[0.875rem]',
-                        inverted ? 'border-inverse-hairline' : 'border-hairline',
-                      )}
+                      className="group/row relative grid grid-cols-[1fr_auto] items-baseline gap-8 border-b border-hairline py-[0.875rem]"
                     >
-                      <span
-                        className={cx(
-                          'ui transition-colors duration-200',
-                          inverted
-                            ? 'text-inverse-ink-2 group-hover/row:text-inverse-ink group-focus-visible/row:text-inverse-ink'
-                            : 'text-ink group-hover/row:text-accent group-focus-visible/row:text-accent',
-                        )}
-                      >
+                      <span className="ui text-ink transition-colors duration-200 group-hover/row:text-accent group-focus-visible/row:text-accent">
                         {child.label}
                       </span>
                       {child.note ? (
-                        <span
-                          className={cx(
-                            'label whitespace-nowrap',
-                            inverted ? 'text-inverse-ink-3' : 'text-ink-3',
-                          )}
-                        >
-                          {child.note}
-                        </span>
+                        <span className="label whitespace-nowrap text-ink-3">{child.note}</span>
                       ) : null}
                       {/* The rule completing. Reduced motion snaps it to full via the
                           global duration override, so the state never depends on movement. */}
                       <span
                         aria-hidden="true"
-                        className={cx(
-                          'absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 transition-transform duration-[280ms] ease-(--ease-entrance) group-hover/row:scale-x-100 group-focus-visible/row:scale-x-100',
-                          inverted ? 'bg-signal' : 'bg-accent',
-                        )}
+                        className="absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-accent transition-transform duration-[280ms] ease-(--ease-entrance) group-hover/row:scale-x-100 group-focus-visible/row:scale-x-100"
                       />
                     </a>
                   </li>
@@ -176,10 +141,7 @@ export function Drawer({
             </Container>
             {/* Full-bleed, like every other divider on the page: it terminates the
                 drawer without drawing a box around it. */}
-            <div
-              aria-hidden="true"
-              className={cx('h-px w-full', inverted ? 'bg-inverse-hairline-strong' : 'bg-hairline-strong')}
-            />
+            <div aria-hidden="true" className="h-px w-full bg-hairline-strong" />
           </>
         ) : null}
       </div>
@@ -189,12 +151,10 @@ export function Drawer({
 
 export function Hamburger({
   open,
-  inverted,
   onClick,
   controls,
 }: {
   open: boolean
-  inverted: boolean
   onClick: () => void
   controls: string
 }) {
@@ -204,10 +164,7 @@ export function Hamburger({
       // 26px tap target on the viewport where every target is a thumb. The
       // negative margin keeps the glyph on the same optical edge it was already
       // on, so this buys 16px of target and moves nothing.
-      className={cx(
-        'control -mr-2 justify-self-end p-2 lg:hidden',
-        inverted ? 'text-inverse-ink' : 'text-ink',
-      )}
+      className="control -mr-2 justify-self-end p-2 text-ink lg:hidden"
       aria-expanded={open}
       aria-controls={controls}
       onClick={onClick}
@@ -276,8 +233,9 @@ export function MobileSheet({ onNavigate, barHeight = 72 }: { onNavigate: () => 
             </div>
             <div className="flex items-center justify-between py-4">
               <span className="label text-ink-3">Appearance</span>
-              {/* The sheet is always on paper — it sets `bg-ground` itself and
-                  never inverts — so no `inverted` here, unlike the bar's copy. */}
+              {/* The sheet sets `bg-ground` itself, which is now the same thing
+                  the bar does — so this and the bar's copy are finally the same
+                  control on the same ground. */}
               <ThemeToggle />
             </div>
           </div>

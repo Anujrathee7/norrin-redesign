@@ -1,6 +1,5 @@
 import { Container, Grid } from '@/components/primitives/Layout'
 import { footerBlurb, offices, social } from '@/data/norrin'
-import { Nori } from '@/components/mascot/nori/Nori'
 
 /**
  * Footer.
@@ -91,23 +90,43 @@ export function Footer() {
         </Grid>
 
         {/* Navigation */}
-        {/* A shorter, earlier window than the footprint above. This block sits
-            lower, so it has less document left to run its range in — measured
-            rather than guessed, and the check at the bottom of `.shots/anim.mjs`
-            asserts that nothing down here is left mid-transform when the page
-            stops scrolling. */}
+        {/* `entry`, NOT `cover`, AND THIS IS A BUG FIX RATHER THAN A TASTE.
+
+            These three blocks used to run on `cover 8/12/16% -> 30/34/38%`,
+            described as "measured rather than guessed". It was guessed, and the
+            last of the three never finished: the Elsewhere column sat 1.13px
+            below its resting position on every page load, on every viewport,
+            for as long as the footer has had motion.
+
+            `cover` spans the element crossing the whole scrollport — enter at
+            the bottom, leave at the top. Nothing in a footer ever leaves at the
+            top, because the document ends first. The highest progress reachable
+            at maximum scroll is `d / (viewport + height)`, where `d` is the
+            distance from the element's top to the bottom of the document — 29.6%
+            for this column at 1512x950. Every range ending past that was unable
+            to complete, and the failure gets WORSE on a taller viewport, so no
+            hand-picked percentage fixes it for everyone.
+
+            `entry` is the phase that actually describes what these do: the
+            element coming into view. It completes as soon as the element is
+            fully on screen, which the footer always achieves, and it is
+            independent of how much document is left underneath. The ranges below
+            end at 68/78/88% so there is headroom even at the shortest viewport.
+
+            The check at the bottom of `tools/anim.mjs` asserts nothing down here
+            is left mid-transform when the page stops scrolling. It was reporting
+            this correctly the whole time. */}
         <Grid className="mt-20 gap-y-10 border-t border-hairline pt-12">
           <div
             data-scroll="enter"
             style={{
               ['--enter-y' as string]: '20px',
-              ['--scrub-from' as string]: 'cover 8%',
-              ['--scrub-to' as string]: 'cover 30%',
+              ['--scrub-from' as string]: 'entry 8%',
+              ['--scrub-to' as string]: 'entry 68%',
             }}
             className="col-span-4 md:col-span-3"
           >
             <a href="#top" className="flex w-fit items-center gap-2.5 text-accent">
-              <Nori pose="wave" size={24} crop="head" animated={false} />
               <span className="wordmark text-ink">
                 Norrin
               </span>
@@ -120,8 +139,8 @@ export function Footer() {
             data-scroll="enter"
             style={{
               ['--enter-y' as string]: '20px',
-              ['--scrub-from' as string]: 'cover 12%',
-              ['--scrub-to' as string]: 'cover 34%',
+              ['--scrub-from' as string]: 'entry 18%',
+              ['--scrub-to' as string]: 'entry 78%',
             }}
             className="col-span-2 md:col-span-2 md:col-start-6"
           >
@@ -147,8 +166,8 @@ export function Footer() {
             data-scroll="enter"
             style={{
               ['--enter-y' as string]: '20px',
-              ['--scrub-from' as string]: 'cover 16%',
-              ['--scrub-to' as string]: 'cover 38%',
+              ['--scrub-from' as string]: 'entry 28%',
+              ['--scrub-to' as string]: 'entry 88%',
             }}
             className="col-span-2 md:col-span-2 md:col-start-9"
           >

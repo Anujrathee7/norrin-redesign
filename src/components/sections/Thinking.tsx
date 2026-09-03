@@ -1,7 +1,5 @@
 import { Container, SectionHeader } from '@/components/primitives/Layout'
 import { publications } from '@/data/norrin'
-import { Nori } from '@/components/mascot/nori/Nori'
-import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
 
 /**
  * Thinking — the commitment ladder.
@@ -97,47 +95,19 @@ export function Thinking() {
         {/* Wiped rather than faded: the rungs are one framed object, and a wipe
             crossing it reads as one gesture where four fades read as four
             separate arrivals. */}
-        {/* The frame gets a `relative` wrapper for one reason: Nori peeks over
-            its top border, and the border is on the <ul> two levels down inside
-            an `overflow-hidden` frame — anything positioned in there would be
-            clipped away. Anchored out here, `bottom-full` is all the placement
-            it needs, because the bottom of the peek drawing IS the edge being
-            peeked over. No offset, no magic number.
+        {/* THE `relative` HERE IS NOW UNCLAIMED. It existed for one reason —
+            Nori peeked over the frame's top border, and the border sits on the
+            <ul> two levels down inside an `overflow-hidden` frame, so anything
+            positioned in there would have been clipped. Nori has been deleted
+            from the codebase, so nothing is positioned against this wrapper any
+            more and the `relative` can probably go with it. Left in place rather
+            than removed blind, because this section is being redesigned by hand
+            and pulling a positioning context out from under a layout mid-edit is
+            how a subtle break gets introduced.
 
-            This replaces a 150px `idea` parked beside the header. Same
-            character, but touching something instead of floating next to it. */}
-        {/* The drift is on this shared wrapper, not on the frame below it: Nori
-            peeks over the frame's top border, and a figure resting on an edge
-            has to travel with that edge or it drifts off the thing it is
-            holding. One layer, two children. */}
+            The drift stays on this shared wrapper rather than on the frame
+            below it. */}
         <div data-scroll="drift-slow" className="relative">
-          {/* Present at every width now. The border it peeks over is the
-              frame's own top edge, which exists on a phone exactly as it does on
-              a desktop — this was hidden below `md` for size, not for want of
-              something to hold on to, so it gets a narrower box instead of a
-              breakpoint. Pulled in to `right-6` on small screens so it clears
-              the frame's rounded corner. */}
-          <div className="absolute right-6 bottom-full flex w-[84px] md:right-10 md:w-[124px] lg:right-20">
-            {/* The float is still off — it would lift the fingers off the
-                border being peeked over. The rock replaces it, pivoting on the
-                bottom edge of the drawing, which IS the edge it is gripping
-                (`NORI_ANCHOR.peek` is 100% for exactly that reason). Rotation
-                there keeps the grip and tips the head, which is what peeking
-                over something actually looks like. */}
-            <div
-              data-scroll="nori-sway"
-              className="flex"
-              style={{
-                ['--pivot' as string]: `50% ${NORI_ANCHOR.peek.y}`,
-                ['--sway' as string]: '3.2deg',
-              }}
-            >
-              <div className="nori-idle">
-                <Nori pose="peek" size={124} animated={false} />
-              </div>
-            </div>
-          </div>
-
         {/* Uncovered left to right against its own scroll range, so it runs
             backwards when you scroll back up instead of being spent on the
             first pass. Still ONE gesture across the whole frame and not four
