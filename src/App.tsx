@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Nav } from '@/components/nav/Nav'
-import { MascotLab } from '@/components/sections/MascotLab'
 import { Compare } from '@/components/sections/Compare'
 import { StyleGuide } from '@/components/sections/StyleGuide'
 import { GapBackdrops } from '@/components/sections/GapBackdrops'
@@ -43,11 +42,11 @@ import { Footer } from '@/components/sections/Footer'
 /**
  * Three surfaces hang off the hash rather than living in the page.
  *
- * `#mascots` is a workbench: every pose against both grounds, down to 24px,
- * with motion off. Worth having, not worth a nav slot — the page has one
- * argument to make and a gallery of mascots is not part of it.
+ * `#mascots` was one of them — a workbench rendering every Nori pose against
+ * both grounds. It is gone: Nori was deleted from the codebase on the user's
+ * instruction, so the surface, the component and its CSS all went with it.
  *
- * `#compare` is the opposite: it is FOR sending. It puts each section of
+ * `#compare`: it is FOR sending. It puts each section of
  * norrin.com beside the same section rebuilt, because a redesign shown on its
  * own asks the viewer to hold the original in their head and do the diff
  * themselves, and a cold link does not get that much patience. It stays off the
@@ -75,8 +74,8 @@ import { Footer } from '@/components/sections/Footer'
  *
  * A surface OWNS the whole document when its hash matches — it is not a section
  * of the homepage — so anchors like `#contact` must never collide with these
- * two names. They do not: every in-page anchor is a section id, and neither
- * `mascots` nor `compare` is one.
+ * two names. They do not: every in-page anchor is a section id, and `compare`
+ * is not one.
  */
 function useHashSurface() {
   const [hash, setHash] = useState(() =>
@@ -87,7 +86,6 @@ function useHashSurface() {
     window.addEventListener('hashchange', onChange)
     return () => window.removeEventListener('hashchange', onChange)
   }, [])
-  if (hash === '#mascots') return 'mascots'
   if (hash === '#compare') return 'compare'
   if (hash === '#styleguide') return 'styleguide'
   if (hash === '#backdrops') return 'backdrops'
@@ -97,7 +95,6 @@ function useHashSurface() {
 
 export default function App() {
   const surface = useHashSurface()
-  if (surface === 'mascots') return <MascotLab />
   if (surface === 'compare') return <Compare />
   if (surface === 'styleguide') return <StyleGuide />
   if (surface === 'backdrops') return <GapBackdrops />

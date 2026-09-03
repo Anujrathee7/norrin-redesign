@@ -1,6 +1,5 @@
 import { Container, Grid } from '@/components/primitives/Layout'
 import { footerBlurb, offices, social } from '@/data/norrin'
-import { Nori } from '@/components/mascot/nori/Nori'
 
 /**
  * Footer.
@@ -128,7 +127,6 @@ export function Footer() {
             className="col-span-4 md:col-span-3"
           >
             <a href="#top" className="flex w-fit items-center gap-2.5 text-accent">
-              <Nori pose="wave" size={24} crop="head" animated={false} />
               <span className="wordmark text-ink">
                 Norrin
               </span>
