@@ -134,6 +134,15 @@ screen-reader user is *told is on the page*, so this was not a cosmetic slip.
 
 Hard constraints. Each is checkable. A change that breaks one does not ship.
 
+**State of play, stated honestly: this section has been unenforceable, because the
+library was never installed.** `package.json` carries react, react-dom, tailwindcss and
+`@tailwindcss/vite` — no shadcn, no Radix, nothing to reach for. So §2.1 has been a rule
+against a library that was not there, and `LocaleMenu.tsx` and `ThemeToggle.tsx` are
+hand-rolled in violation of it. Adoption is now in progress. §2.1 becomes enforceable the
+moment Radix is installed, and those two controls are the backlog it creates — they get
+replaced, one at a time, each through §2.5's full gate. Nothing below is softened by
+this; the rules stand as written and the code is what has to move.
+
 **2.1 Never hand-roll an interactive primitive.** If shadcn/Radix ships it — menu,
 dialog, sheet, select, popover, tooltip, tabs, accordion, toggle — it gets used.
 Hand-written ARIA is banned.
@@ -197,13 +206,38 @@ exists, leave the asymmetry visible rather than smoothing it over.
 **Numbering only where content is a sequence.** A timeline earns 01/02/03. Eight
 unrelated sections do not. Zero of four reference sites number their sections.
 
-**Motion: native CSS `animation-timeline` only.** No GSAP, no framer-motion.
-*Reason:* a ScrollTrigger misfire strands an element at `opacity: 0` forever, while a
-compositor-driven timeline has no JS in the path to misfire. Reaktor ships
-`body{opacity:0 !important}` with no `prefers-reduced-motion` fallback and blanks
-itself for anyone whose JS fails.
+**Motion: Motion for components, native CSS `animation-timeline` for scroll.** The
+blanket ban — *"no GSAP, no framer-motion"* — was lifted by the repo owner. Motion (the
+library formerly called framer-motion, now published as `motion`) is allowed for
+component state transitions, enter/exit and gestures. **GSAP ScrollTrigger stays out**,
+and everything scroll-linked stays on native CSS `animation-timeline`. The scroll half of
+the ban was kept because that is where the real defect was.
+
+*Reason:* the named failure was scroll-driven — a ScrollTrigger misfire strands an
+element at `opacity: 0` forever, while a compositor-driven timeline has no JS in the path
+to misfire. Reaktor ships `body{opacity:0 !important}` with no `prefers-reduced-motion`
+fallback and blanks itself for anyone whose JS fails. A hover state or an exit transition
+carries none of that risk, so the ban was wider than the defect it was written for.
+
+**The guard rail that replaces it: no animation may leave content in a state where its
+failure hides content.** Never animate a text element's `opacity` from 0 as its arrival —
+movement carries arrivals. That is *"Text is never faded for effect"* below, seen from
+the other end: the same defect, whether the fade never finishes or never starts. If JS
+never runs, every piece of content must still be visible and readable.
+`prefers-reduced-motion` is honoured by every animation, with no exceptions.
 Keep orchestrated moments; cut scattered ones. Density of scroll effects is itself a
 generated-looking signal.
+
+*Check:* two greps, both of which actually run. Every animation rule in the built CSS
+sits inside `@supports (animation-timeline: view())`. And under `prefers-reduced-motion`,
+every animated element reports `opacity: 1`, `clipPath: none` and its full width.
+
+*This check was rewritten once already.* It first read "disable JavaScript and load the
+page; every heading must still be legible" — which sounds right and is unsatisfiable
+here. This is a client-rendered SPA with no SSR: with JS off the document is 31
+characters, `<div id="root"></div>`, and **no** section passes. A check nothing can pass
+is not a standard, it is decoration. The two above catch the same defect — an animation
+that can strand content — and can be run today.
 
 **Text is never faded for effect** — ancestor opacity folds into contrast maths, so
 faded copy genuinely fails. Movement alone carries text arrivals.
@@ -222,7 +256,15 @@ These are being decided with the user, on rendered options, not chosen unilatera
   is the page itself — a full-bleed band, the ground, a rule, a timeline — and planes have
   no corners because they have no edges you are meant to see. An object sits on a plane
   and has a shape. Structure that is plane stays square: the production line, the eyebrow
-  rules, the ruled tables, the timeline nodes.
+  rules, the ruled tables.
+
+  **Amended: a node is a point, not a plane.** The timeline's milestone nodes used to be
+  listed above as structure that stays square. They are circles, and the rule was the
+  thing that was wrong. A station on a track is a *point* — it has no edges and therefore
+  no corners to round, so a circle is its geometry rather than a radius applied to it.
+  The track line it sits on is still plane and still square-ended. Drawn as an
+  equal-sided box at `--radius-action`, never as a rounded rectangle approximating a
+  circle.
 
   This entry had gone stale: it still quoted the retired *"radius means you can touch
   it"* wording months after `index.css` was amended, and after `Roles` had already shipped
