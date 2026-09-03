@@ -3,12 +3,24 @@ import { NAV } from './navData'
 
 /**
  * Everything every navbar variant needs to know, in one place: whether the page
- * has scrolled, whether a dark section is under the bar, which section is being
- * read, and which drawer is open.
+ * has scrolled, which section is being read, and which drawer is open.
  *
  * This began as shared plumbing for four competing bars. Three are gone; the
  * hook stays split out because the observers and the hover-intent timers are
  * the part worth reading on their own.
+ *
+ * IT NO LONGER WATCHES WHAT IS UNDERNEATH IT, and that is the point. A fourth
+ * observer used to query `[data-tone="inverse"]`, collapse the viewport to a
+ * band the height of the bar, and flip the whole header's palette to forest
+ * whenever a dark section crossed it. That was a bar with no ground of its own,
+ * adapting to every plane it passed over — so the moment Work took a fixed
+ * near-black band the header started turning green in the middle of the
+ * customer section, which is what got it removed.
+ *
+ * The bar now paints its own `--ground` and stops asking. `data-tone="inverse"`
+ * stays on the SECTIONS: it still drives the sun focus-ring substitution, the
+ * inverse ink sets, `tools/audit.mjs` and `tools/shot.mjs`. Nothing about it was
+ * for the nav except this observer.
  */
 
 /** Long enough that crossing the nav on the way to Contact doesn't open anything. */
@@ -18,11 +30,10 @@ const CLOSE_DELAY = 140
 
 type Trigger = { label: string; href: string }
 
-export function useNavState(barHeight = 72) {
+export function useNavState() {
   const [openItem, setOpenItem] = useState<string | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [overDark, setOverDark] = useState(false)
   const [currentSection, setCurrentSection] = useState<string | null>(null)
   /** Assume a mouse until told otherwise: the desktop bar is hidden below `lg` anyway. */
   const [canHover, setCanHover] = useState(true)
@@ -191,42 +202,6 @@ export function useNavState(barHeight = 72) {
     return () => observer.disconnect()
   }, [])
 
-  /**
-   * Flip the bar's palette while an inverted section sits beneath it. The root
-   * margin collapses the viewport to a band the height of the bar, so "is a dark
-   * section under the header" is a plain intersection test rather than a scroll
-   * handler doing geometry every frame.
-   */
-  useEffect(() => {
-    const sections = document.querySelectorAll('[data-tone="inverse"]')
-    if (!sections.length) return
-    let observer: IntersectionObserver | null = null
-    const dark = new Set<Element>()
-
-    const build = () => {
-      observer?.disconnect()
-      const band = Math.max(0, window.innerHeight - barHeight)
-      observer = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (e.isIntersecting) dark.add(e.target)
-            else dark.delete(e.target)
-          }
-          setOverDark(dark.size > 0)
-        },
-        { rootMargin: `0px 0px -${band}px 0px`, threshold: 0 },
-      )
-      for (const s of sections) observer.observe(s)
-    }
-
-    build()
-    window.addEventListener('resize', build)
-    return () => {
-      observer?.disconnect()
-      window.removeEventListener('resize', build)
-    }
-  }, [barHeight])
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return
@@ -258,10 +233,6 @@ export function useNavState(barHeight = 72) {
     }
   }, [mobileOpen])
 
-  // Over a forest band an overlay would be unreadable, so opening one always
-  // returns the bar to its own ground.
-  const inverted = overDark && !mobileOpen
-
   return {
     rootRef,
     openItem,
@@ -278,8 +249,18 @@ export function useNavState(barHeight = 72) {
     mobileOpen,
     setMobileOpen,
     scrolled,
-    inverted,
     currentSection,
-    solid: scrolled || openItem !== null || mobileOpen,
+    /**
+     * Whether the bar draws its bottom hairline.
+     *
+     * This was `solid`, back when it also decided whether the bar had a
+     * background at all. The bar is opaque unconditionally now, so the only
+     * thing left for this flag to say is whether there is an EDGE — and an edge
+     * is only true where there is something to separate: content that has
+     * travelled under the bar, or a drawer hanging off it. At rest over the
+     * hero the bar and the page are the same plane and a rule there would be
+     * drawing a line through one surface.
+     */
+    edged: scrolled || openItem !== null || mobileOpen,
   }
 }
