@@ -1,5 +1,5 @@
 import { Container, Grid, SectionHeader } from '@/components/primitives/Layout'
-import { Card } from '@/components/primitives/Card'
+import { CardSlider } from '@/components/primitives/CardSlider'
 import { roles } from '@/data/norrin'
 
 /**
@@ -11,35 +11,58 @@ import { roles } from '@/data/norrin'
  * buried in body copy.
  *
  * ---------------------------------------------------------------------------
- * HEADING LEFT, CARDS RIGHT
+ * HEADING ON TOP, ROW CENTRED UNDERNEATH
  * ---------------------------------------------------------------------------
- * A directed layout: the heading holds a narrow column on the left and the four
- * roles sit as cards in a 2x2 to its right, on a lifted surface with a hairline
- * and a soft radius.
+ * The heading runs across the top of the section and the roles sit in a
+ * three-across slider centred beneath it: one card popped out at the front, one
+ * legible card either side, and real controls under the row. The mechanism and
+ * every reason it is shaped the way it is live in `CardSlider.tsx`; what belongs
+ * here is why this section has one at all, and what the arrangement costs.
  *
- * The split is the composition's whole job. A section header that runs the full
- * width and then hands off to a grid underneath is the shape six other sections
- * on this page already have; a header that stays beside its content for the
- * whole section is a different silhouette, and it puts information on the left
- * and the right of one horizontal band rather than stacking everything down a
- * single axis (§1.4).
+ * IT USED TO BE HEADING LEFT, CARDS RIGHT. That split was the section's answer
+ * to §1.5 — a header that stays beside its content for the whole section is a
+ * different silhouette from a header that runs the full width and hands off to a
+ * grid underneath, which is the shape most of this page already has. Moving the
+ * row underneath gives that up, and it is worth saying plainly rather than
+ * quietly: this section now opens the way its neighbours open. What carries the
+ * silhouette instead is the row itself. A three-across slider with a popped-out
+ * centre card, arrows level with it in the outer margins and a dot row beneath
+ * traces nothing else on this page — TheGap above it is a pinned scene and
+ * Pillars below it is a ruled surface band. Checked at 25% zoom, which is the
+ * only scale that question can be answered at.
  *
- * 2x2, NOT A ROW OF FOUR. Four cards abreast inside a seven-column span are
- * 180px wide and every claim sets to five or six lines.
+ * A ROW, NOT A 2x2. The grid was the honest layout for four claims that are all
+ * true at once, and it is still what a reduced-motion reader gets — every part
+ * of the slider lives inside `prefers-reduced-motion: no-preference` and the
+ * grid is the resting state. What the row buys is a focal point: four equal
+ * cards have no subject. What it costs is that only three of the four are on
+ * screen at a time, which is payable because the fourth is behind the front card
+ * rather than deleted, because it rotates in on its own, and because a reader
+ * can reach any of them directly with a dot.
+ *
+ * ---------------------------------------------------------------------------
+ * THE CARD
+ * ---------------------------------------------------------------------------
+ * CENTRED, LIKE THE CUSTOMER CARD, BUT WITHOUT ITS QUOTATION MARK. The two share
+ * the `.card` shell and its composition: copy centred, the name on the floor at
+ * the left. What Scope does NOT take is the quote mark. These four claims are
+ * Norrin's own words about itself, not quoted matter, and a quotation mark over
+ * them would say something untrue about where they came from.
  *
  * THE CLAIM IS ON TOP AND THE ROLE IS AT THE BOTTOM. `mt-auto` pins the role
  * name to the card's floor, so a card reads as a statement resolving into the
  * name for it — "We run the platforms underneath." → *Infrastructure partner*.
  * It also turns the four ragged claim lengths (53, 68, 32 and 137 characters)
- * from damage into air: every card in a row stretches to the tallest, and with
- * the names all sitting on the floor the leftover space reads as deliberate
- * rather than as a short column that failed to fill.
+ * from damage into air: all four cards share one grid cell, so every one of them
+ * stretches to the tallest, and with the names sitting on the floor the leftover
+ * space reads as deliberate rather than as a short column that failed to fill.
  *
- * NO SHADOW, ON PURPOSE. §2.7 allows one only for a genuinely floating layer —
- * a dropdown, a dialog, a sheet. These are page content, so they separate from
- * the ground the way everything else here does: a hairline and a one-step lift
- * from `--ground` to `--surface`. That lift is deliberately small in both
- * themes (#0e120f → #161b17 dark, #f8f7f3 → #f1f0ea light).
+ * ONE SHADOW, ON THE FRONT CARD ONLY. §2.7 allows a shadow for "a genuinely
+ * floating layer" and refuses it everywhere else. A card lifted out of a row of
+ * three is that case, and it is the cue that turns the front card from the
+ * middle item into the active one. It is deliberately small and it is on nothing
+ * else in the section; the flanking cards separate on a hairline like everything
+ * else on this page. The value and the alpha are argued at the declaration.
  *
  * `--radius-panel`, not `--radius-section`. The section step is for a whole
  * section lifted off the ground as one plate; these are component-scale objects
@@ -47,147 +70,167 @@ import { roles } from '@/data/norrin'
  * frames at component scale".
  *
  * ---------------------------------------------------------------------------
- * THE RULE
- * ---------------------------------------------------------------------------
- * One rule opens the section, running the full width of the viewport. It is a
- * sibling of `Container` rather than a child, so it crosses the container edge
- * by the gutter on both sides — 82px each at 1512 — and leaves the frame
- * (§1.6). It is also the page's own device at section scale: solid means
- * committed, and this section is the page's definition of what Norrin commits
- * to.
- *
- * `draw` is scaleX from `transform-origin: left center`, which is what makes it
- * draw rather than fade. It opens ahead of the cards so the line is already
- * across by the time they arrive — one orchestrated gesture rather than five
- * scattered ones.
- *
- * ---------------------------------------------------------------------------
  * WHAT WAS REMOVED, AND WHY IT IS NOT COMING BACK
  * ---------------------------------------------------------------------------
- * THE OLD INSET PANEL. This section used to be a single `--surface` plate with
- * `--radius-section` and a hairline, on the argument that it was "the first
- * section that is an OBJECT rather than a plane" and therefore broke the page's
- * band rhythm. Measured, it did the opposite: the panel's background computed
- * to `rgb(22, 27, 23)` and Pillars — the 2112px band that starts 113px below it
- * — computes to `rgb(22, 27, 23)`. Same token, same colour. The floating object
- * and the plane under it were one continuous field with a notch cut in it,
- * which is the §1.5 failure the panel was introduced to fix.
+ * THE OPENING RULE — REMOVED, ON THE USER'S CALL. A one-pixel `--hairline-strong`
+ * span ran the full width of the viewport at the top of this section, drawn on
+ * scroll by `data-scroll="draw"`. Unlike the seam rule below it DID render, and
+ * it did the two jobs written down for it: it crossed the container edge by the
+ * gutter on both sides, which was one of the page's frame-breaks (§1.6), and it
+ * opened the section with a committed line ahead of the cards.
  *
- * The cards are not that mistake repeated at smaller scale. One plate the width
- * of the section reads as a plane and merges with the plane below it; four
- * separated objects with ground visible between and around them read as
- * objects, and the section's own ground still flips to Pillars' surface at the
- * boundary. Checked at 25% zoom, which is the only scale that question can be
- * answered at.
+ * It is gone because the user does not want a line there. Two consequences are
+ * paid for rather than left to be discovered. The §1.6 count is one lower, and
+ * this section no longer contributes a full-bleed one — the slider's arrows sit
+ * in the page gutter beyond the container's content edge, which is a smaller
+ * gesture, so the page's budget should be re-counted rather than assumed. And
+ * the rule was carrying 1px of layout plus the 56/64px of margin under it that
+ * existed to clear it; that space is now spent as the section's own top padding
+ * instead, so the join does not jump.
  *
  * THE SEAM RULE. A one-pixel accent rule at `mt-24 -mb-24 md:mt-36 md:-mb-36`,
- * described in twenty-five lines of comment as "seam 3 — the taper, and the
- * last of them". It has never rendered. A negative bottom margin on a last
- * child shortens the content box; it does not cancel the parent's
- * padding-bottom, which is still laid out after it. Measured at 1512: the
- * rule's box sat at y=4833 and the section's `overflow-clip` box ended at
- * y=4802 — thirty-one pixels outside its own clip, on every page load since it
- * was written. The decaying series it claimed to close had two members, not
- * three.
+ * described in twenty-five lines of comment as "seam 3 — the taper, and the last
+ * of them". It never rendered, which is the difference between it and the
+ * opening rule above. A negative bottom margin on a last child shortens the
+ * content box; it does not cancel the parent's padding-bottom, which is still
+ * laid out after it. Measured at 1512: the rule's box sat at y=4833 and the
+ * section's `overflow-clip` box ended at y=4802 — thirty-one pixels outside its
+ * own clip, on every page load since it was written.
+ *
+ * THE OLD INSET PANEL. This section used to be a single `--surface` plate with
+ * `--radius-section` and a hairline, on the argument that it was "the first
+ * section that is an OBJECT rather than a plane". Measured, it did the opposite:
+ * the panel's background computed to `rgb(22, 27, 23)` and Pillars — the band
+ * that starts below it — computes to `rgb(22, 27, 23)`. Same token, same colour.
+ * The floating object and the plane under it were one continuous field with a
+ * notch cut in it, which is the §1.5 failure the panel was introduced to fix.
  *
  * THE PROPORTIONAL COLUMN TRACKS. A previous pass sized four flat columns by
  * their claim lengths — `minmax(11rem, 53fr) minmax(11rem, 68fr) …` — so that
  * line counts, and therefore column bottoms, came out equal. It worked;
  * measured, all four paragraphs set to 55px. It is gone because the layout it
- * solved is gone, not because it failed: cards in a stretched grid already
- * share a floor, and the names are pinned to it. Recorded so nobody re-derives
- * it from scratch.
+ * solved is gone, not because it failed. Recorded so nobody re-derives it.
  *
  * ---------------------------------------------------------------------------
  * STILL TRUE
  * ---------------------------------------------------------------------------
- * Not numbered inside the section, and not hoverable. These are four
- * responsibilities held at the same time, not four steps — numbering them
- * asserts a sequence that does not exist, and "03" would mean one thing here
- * and another in the section eyebrow beside it. Nothing here opens, so nothing
- * here gets a hover affordance.
+ * Not numbered inside the section. These are four responsibilities held at the
+ * same time, not four steps — numbering them asserts a sequence that does not
+ * exist, and "03" would mean one thing here and another in the section eyebrow
+ * above it. The dots are a position indicator for a rotation, not an order.
  *
- * No dimming either, which the reference this layout was directed from uses to
- * favour its first card. §3: text is never faded for effect — ancestor opacity
- * folds into contrast maths and genuinely fails it — and past the mechanics,
- * four responsibilities held at the same time cannot have one of them turned
- * up.
+ * No dimming, which the reference this layout was directed from uses to favour
+ * its centre card. §3: text is never faded for effect — ancestor opacity folds
+ * into contrast maths and genuinely fails it. The flanking cards recede on size
+ * and on a measured tone instead, and every word on them clears AA against the
+ * surface it is painted on.
  */
+/**
+ * THE ROW IS A SET OF TONES, NOT FOUR OF THE SAME CARD.
+ *
+ * `TONES` is the FLAT layout's composition — what renders under reduced motion,
+ * where all four cards are on screen at once and their arrangement is the whole
+ * design. Four cards, three tones, so one tone repeats — and the one that
+ * repeats is the quiet one. Repeating a loud tone would say the two cards
+ * carrying it are a pair, which is a claim about the content that is not true;
+ * repeating the paper tone says nothing, because paper is what a card is when it
+ * is not making a point of its surface.
+ *
+ * WHERE THEY SIT. `dark, paper, paper, signal` puts the two loud tones on the
+ * leading diagonal at 2x2 — dark in the top-left corner the eye starts at,
+ * signal in the bottom-right corner it leaves from — with the two quiet ones on
+ * the other diagonal. Collapsed to one column it is the same decision seen
+ * end-on: the loud pair bookends the stack and the quiet pair sits between them.
+ * Every other arrangement fails one of the two. Putting both loud tones in the
+ * top row leaves a dead bottom row at 2x2; putting them adjacent anywhere makes
+ * them a pair rather than a span.
+ *
+ * IN THE SLIDER THE TONE IS KEYED TO POSITION INSTEAD, and it has to be. A
+ * position-keyed tone cannot follow the item: if the tones travelled with the
+ * cards, the row would be a different arrangement of colour every five seconds.
+ * So the row holds still and the cards move through it — sun at the front, and a
+ * muted surface on the two flanking cards and on the one behind them. That
+ * binding lives in `index.css` at SCOPE — THE ROW, because it is keyed to a
+ * depth this file does not compute.
+ *
+ * The argument above survives the move intact, which is why it was made this way
+ * rather than by picking new tones. The tone that repeats is still the quiet
+ * one, and it now repeats for a structural reason rather than a chosen one: the
+ * two flanking cards are the same depth, so they are the same tone. And sun at
+ * the front is what makes the active card unmistakable without a drop of opacity
+ * (§3) — it is the only saturated object in the section, on both grounds,
+ * because all these tones are fixed in both themes.
+ *
+ * NO COLOUR IS WRITTEN HERE (§2.4). The call site names a tone; every value
+ * behind that name lives in the token layer at the end of `index.css`, which is
+ * also where the dark tone is flagged as pending the §4 palette pick.
+ */
+const TONES = ['dark', 'paper', 'paper', 'signal'] as const
+
 export function Roles() {
   return (
     <section
       id="roles"
       data-shot="roles"
       aria-labelledby="roles-heading"
-      className="overflow-clip py-20 md:py-28"
+      // ASYMMETRIC PADDING, AND THAT IS THE POINT. The rest of the page runs
+      // `py-20 md:py-28`; this section runs about a third of that at the top and
+      // the page's usual value at the bottom.
+      //
+      // Two things paid for the old top value and neither exists now. The
+      // opening rule sat at the section's top edge and needed air above it to
+      // read as a rule rather than as a border; the header then needed
+      // `mt-14 md:mt-16` to clear it. That is 177px of vertical at 1512 spent on
+      // an element that has been removed. Leaving the padding where it was would
+      // have left a hole exactly the size of the thing taken out of it, on top
+      // of TheGap's own `pb-28 md:pb-12` — which is not this file's to change
+      // and is documented there as a deliberate fix for a scroll-scene join.
+      //
+      // Measured rather than picked; the before and after are in the commit.
+      className="overflow-clip pt-8 pb-20 md:pt-10 md:pb-28"
     >
-      {/* Outside `Container` on purpose — see THE RULE above. */}
-      <div aria-hidden="true" className="h-px">
-        <span
-          data-scroll="draw"
-          style={{
-            ['--scrub-from' as string]: 'cover 4%',
-            ['--scrub-to' as string]: 'cover 34%',
-          }}
-          className="block h-px w-full bg-hairline-strong"
-        />
-      </div>
-
       <Container>
-        <Grid className="mt-14 md:mt-16">
-          {/* The split is `lg` and up only. At 834 a four-column heading is
-              250px and the seven-column card region is 440px, which puts each
-              card at 208px — narrower than the phone layout it is meant to be
-              an improvement on. Below `lg` the heading takes the full width and
-              the cards follow underneath. */}
-          <div className="col-span-4 mb-12 md:col-span-12 lg:col-span-4 lg:mb-0">
+        <Grid>
+          {/* Seven of twelve. The heading runs across the top now, but it does
+              not run the full width — a full-bleed h2 with a row under it is the
+              band shape §1.5 is about, and stopping the measure at column seven
+              leaves the right-hand fifth of the section open above the row. */}
+          <div className="col-span-4 md:col-span-10 lg:col-span-7">
             <SectionHeader index="02" label="Scope" id="roles-heading" gap="none">
               What we take responsibility for.
             </SectionHeader>
           </div>
-
-          {/* `col-start-6`, leaving column five empty. The grid's own 24px
-              gutter is already the gap BETWEEN two cards; if it were also the
-              gap between the heading and the cards, the heading would read as a
-              fifth cell of the same grid rather than as the other side of a
-              split. The empty column is what makes it a split. */}
-          <ul
-            data-scroll="drift-slow"
-            className="col-span-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:col-span-12 md:gap-5 lg:col-span-7 lg:col-start-6"
-          >
-            {roles.map((r, i) => (
-              <li
-                key={r.id}
-                data-scroll="enter"
-                style={{
-                  // Rises rather than slides. The old entrance travelled in from
-                  // the left by four fifths of the gutter, which suited flat
-                  // columns hanging off a rule; a card that already has an edge
-                  // on every side has nowhere to have come from sideways.
-                  ['--enter-y' as string]: '28px',
-                  // Staggered in reading order — across the top row, then
-                  // across the bottom. Each item is still timed against its own
-                  // view range rather than the list's: at `lg` the four share a
-                  // scroll fate, but at phone width this is a tall single column
-                  // and a shared range would spend the last card's slot long
-                  // before that card is anywhere near the screen.
-                  ['--scrub-from' as string]: `cover ${14 + i * 5}%`,
-                  ['--scrub-to' as string]: `cover ${14 + i * 5 + 26}%`,
-                }}
-              >
-                {/* The box, the padding, the hairline and the floor rule now
-                    live in `.card` / `Card.tsx`, shared with the customer
-                    stack. The values moved across unchanged, so this is a
-                    refactor with a zero-pixel diff and not a restyle — proved
-                    with `--clip=roles` before and after, not asserted. What
-                    stays on the `<li>` is what the `<li>` owns: the grid cell
-                    and its own arrival. */}
-                <Card body={r.claim} floor={r.role} />
-              </li>
-            ))}
-          </ul>
         </Grid>
       </Container>
+
+      {/* OUTSIDE `Container`, ON PURPOSE. The row is a sibling of the measure
+          rather than a child of it, so the arrows sit in the page gutter beyond
+          the container's content edge — 36px outside it at 1512 — and the row of
+          cards gets the width the viewport can give it rather than the width the
+          text measure happens to be. It is also what is left of this section's
+          frame-break (§1.6) now that the opening rule is gone.
+
+          The arrival is on this wrapper rather than on the cards. The scroll
+          layer animates `transform` and the slider's positions ARE a transform,
+          so on the cards the two would fight over one property on one element —
+          and four staggered arrivals into a thing that then rotates on its own
+          is two motion ideas in one place, which is the density §3 warns about.
+          One arrival, one rotation. */}
+      <div
+        data-scroll="enter"
+        style={{ ['--enter-y' as string]: '28px' }}
+        className="mt-10 px-(--spacing-gutter) md:mt-14"
+      >
+        <CardSlider
+          items={roles.map((r, i) => ({
+            id: r.id,
+            body: r.claim,
+            floor: r.role,
+            label: r.role,
+            tone: TONES[i] ?? 'paper',
+          }))}
+        />
+      </div>
     </section>
   )
 }

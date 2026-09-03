@@ -30,6 +30,7 @@ import { cx } from '@/lib/cx'
  */
 export function Card({
   eyebrow,
+  index,
   title,
   titleId,
   lede,
@@ -39,6 +40,15 @@ export function Card({
 }: {
   /** Mono metadata above the heading. The stack: the client's sector. */
   eyebrow?: ReactNode
+  /**
+   * A position marker set opposite the eyebrow. The stack: which card of the
+   * pile this is.
+   *
+   * `aria-hidden`, because it duplicates information a screen reader already
+   * has for free — all the cards are in the accessibility tree in source order,
+   * so the number adds nothing there and would only be read out twice.
+   */
+  index?: ReactNode
   /** The card's heading, rendered as `<h3>`. The stack: the client. */
   title?: ReactNode
   titleId?: string
@@ -75,15 +85,65 @@ export function Card({
 
   return (
     <div className="card">
-      {eyebrow ? <p className="label text-ink-3">{eyebrow}</p> : null}
+      {/* THE IDENTITY BLOCK. Sector and position on one mono line, then the
+          client set large enough to be the card's subject rather than one of
+          four paragraphs in it.
+
+          The card previously ran 10.5 / 25 / 17 / 17px — its largest element
+          was 1.47x its body text and two of its four blocks were the same size,
+          so it had no focal point and read as a box of prose. §1.3 makes the
+          same argument about the h1: if it is not the largest thing by a wide
+          margin, it is too small.
+
+          SETTING THE NAME LARGE IS THIS SECTION'S OWN ARGUMENT, not a new one.
+          The file opens by noting that Norrin gives its strongest peer proof
+          the visual weight of a footer menu, and that the fix is to set the
+          names as type — we hold no licence to their marks, so typography is
+          both the honest option and the better-looking one. That job used to
+          belong to the roster; the roster is small now, and the argument had
+          nowhere left to live. */}
+      {eyebrow || index ? (
+        <p className="label flex items-baseline justify-between gap-4 text-ink-3">
+          <span>{eyebrow}</span>
+          {index ? (
+            <span aria-hidden="true" className="tabular-nums">
+              {index}
+            </span>
+          ) : null}
+        </p>
+      ) : null}
       {title ? (
-        <h3 id={titleId} className="display-4 mt-2 text-ink">
+        <h3 id={titleId} className="display-2 mt-4 text-ink">
           {title}
         </h3>
       ) : null}
-      {lede ? <p className="mt-4 text-ink">{lede}</p> : null}
-      <p className={cx('body-serif measure-serif text-reading', hasSlotAbove && 'mt-3')}>{body}</p>
-      {note ? <p className="caption mt-3 text-ink-3">{note}</p> : null}
+      {/* THE QUOTED MATTER, GROUPED, so the stack can size it as one block —
+          see the font-size rule scoped to `.card-quoted` in index.css. Scope has
+          no `title`, takes no group, and its flow is untouched, which is what
+          keeps its zero-pixel diff true. */}
+      {title ? (
+        <div className="card-quoted mt-8">
+          {/* THE QUOTATION MARK IS GONE, and it is worth saying why rather than
+              leaving a hole where it was. It marked the case text as quoted,
+              which was true — these strings are verbatim from Norrin's published
+              pages. But a large quote glyph under a client's name is the visual
+              grammar of a testimonial, and these are summaries Norrin wrote, not
+              words the client said. The card carries no person, no face and no
+              attribution for exactly that reason, and the glyph was the one
+              element pulling the other way. The caption under the pile still
+              states the source, which is the honest way to say it. */}
+          {lede ? <p className="mt-2 text-ink">{lede}</p> : null}
+          <p className="body-serif measure-serif mt-3 text-reading">{body}</p>
+          {note ? <p className="caption mt-3 text-ink-3">{note}</p> : null}
+        </div>
+      ) : (
+        <>
+          <p className={cx('body-serif measure-serif text-reading', hasSlotAbove && 'mt-3')}>
+            {body}
+          </p>
+          {note ? <p className="caption mt-3 text-ink-3">{note}</p> : null}
+        </>
+      )}
       {/* An `<h3>` only when the card has no `title`, so a card never emits two
           headings at the same level and `tools/audit.mjs`'s heading-order check
           stays clean. Scope reaches this branch; the stack uses `title`. */}

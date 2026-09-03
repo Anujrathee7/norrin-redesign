@@ -551,9 +551,11 @@ export function TheGap() {
       // reason the class is there. An inherited background would let the pinned
       // hero read straight through.
       //
-      // `data-tone="inverse"` is gone with the forest. The nav's overDark
-      // observer queries `[data-tone="inverse"]`, so the bar simply no longer
-      // flips here; `Contact` is the only section that asks it to now.
+      // `data-tone="inverse"` is gone with the forest, and nothing here needs
+      // it back: the attribute now only carries the inverse ink sets and the sun
+      // focus ring, both of which belong to a dark plane, and this is paper. It
+      // used to flip the navbar too — that observer is gone, and the bar paints
+      // its own ground regardless of what it is passing over.
       //
       // `overflow-clip`, never `hidden`: hidden would make this a scrollport,
       // and a view() timeline measured inside a scroll container it is itself
@@ -781,7 +783,7 @@ export function TheGap() {
                     sit at a constant fraction of the screen at every width. */}
                 <Container className="relative pt-[3svh]">
                   <div aria-hidden="true" className="max-w-[30ch]">
-                    <Eyebrow index="01" label="The gap" rule={false} />
+                    <Eyebrow index="01" label="The gap" />
                     <h2 className="thesis mt-3">{positioning.thesisOpening}</h2>
                   </div>
                 </Container>

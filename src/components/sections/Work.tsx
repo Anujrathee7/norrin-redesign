@@ -42,7 +42,25 @@ export function Work() {
       id="work"
       data-shot="work"
       aria-labelledby="work-heading"
-      className="overflow-clip py-20 md:py-28"
+      // THE NIGHT BAND. Full-bleed, edge to edge — the background is on the
+      // SECTION, which already spans the viewport, so there is no inset panel
+      // and `--radius-section` stays unspent and still flagged in §4.
+      //
+      // FIXED IN BOTH THEMES. `--band-night` is `--ground`'s dark branch pinned,
+      // and index.css carries the argument: the pile on it is four sheets
+      // separated by tone, and a ground that flips takes that separation with it.
+      //
+      // `data-tone="inverse"` is the page's existing switch for "this plane is
+      // dark". It is what repaints the focus ring in sun, which is the one thing
+      // in this section that axe cannot check and that this repo has shipped two
+      // real bugs in.
+      //
+      // `overflow-clip` STAYS, and not as a formality: the deal keyframe throws
+      // the leaving card to `translate(128%)` and something has to take it, and
+      // `hidden` would create a scroll container that freezes the roster's
+      // `view()` timeline at 0% forever. The comment above says so at length.
+      data-tone="inverse"
+      className="overflow-clip bg-band-night py-20 text-inverse-ink md:py-28"
     >
       <Container>
         {/* READING MATTER LEFT, THE PILE RIGHT.
@@ -59,15 +77,33 @@ export function Work() {
             a card off the edge of the page. Checked at 25%, which is the only
             zoom that question can be answered at.
 
-            The pile is the last column of the grid, so its right edge is the
-            container's — everything past it is gutter, and then the section's
-            clip. That is what gives the dealt card somewhere to go. */}
+            THE PILE NO LONGER ENDS AT THE CONTAINER'S RIGHT EDGE, and that is
+            the change rather than an oversight. It used to start at column 8 and
+            be right-aligned inside its cell, which put the front card hard
+            against the container edge and sent the three cards behind it
+            stepping OUT of the container — visible as a sheared right edge at
+            390, where the deepest card ended 24px outside the viewport and the
+            section's clip took it.
+
+            It is LEFT-ALIGNED in its cell now, so the pile grows into the
+            column's own slack instead of out of it. The dealt card still has
+            somewhere to go: it travels 128% of the card's width to the right,
+            which is well past the container and into the clip from anywhere in
+            this cell.
+
+            THE COLUMN START AND THE NEGATIVE TOP MARGIN ARE THE USER'S OWN
+            EDIT AND ARE FROZEN. This pass moved the pile a column further left
+            and it was moved back by hand; the placement here is the one that was
+            chosen by looking at it. Nothing in this file may adjust the pile's
+            position to compensate for something else — a wider card, a taller
+            title, different padding. If one of those stops fitting, the thing
+            that changed is what gives. */}
         <Grid className="items-start">
           <div className="col-span-4 md:col-span-5">
-            <SectionHeader index="04" label="Customers" id="work-heading" gap="tight">
+            <SectionHeader index="04" label="Customers" id="work-heading" gap="tight" tone="inverse">
               Forerunners, mostly Nordic.
             </SectionHeader>
-            <p className="body-serif measure-serif mt-6 text-reading">{customersIntro}</p>
+            <p className="body-serif measure-serif mt-6 text-inverse-ink-2">{customersIntro}</p>
             {/* THE ROSTER, UNDER THE INTRO IT BELONGS TO.
 
                 It used to be a full-width row of ten names set large, panning
@@ -88,28 +124,38 @@ export function Work() {
                 left as a rule nothing uses.
 
                 THE MASCOT WENT TOO. It sat on the roster's top rule, and that
-                rule is gone. Nori is still on the timeline in Proof and on the
-                rungs in Thinking, so the pose and its anchor keep earning their
-                place — just not here. */}
-            <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-2.5 border-t border-hairline pt-8">
-              {customers.map((name, i) => (
+                rule is gone. Nori has since been deleted from the codebase
+                altogether, so there is no remaining consumer of the pose or its
+                anchor anywhere on the page. */}
+            {/* NINE OF THE TEN, and the tenth is left out on purpose rather than
+                by accident. `customers` in norrin.ts keeps all ten, because that
+                array is the record of what Norrin publishes and it should stay
+                complete. This is a display choice: nine names fill three columns
+                exactly, and nothing on this page claims the list is exhaustive —
+                the sentence above it says "most of our customers", not "all".
+                The moment anything here does claim completeness, this filter has
+                to go. */}
+            <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-2.5 border-t border-inverse-hairline pt-8 sm:grid-cols-3">
+              {customers
+                .filter((name) => name !== 'Plan International Finland')
+                .map((name, i) => (
                 <li
                   key={name}
                   data-scroll="enter"
                   style={{
                     ['--enter-y' as string]: '16px',
-                    // Staggered by column rather than by index: the two columns
+                    // Staggered by column rather than by index: the columns
                     // are already offset by sitting at different heights, so an
                     // index stagger would compound into a slow cascade down a
                     // list this short.
-                    ['--scrub-from' as string]: `cover ${12 + (i % 2) * 5}%`,
-                    ['--scrub-to' as string]: `cover ${12 + (i % 2) * 5 + 26}%`,
+                    ['--scrub-from' as string]: `cover ${12 + (i % 3) * 4}%`,
+                    ['--scrub-to' as string]: `cover ${12 + (i % 3) * 4 + 26}%`,
                   }}
-                  className="ui text-ink-2"
-                >
-                  {name}
-                </li>
-              ))}
+                  className="ui text-inverse-ink-2"
+                  >
+                    {name}
+                  </li>
+                ))}
             </ul>
           </div>
 
@@ -119,20 +165,30 @@ export function Work() {
               narrows the card: at six columns it was 744px, which sets the
               quote to two lines and reads as a panel lying on its side rather
               than as a card. */}
-          <div className="col-span-4 mt-12 md:col-span-5 md:col-start-8 md:mt-0">
+          {/* `md:-mt-18` — the card's top edge rides above the heading's, which
+              is what stops the two columns reading as two halves of the same
+              band. The quotation mark hangs a further 13px above the card, and
+              the section's own top padding is 112px, so there is still 27px of
+              clearance to the section's clip box at the tightest viewport.
+
+              `pr` is gone with the right-alignment: it existed to hold the card
+              off the container's right edge, and the card is no longer near it.
+              Keeping it would have cost the tablet column 50px of a 306px
+              budget, which comes straight off the quote's measure. */}
+          <div className="col-span-4 mt-12 md:col-span-5 md:col-start-8 md:-mt-18">
             <CardStack
               items={cases.map((c) => ({
                 id: c.id,
-                eyebrow: c.sector,
-                title: c.client,
-                lede: c.title,
+                // The design puts a name and a role on the card floor. Ours are a
+                // company and a sector, because that is what a case is about — see
+                // the note in CardStack about the avatar that is not there.
+                who: c.client,
+                role: c.sector,
+                kicker: c.title,
                 body: c.quote,
                 note: 'attribution' in c && c.attribution ? c.attribution : undefined,
               }))}
             />
-            <p className="caption mt-8 text-ink-3">
-              Case summaries quoted from Norrin&rsquo;s published customer cases.
-            </p>
           </div>
         </Grid>
 

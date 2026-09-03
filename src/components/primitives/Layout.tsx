@@ -180,28 +180,25 @@ export function SectionHeader({
 
 /**
  * The single eyebrow treatment used by every section, including the hero.
- * Rule, index, separator, label — in that order, at that size, always.
+ * Index, separator, label — in that order, at that size, always.
+ *
+ * THE LEAD-IN RULE IS GONE. A 32px hairline sat before the index, and at label
+ * size it did not read as structure — it read as an em dash, so every section on
+ * the page opened with "— 04 / Customers", a punctuation mark introducing a
+ * heading it had no grammatical relationship to. TheGap already suppressed it
+ * with `rule={false}` for a related reason, which left the system with a part
+ * that most callers wanted off. Removing it removes the prop too: one eyebrow,
+ * one shape, nothing to pass.
  */
 export function Eyebrow({
   index,
   label,
   tone = 'default',
-  rule = true,
   className,
 }: {
   index?: string
   label: string
   tone?: 'default' | 'inverse'
-  /**
-   * The short lead-in rule before the index.
-   *
-   * `false` drops it. It exists because the rule reads as a dash at label size
-   * — "— 01 / The gap" — and over a drawn backdrop, where the eyebrow is
-   * already sitting on a picture rather than on a plain margin, that stray dash
-   * is one mark too many. Everywhere the eyebrow sits on flat ground it keeps
-   * the rule, which is what ties it to the hairline structure around it.
-   */
-  rule?: boolean
   className?: string
 }) {
   return (
@@ -212,15 +209,6 @@ export function Eyebrow({
         className,
       )}
     >
-      {rule ? (
-        <span
-          aria-hidden="true"
-          className={cx(
-            'inline-block h-px w-8 shrink-0',
-            tone === 'inverse' ? 'bg-inverse-hairline-strong' : 'bg-hairline-strong',
-          )}
-        />
-      ) : null}
       {index ? (
         <>
           <span className="tabular-nums">{index}</span>

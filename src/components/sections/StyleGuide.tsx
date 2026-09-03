@@ -6,6 +6,8 @@ import { useTheme } from '@/hooks/useTheme'
 import { measure } from '@/lib/contrast'
 import { Card } from '@/components/primitives/Card'
 import { CardStack } from '@/components/primitives/CardStack'
+import { CardSlider } from '@/components/primitives/CardSlider'
+import { Progress } from '@/components/ui/progress'
 import { cases, photos, roles } from '@/data/norrin'
 
 /**
@@ -155,6 +157,54 @@ function TypeRow({ cls, role, sample }: { cls: string; role: string; sample: str
 }
 
 /* ------------------------------------------------------------------ *
+ * The tone lab
+ * ------------------------------------------------------------------ */
+
+/**
+ * Four directions for the customer pile's card surfaces, rendered.
+ *
+ * §4 is the reason this is a page and not a paragraph: the palette is under
+ * revision, and it says directions get rendered here and picked from. One tone
+ * — the forest — was committed straight to the real pile instead, looked at,
+ * and taken off again. That is the round trip this block exists to stop.
+ *
+ * REAL CONTENT, NOT SWATCHES. Each specimen carries the case title with its
+ * accent phrase, the quote and the attribution, because what is being judged is
+ * three colours carrying type at four ink weights — which a rectangle of colour
+ * cannot tell you anything about.
+ *
+ * PAPER AND SUN ARE THE SAME IN ALL FOUR. Only the dark tone changes, so the
+ * question being asked is exactly one colour wide.
+ */
+const TONE_DIRECTIONS = [
+  { key: 'a', name: 'Ink', hex: '#14170f' },
+  { key: 'b', name: 'Espresso', hex: '#2a221c' },
+  { key: 'c', name: 'Slate', hex: '#1c2733' },
+  { key: 'd', name: 'Aubergine', hex: '#2d1f33' },
+] as const
+
+function ToneCard({ lab }: { lab: 'dark' | 'dark-ruled' | 'paper' | 'sun' }) {
+  const c = cases[0]
+  const words = c.title.trim().split(/\s+/)
+  const head = words.slice(0, -2).join(' ')
+  const tail = words.slice(-2).join(' ')
+  return (
+    <div className="card" data-lab={lab}>
+      <div className="quote-set">
+        <p className="quote-title">
+          {head} <span className="quote-title-tail">{tail}</span>
+        </p>
+        <p className="quote-body">{c.quote}</p>
+        <div className="quote-who">
+          <p className="quote-who-name">{c.client}</p>
+          <p className="quote-who-role">{c.sector}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ *
  * The page
  * ------------------------------------------------------------------ */
 
@@ -169,16 +219,18 @@ function Rule({ children }: { children: ReactNode }) {
 /**
  * The pile's geometry, read off the live DOM.
  *
- * `--stack-shrink` is the one number in the stack that is not derived from
- * another token, and the quantity it actually controls — the side inset at
- * depth 1, in pixels — is a function of the rendered card width. That width is
- * seven of twelve columns of the page measure, and the page measure has already
- * moved twice (1512 -> 1200 -> 1440). The first draft of this constant was
- * estimated against a card width that did not exist and was out by 20%.
+ * WHAT THIS READOUT IS FOR. `--stack-step` is paid for out of the front card's
+ * own width — the region subtracts the pile's whole travel before sizing the
+ * card, so that the PILE fits its column rather than the card fitting it and the
+ * three cards behind hanging out into the clip. That makes the card width a
+ * consequence of the step and the column, and a consequence is exactly the kind
+ * of number a style guide should print rather than assert.
  *
- * So the number is printed rather than asserted. If someone moves the measure
- * or the column span, the inset stops matching the step here, visibly, on a
- * page a human is already looking at.
+ * IT USED TO MEASURE `--stack-shrink`, A TOKEN THAT NO LONGER EXISTS, and it
+ * printed `NaN` in two of its six rows for however long that had been true. It
+ * also described the step as "one --radius-panel", which stopped being true when
+ * the two were decoupled — a lying style guide is worse than no style guide, and
+ * this file says so in its own header.
  */
 function StackSpec() {
   const theme = useTheme()
@@ -189,17 +241,20 @@ function StackSpec() {
     const ol = host.current?.querySelector('[data-cardstack]')
     const card = ol?.querySelector('.card')
     if (!ol || !card) return
-    const cs = getComputedStyle(ol)
+    const region = host.current?.querySelector('[data-cardstack-region]')
+    const cs = getComputedStyle(region ?? ol)
     const step = parseFloat(cs.getPropertyValue('--stack-step'))
-    const shrink = parseFloat(cs.getPropertyValue('--stack-shrink'))
+    const count = parseFloat(cs.getPropertyValue('--stack-count'))
     const width = card.getBoundingClientRect().width
+    const cardCs = getComputedStyle(card)
     setRows([
-      { label: '--stack-step', value: `${step}px — one --radius-panel` },
-      { label: '--stack-shrink', value: String(shrink) },
+      { label: '--stack-step', value: `${step}px, down and right` },
+      { label: '--radius-stack', value: cs.getPropertyValue('--radius-stack').trim() },
       { label: 'card width, measured', value: `${width.toFixed(1)}px` },
-      { label: 'depth-1 side inset', value: `${((width * shrink) / 2).toFixed(2)}px` },
-      { label: 'depth-1 vertical step', value: `${step}px` },
-      { label: 'list overflow', value: cs.overflow },
+      { label: 'pile travel', value: `${((count - 1) * step).toFixed(0)}px` },
+      { label: 'pile width, card + travel', value: `${(width + (count - 1) * step).toFixed(1)}px` },
+      { label: 'deepest card fill', value: cardCs.backgroundColor },
+      { label: 'list overflow', value: getComputedStyle(ol).overflow },
     ])
   }, [theme])
 
@@ -217,9 +272,9 @@ function StackSpec() {
         paused
         items={cases.map((c) => ({
           id: c.id,
-          eyebrow: c.sector,
-          title: c.client,
-          lede: c.title,
+          who: c.client,
+          role: c.sector,
+          kicker: c.title,
           body: c.quote,
           note: 'attribution' in c && c.attribution ? c.attribution : undefined,
         }))}
@@ -351,8 +406,11 @@ export function StyleGuide() {
                 progression that does not exist.
               </Rule>
               <Rule>
-                <strong className="text-ink">Sun is a signal, never a surface.</strong> Three solid
-                uses per page. Anything sitting on sun takes fixed dark ink in both themes.
+                <strong className="text-ink">Sun may carry a card, never a plane.</strong> Amended:
+                this read &ldquo;never a surface&rdquo; until the code broke it three times &mdash; the
+                customer pile, this lab and Scope each set a whole card on sun. The line is scale,
+                not permission. Never a band or a section ground. Anything sitting on sun takes
+                fixed dark ink in both themes.
               </Rule>
               <Rule>
                 <strong className="text-ink">
@@ -371,6 +429,165 @@ export function StyleGuide() {
                 destination does not exist is the same class of dishonesty as a fake number.
               </Rule>
             </ul>
+          </Container>
+        </section>
+
+        {/* THE TONE LAB. §4's instruction, carried out: rendered options, in
+            both themes, picked from rather than chosen. */}
+        <section
+          data-shot="tonelab"
+          data-tone="inverse"
+          className="bg-band-night py-16 text-inverse-ink md:py-24"
+        >
+          <Container>
+            <h2 className="display-3 mb-3">Card tones &mdash; four directions</h2>
+            <p className="body-serif measure-serif mb-4 text-inverse-ink-2">
+              The customer pile is being given three card surfaces instead of one. Paper and sun are
+              the same in all four directions below; only the dark tone changes, so the question is
+              exactly one colour wide. Each specimen carries the real case &mdash; title, accent
+              phrase, quote, attribution &mdash; because three colours carrying type at four ink
+              weights is not a thing a swatch can answer.
+            </p>
+            <p className="body-serif measure-serif mb-4 text-inverse-ink-2">
+              All three surfaces are fixed in both themes, the way sun already is. That is what
+              makes a direction a direction. Nothing here is a token in the system and none of it is
+              in <code>tools/palette.mjs</code>: gating a colour is what you do once a colour has
+              been chosen.
+            </p>
+            <p className="body-serif measure-serif mb-12 text-inverse-ink-2">
+              <strong className="text-inverse-ink">
+                These now sit on the night band, which is the ground the pile actually has,
+              </strong>{' '}
+              and it changes the answer. A dark card on a dark band does not read: measured against
+              #0e120f the four dark tones are 1.04:1 (A), 1.21:1 (B), 1.25:1 (C) and 1.22:1 (D)
+              &mdash; the parity bar this file sets for a rule is 1.25:1, so the best of them is
+              exactly as separated from the band as a hairline is, and the worst is not separated at
+              all. Paper reads at 16.54:1 and sun at 16.09:1 on the same ground. Below, each dark
+              card is shown twice: on the left as a plane, on the right with the band&rsquo;s
+              stronger hairline drawn round it.
+            </p>
+
+            {TONE_DIRECTIONS.map((d) => (
+              <div key={d.key} data-tonelab={d.key} className="mb-14">
+                <div className="mb-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                  <span className="label">
+                    {d.key.toUpperCase()} &middot; {d.name}
+                  </span>
+                  <span className="label text-inverse-ink-3">{d.hex}</span>
+                </div>
+                <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                  <ToneCard lab="dark" />
+                  <ToneCard lab="dark-ruled" />
+                  <ToneCard lab="paper" />
+                  <ToneCard lab="sun" />
+                </div>
+              </div>
+            ))}
+
+            <p className="caption mb-4 max-w-[62ch] text-inverse-ink-2">
+              The accent phrase on a dark card is sun, not moss. Moss measures 1.68&ndash;2.01:1 on
+              these four and fails every one of them &mdash; the same failure this file already
+              records for moss on the forest band. Sun measures 12.90&ndash;15.44:1. The inverse ink
+              ladder clears AA on all four darks at every rung, so the TYPE on a dark card is never
+              the problem; only the card&rsquo;s own edge is.
+            </p>
+            <p className="caption max-w-[62ch] text-inverse-ink-2">
+              Three ways out, none of them picked here. ONE: the dark card keeps its tone and gets
+              the band&rsquo;s stronger hairline, so it reads as an outlined object rather than as a
+              plane &mdash; that rule is 1.87:1 on the band, the same weight every other rule on
+              this page is drawn at, and it is the right-hand specimen in each row. TWO: push the
+              band darker. It was measured and it is the one to refuse: at #0a0d0b the inverse
+              hairline falls to 1.25:1 and at #060807 both hairlines fail their parity bar, so the
+              page&rsquo;s only separating device stops reading in order to buy a tenth of a ratio
+              behind a card. THREE: drop the dark card and run paper, sun and a mid tone &mdash;
+              which is what the sketch this came from actually showed. Option ONE is the one worth
+              defending: it costs nothing measured, it keeps all four directions alive, and an
+              outlined card on a night ground is a thing this page already knows how to draw.
+            </p>
+          </Container>
+        </section>
+
+        {/* ADOPTED COMPONENTS.
+
+            §2.8 is the clause this section exists for: every adopted component
+            is rendered here, in both themes, or it is not adopted. A component
+            that exists only inside a section cannot be reviewed — the reviewer
+            would have to find the one card that happens to use it, in the one
+            state it happens to be in.
+
+            ON `--ground`, for the same reason the card section below is: these
+            are shown against the plane they are actually drawn on. */}
+        <section data-shot="adopted" className="border-t border-hairline py-16 md:py-24">
+          <Container>
+            <h2 className="display-3 mb-3">Adopted components</h2>
+            <p className="body-serif measure-serif mb-12 text-reading">
+              One shadcn component, rethemed. Not one stock value survives: every colour below is
+              a bridge variable pointing at a token that was already here and already measured,
+              which is what §2.2 asks for &mdash; the stock neutral-zinc look is on tens of
+              thousands of sites and shipping it would worsen the exact problem this page exists to
+              answer. The focus classes it shipped with were stripped rather than restyled: a
+              Tailwind ring is a box-shadow, and it would have cancelled this page&rsquo;s global
+              outline along with the swap that keeps a ring visible on the forest band. A Badge was
+              adopted here too and then removed with the element it was carrying &mdash; a
+              component with no consumer is not adopted, it is inventory.
+            </p>
+
+            <h3 className="display-4 mb-5">Progress</h3>
+            <div className="mb-4 max-w-[24rem] space-y-5">
+              {[0, 25, 50, 75, 100].map((v) => (
+                <div key={v} className="flex items-center gap-4">
+                  <span className="label w-10 shrink-0 text-ink-3">{v}%</span>
+                  <Progress aria-label={`Progress specimen, ${v} percent`} value={v} />
+                </div>
+              ))}
+            </div>
+            <p className="caption mb-6 max-w-[62ch] text-ink-3">
+              0% and 100% are shown because they are the two states that expose a track that cannot
+              be seen: at 0% only the track is drawn, at 100% only the fill. The track is the accent
+              at 20%, the fill the accent solid, so the pair reads on either ground without adding a
+              colour to the system.
+            </p>
+            <p className="caption max-w-[62ch] text-ink-3">
+              These five carry an <code>aria-label</code>, because a specimen on a review page is
+              genuinely describing its own value. The one in the customer stack does not:
+              it is <code>aria-hidden</code> there, and deliberately.{' '}
+              <code>role=&ldquo;progressbar&rdquo;</code> means task completion, all four customer
+              cases are already in the accessibility tree in source order, and
+              &ldquo;25%&rdquo; is not a description of &ldquo;showing the first of four&rdquo;. The
+              bar is a picture of where the pile is, for people who can see the pile.
+            </p>
+
+            {/* SLIDER — §2.8. Rendered here because a component that exists only
+                inside a section cannot be reviewed. `paused` holds it still so
+                it can be compared rather than watched; in Scope it advances
+                every 5s, pauses on hover, on focus, and while a card is held.
+
+                THE BLUR IS ABSENT AT REST HERE ONLY BECAUSE THE SPECIMEN IS
+                PAUSED-BUT-NOT-REDUCED. Under `prefers-reduced-motion` the real
+                section falls back to a flat 2x2 grid with no blur and no travel,
+                and every card sharp — which is why the flanking cards' contrast
+                pairs are still gated and must stay gated. The blur is a
+                depth-of-field cue, not a licence to stop measuring the type it
+                sits on. */}
+            <h3 className="display-4 mt-14 mb-5">Card slider</h3>
+            <CardSlider
+              paused
+              items={roles.map((r, i) => ({
+                id: r.id,
+                body: r.claim,
+                floor: r.role,
+                label: r.role,
+                tone: (['dark', 'paper', 'paper', 'signal'] as const)[i] ?? 'paper',
+              }))}
+            />
+            <p className="caption mt-6 max-w-[62ch] text-ink-3">
+              Three cards across, the centre one focused. It recedes by scale, by tone and by a 3px
+              blur &mdash; never by opacity, because ancestor opacity folds into contrast maths and
+              faded copy genuinely fails. Every card here is <code>opacity: 1</code>. The arrows and
+              dots are real buttons, which is what lets a keyboard or touch user stop it: hover is
+              unreachable on touch, and the customer stack records that gap as an accepted cost.
+              This component closes it.
+            </p>
           </Container>
         </section>
 
@@ -410,18 +627,22 @@ export function StyleGuide() {
           <Container>
             <h2 className="display-3 mb-3">The stack</h2>
             <p className="body-serif measure-serif mb-12 text-reading">
-              Four cards in one grid cell, offset by exactly one corner radius each, so what shows
-              of a card behind is precisely its rounded corner. It rotates on a timer, dealing the
-              front card out past the frame; it stops for a mouse and for a backgrounded tab, and
-              never starts at all under reduced motion. It carries no controls, so it does not meet
-              WCAG 2.2.2 — recorded here rather than left to be discovered. Shown here
+              Four cards in one grid cell, each stepped down and to the right by the same amount
+              and sunk one step closer to the page ground, so the pile reads as four sheets rather
+              than as one card with a thick edge. The step was derived from{' '}
+              <code>--radius-panel</code> until it was not: a corner radius and the distance between
+              two cards were never the same measurement, and tying them meant the only way to make
+              the pile legible was to round every panel on the page harder. It rotates on a timer,
+              dealing the front card out past the frame; it stops for a mouse and for a backgrounded
+              tab, and never starts at all under reduced motion. It carries no controls, so it does
+              not meet WCAG 2.2.2 — recorded here rather than left to be discovered. Shown here
               paused, so it can be compared rather than watched.
             </p>
             <StackSpec />
             <p className="caption mt-4 text-ink-3">
-              Measured off the live DOM on every theme change. The side inset should equal the
-              vertical step at the desktop measure; if it does not, the page measure or the
-              column span moved and <code>--stack-shrink</code> needs re-deriving.
+              Measured off the live DOM on every theme change. The card width is what is left of the
+              column after the pile&rsquo;s travel is subtracted, so if the pile is ever clipped at
+              its right edge, it is this row that will say why.
             </p>
           </Container>
         </section>

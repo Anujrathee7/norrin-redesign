@@ -1,6 +1,4 @@
 import { Container, Eyebrow } from '@/components/primitives/Layout'
-import { Nori } from '@/components/mascot/nori/Nori'
-import { NORI_ANCHOR } from '@/components/mascot/nori/anchors'
 import { story, timeline } from '@/data/norrin'
 
 /**
@@ -19,8 +17,47 @@ import { story, timeline } from '@/data/norrin'
  * The heading is now the recognition itself. It is the most differentiating fact
  * in the whole dataset and it was set at 14px grey behind a sun bullet that
  * measured 1.09:1 on paper, under the only sr-only heading on the page.
+ *
+ * ---------------------------------------------------------------------------
+ * THE RAIL IS NOW A STATION LINE, not four ruled columns of type.
+ *
+ * Each milestone gets a date pill sitting on the rail at its node and a card
+ * holding the title and the copy, and the cards ALTERNATE above and below the
+ * line. That alternation is not styling: §1.5 is the anti-band rule, and four
+ * equal cards in a row under a rule is a band — the same rectangle the section
+ * above it traces. Staggered, the section's silhouette is a zig-zag that
+ * nothing else on the page shares.
+ *
+ * WHAT IS TRUE ABOUT 2027, AND HOW THE MARKUP SAYS SO. `future: true` is the
+ * only input; nothing here counts indices. It drives four things at once:
+ *
+ *   - the segment ARRIVING at it is dashed. That segment belongs to 2025, which
+ *     is why the dash is computed from `marks[i + 1].ahead` — the segment is
+ *     dashed because of where it is going, not because of where it starts.
+ *   - the node is hollow rather than filled.
+ *   - the accent fill does not exist on that segment, so the drawn line stops
+ *     at 2025 no matter how far anyone scrolls. There is nothing that could
+ *     fill it.
+ *   - the pill carries a visually-hidden "planned". A dash and a hollow ring
+ *     are visual-only signals, and a screen-reader user given "2027 — Public
+ *     listing" with no qualifier has been told something that is not true.
+ *
+ * Nothing about the ahead segment is animated. A progress bar that ran to the
+ * end of the rail would assert a public listing that has not happened, which is
+ * §3, not decoration.
  */
 export function Proof() {
+  /* Flattened once here rather than probed inside the map. The dash on a
+     segment depends on the NEXT station's flag, and `'future' in t` narrowing
+     inside a `timeline[i + 1]` lookup is both unreadable and easy to get
+     silently wrong when the data grows a fifth entry. */
+  const marks = timeline.map((t) => ({
+    year: t.year,
+    title: t.title,
+    body: t.body,
+    ahead: 'future' in t && t.future === true,
+  }))
+
   return (
     <section
       id="proof"
@@ -63,246 +100,191 @@ export function Proof() {
             The hold IS their gesture. */}
         <div data-scene data-scene-runway className="h-[220svh]">
           <div data-scene-pin className="sticky top-[max(88px,12svh)]">
-        <Eyebrow index="07" label="Track record" className="mb-8" />
+            <Eyebrow index="07" label="Track record" className="mb-8" />
 
-        <h2 id="proof-heading" className="display-2 max-w-[22ch]">
-          {story.recognition}
-        </h2>
+            <h2 id="proof-heading" className="display-2 max-w-[22ch]">
+              {story.recognition}
+            </h2>
 
-        {/* How it got here — on the same rule as everything else. */}
-        {/* One rail, rotated — not a grid of separate rules.
-            At `sm:grid-cols-2` this became two stacked pairs, so the line that
-            carries the argument was snapped in half exactly at tablet. Below
-            `lg` it is now vertical, the same device turned ninety degrees, which
-            is how TheGap already handles its own narrow fallback.
-            "Real" is drawn in moss here, as it is in the hero and the nav. It
-            used to be `hairline-strong`, making this the one implementation of
-            four that said "solid" in a different colour. */}
-        {/* Was a `Reveal` — one 56px rise on first sight, then finished for
-            good. The rail inside it was already scroll-driven, so the block had
-            the odd property that its container had stopped animating while its
-            contents had not. It is a plain box now; everything that moves in
-            here moves off the section's own scroll range. */}
-        <div className="mt-20 md:mt-28">
-          {/* The parallax drift that used to be here is gone. It was a
-              `view()` timeline, and a stuck element does not move in the
-              viewport — so from the moment the scene pins it would have frozen,
-              which is the entire time this block is on screen. A parallax layer
-              that cannot move is just a wrapper. The named `--scene` timeline
-              on the runway above is what everything in here reads instead;
-              named lookup walks the tree rather than hunting for a scrollport,
-              so it reaches through the sticky child perfectly well. */}
-          <div className="relative">
-            {/* Standing ON the rail, at the far end of it — over the one entry
-                that has not happened yet, reading about it.
+            {/* Was a `Reveal` — one 56px rise on first sight, then finished for
+                good. The rail inside it was already scroll-driven, so the block
+                had the odd property that its container had stopped animating
+                while its contents had not. It is a plain box now; everything
+                that moves in here moves off the section's own scroll range. */}
+            {/* HALVED, and the arithmetic is worth writing down because the
+                obvious reading of "the track sits too low" points at the wrong
+                number.
 
-                `NORI_ANCHOR.stand` is the sole of the drawing, so the feet land
-                on the line instead of the box's bottom edge floating above it.
+                The distance from the heading to the RAIL is three things:
+                this margin, the height of the tallest card in the row above the
+                rail, and the 24px row gap. At 1512 that was 80 + 156 + 24 =
+                260px. Only the first of those is a spacing decision — the other
+                184px is a card, and shrinking it would mean shrinking the copy.
 
-                It used to sit INSIDE the <ol>, to ride the rail's drift. axe
-                caught that: the content model there is <li>, <script>,
-                <template> and nothing else, so a positioned <div> among the
-                items is a genuine validity error, not a nitpick — the same one
-                that kept the Pillars progress fill out of its own list. The
-                drift moved out to the shared wrapper instead, so the rail and
-                the figure standing on it still travel as one layer.
+                The mascot that used to stand here was `position: absolute`, so
+                removing it took exactly 0px out of this gap at any width above
+                `md`. It is recorded because it is the thing most likely to be
+                credited with the change: 80 -> 80 on removal, 80 -> 40 here.
+                The rail moved from 260px below the heading to 220px. */}
+            <div className="mt-8 md:mt-10">
+              {/* The parallax drift that used to be here is gone. It was a
+                  `view()` timeline, and a stuck element does not move in the
+                  viewport — so from the moment the scene pins it would have
+                  frozen, which is the entire time this block is on screen. A
+                  parallax layer that cannot move is just a wrapper. The named
+                  `--scene` timeline on the runway above is what everything in
+                  here reads instead; named lookup walks the tree rather than
+                  hunting for a scrollport, so it reaches through the sticky
+                  child perfectly well. */}
+              {/* NO MASCOT HERE ANY MORE, and the removal is the user's call
+                  rather than a tidy-up. Two figures used to stand on this rail —
+                  one on the horizontal line at the far right, one beside the
+                  last entry in the narrow branch — and both are gone. Nori
+                  has since been deleted from the codebase entirely, on the
+                  user's instruction: the component, its poses, the `#mascots`
+                  surface and the `nori-sway` / `nori-idle` CSS are all gone.
 
-                lg only — below that the rail is vertical and there is no
-                horizontal line to stand on. This box carries only the
-                inline `translateY` anchor transform and no scene part, on
-                purpose: an animation on this same element would replace
-                that transform outright rather than combine with it, and
-                Nori would stop standing on the line. */}
-            <div
-              className="absolute top-0 right-0 z-10 hidden w-[112px] lg:block"
-              style={{ transform: 'translateY(calc(-1 * ' + NORI_ANCHOR.stand.y + '))' }}
-            >
-              <div
-                data-scroll="nori-sway"
-                className="flex"
-                style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}` }}
-              >
-                <div className="nori-idle">
-                  <Nori pose="read" size={112} animated={false} />
-                </div>
+                  One thing the mascot used to justify is worth keeping, because
+                  it is still true without it: the list's two card rows are equal
+                  `1fr` tracks, so the rail sits at exactly half the block's
+                  height and the composition is symmetric about it. That was
+                  argued in index.css as "which is why the figure standing on it
+                  can be positioned against the wrapper" — the arithmetic
+                  survives the argument. */}
+              <div className="relative">
+                <ol className="tl">
+                  {marks.map((m, i) => {
+                    const last = i === marks.length - 1
+                    /* The segment leaving this station is dashed when the
+                       station it ARRIVES at has not happened — and the trailing
+                       run past the final station is dashed for the same reason,
+                       because there is no station on it at all. Both branches
+                       read `ahead`; neither reads `i`. */
+                    const dashed = last ? m.ahead : marks[i + 1].ahead
+
+                    /* Stations 18% apart across the hold, each taking about 20%
+                       of it, so the sweep reads as one continuous line being
+                       drawn rather than four rules ticking off independently.
+                       The last card finishes at 79%, leaving a fifth of the
+                       hold to look at a finished rail before the pin releases.
+
+                       `contain` is safe here BECAUSE the block is pinned, and it
+                       was not safe before. `contain` is the period a scene is
+                       fully inside the viewport, so its length is `sceneHeight -
+                       viewportHeight` — which collapses toward zero as a scene
+                       approaches the viewport's height, and that is what ruled
+                       it out when this list was a 193px row in normal flow. A
+                       220svh runway is always more than a viewport tall by
+                       construction, so `contain` is always about 120svh of
+                       scroll: roughly 1140px on a laptop, and it cannot
+                       degenerate at any height. */
+                    const s = 4 + i * 18
+
+                    return (
+                      <li
+                        key={m.year}
+                        className="tl-item"
+                        data-side={i % 2 === 0 ? 'above' : 'below'}
+                        data-ahead={m.ahead ? '' : undefined}
+                      >
+                        <div className="tl-mark">
+                          {/* The node arrives as the rail reaches it. `pop` is
+                              the one entrance in the layer allowed to fade, and
+                              this qualifies on the same grounds the sun terminus
+                              does: it is `aria-hidden`, carries no text, and has
+                              no contrast requirement to fail. A mark that only
+                              slid would be sitting on the rail before the rail
+                              got there. */}
+                          <span
+                            aria-hidden="true"
+                            data-scene-part="pop"
+                            style={{
+                              ['--scene-from' as string]: `contain ${s}%`,
+                              ['--scene-to' as string]: `contain ${s + 8}%`,
+                            }}
+                            className="tl-node"
+                          />
+                          <p className="tl-pill label tabular-nums">
+                            {m.year}
+                            {/* The non-visual half of "this has not happened".
+                                Everything else that says so — the dash, the
+                                hollow node, the rail stopping short — is
+                                pixels. */}
+                            {m.ahead ? <span className="sr-only"> — planned</span> : null}
+                          </p>
+
+                          {/* The rail. The dim base is static and unconditional;
+                              the accent fill is a second element on top of it,
+                              and it only exists where the line is solid. */}
+                          <span
+                            aria-hidden="true"
+                            className="tl-seg"
+                            data-dash={dashed ? '' : undefined}
+                          >
+                            {dashed ? null : (
+                              <>
+                                <span
+                                  data-scene-part="rule"
+                                  style={{
+                                    ['--scene-from' as string]: `contain ${s + 4}%`,
+                                    ['--scene-to' as string]: `contain ${s + 21}%`,
+                                  }}
+                                  className="tl-fill tl-fill-h"
+                                />
+                                <span
+                                  data-scene-part="rule-v"
+                                  style={{
+                                    ['--scene-from' as string]: `contain ${s + 4}%`,
+                                    ['--scene-to' as string]: `contain ${s + 21}%`,
+                                  }}
+                                  className="tl-fill tl-fill-v"
+                                />
+                              </>
+                            )}
+                          </span>
+                        </div>
+
+                        {/* The card UNCOVERS left to right on the same scroll
+                            range as the segment leaving its station, so the line
+                            arrives and the card is what it delivers, rather than
+                            the two being separate events that happen to overlap.
+
+                            A wipe rather than a lift. It matches the rail — the
+                            line is already drawing left to right — and it reads
+                            as APPEARING, which a 28px lift does not: at half
+                            progress a lift is 14px of offset on type that was
+                            legible the whole time.
+
+                            Reversal is free and exact. These are scroll ranges,
+                            not triggers, so scrolling back up runs the clip the
+                            other way and the cards re-cover right to left,
+                            newest first. Nothing had to be written for it.
+
+                            Fading was not an option and is worth recording as
+                            such: axe folds ancestor opacity into contrast, and a
+                            card held at part of its ink while it waits fails.
+                            `clip-path` hides without touching a colour value —
+                            and when it does not run at all, which is the case in
+                            any browser without scroll timelines and for any
+                            reader who asked for less motion, the card is simply
+                            there. */}
+                        <div
+                          className="tl-card"
+                          data-scene-part="uncover"
+                          style={{
+                            ['--scene-from' as string]: `contain ${s + 3}%`,
+                            ['--scene-to' as string]: `contain ${s + 21}%`,
+                          }}
+                        >
+                          <h3 className="tl-title">{m.title}</h3>
+                          <p className="tl-body">{m.body}</p>
+                        </div>
+                      </li>
+                    )
+                  })}
+                </ol>
               </div>
             </div>
-            {/* The same figure over the same entry, below `lg`, where the rail
-                is vertical and the entry it is reading about is the LAST one
-                rather than the rightmost. No `stand` anchor here: that anchor
-                puts the soles on a horizontal rule and there is no horizontal
-                rule in this branch, so applying it would lift the figure by 85%
-                of its own height for no reason. It sits beside the final entry
-                instead, which is what standing at the end of the line means
-                when the line runs downwards. */}
-            <div className="absolute right-0 bottom-0 z-10 w-[84px] lg:hidden">
-              {/* Pivoting on the sole here too, even though nothing is under it
-                  in this branch: a figure that rocks about its feet reads as
-                  standing whatever it is standing on, and rocking about its
-                  middle reads as floating. */}
-              <div
-                data-scroll="nori-sway"
-                className="flex"
-                style={{ ['--pivot' as string]: `50% ${NORI_ANCHOR.stand.y}` }}
-              >
-                <div className="nori-idle">
-                  <Nori pose="read" size={112} animated={false} />
-                </div>
-              </div>
-            </div>
-            <ol className="grid grid-cols-1 lg:grid-cols-4">
-
-
-            {timeline.map((t, i) => {
-              const ahead = 'future' in t && t.future
-              // Stagger by index so the rail draws in reading order rather
-              // than all four segments completing at once, each slot opening
-              // before the previous has finished (13% apart, 17% wide) so the
-              // sweep reads as one continuous line being drawn rather than
-              // four rules ticking off independently.
-              //
-              // `contain` is safe here BECAUSE the block is pinned, and it
-              // was not safe before. `contain` is the period a scene is fully
-              // inside the viewport, so its length is `sceneHeight -
-              // viewportHeight` — which collapses toward zero as a scene
-              // approaches the viewport's height, and that is what ruled it out
-              // when this list was a 193px row in normal flow. A 220svh runway
-              // is always more than a viewport tall by construction, so
-              // `contain` is always about 120svh of scroll: roughly 1140px on a
-              // laptop, and it cannot degenerate at any height.
-              //
-              // Four stations across 5%–80% of it, 25% wide and 17% apart, so
-              // each takes ~285px of scrolling (it was 240) and the sequence
-              // spans ~855px (it was 617). The last station closes at 80%,
-              // leaving a fifth of the hold to look at a finished line before
-              // the pin releases.
-              const sceneRange = {
-                ['--scene-from' as string]: `contain ${5 + i * 17}%`,
-                ['--scene-to' as string]: `contain ${5 + i * 17 + 25}%`,
-              }
-              return (
-                <li
-                  key={t.year}
-                  className="relative pb-10 pl-8 last:pb-0 lg:pt-8 lg:pr-8 lg:pb-0 lg:pl-0"
-                >
-                  {ahead ? (
-                    // The dashed "ahead" segment carries no scene part and no
-                    // animation at all — it is static in its dashed state by
-                    // construction, which is how this section's whole
-                    // argument (solid = happened, dashed = still ahead) stays
-                    // true no matter how far the reader scrolls. There is
-                    // nothing here that could ever fill.
-                    <span
-                      aria-hidden="true"
-                      className="absolute top-0 left-0 h-full w-0 border-l border-dashed border-inactive lg:h-0 lg:w-full lg:border-l-0 lg:border-t"
-                    />
-                  ) : (
-                    // Two sibling spans rather than one responsive span:
-                    // `rule` and `rule-v` are different animation-name /
-                    // keyframe pairs (scaleX vs scaleY), and a `data-*`
-                    // value can't be switched at a Tailwind breakpoint. Each
-                    // orientation is its own element, shown with
-                    // `hidden lg:block` / `lg:hidden` so exactly one is ever
-                    // in the accessibility tree and exactly one ever has its
-                    // keyframes running at a given viewport width.
-                    <>
-                      <span
-                        aria-hidden="true"
-                        data-scene-part="rule"
-                        style={sceneRange}
-                        className="absolute top-0 left-0 hidden h-px w-full bg-accent lg:block"
-                      />
-                      <span
-                        aria-hidden="true"
-                        data-scene-part="rule-v"
-                        style={sceneRange}
-                        className="absolute top-0 left-0 h-full w-px bg-accent lg:hidden"
-                      />
-                    </>
-                  )}
-                  {/* The node arrives as its own rule reaches it. `pop` is the
-                      one entrance in the layer allowed to fade, and this
-                      qualifies on the same grounds the sun terminus does: it is
-                      `aria-hidden`, carries no text, and has no contrast
-                      requirement to fail. A mark that only slid would be
-                      sitting on the rail before the rail got there.
-
-                      Two boxes. The node's placement is a `translate` written
-                      in classes, and an animation on the same element replaces
-                      that transform outright rather than composing with it —
-                      the dot would jump to the corner. So the positioning stays
-                      on the span and the arrival goes on a wrapper. */}
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 left-0 -translate-x-1/2 lg:translate-x-0 lg:-translate-y-1/2"
-                  >
-                    <span
-                      data-scene-part="pop"
-                      style={{
-                        ['--scene-from' as string]: `contain ${5 + i * 17 + 11}%`,
-                        ['--scene-to' as string]: `contain ${5 + i * 17 + 19}%`,
-                      }}
-                      className={
-                        'block h-1.5 w-1.5 ' +
-                        (ahead ? 'border border-inactive bg-ground' : 'bg-accent')
-                      }
-                    />
-                  </span>
-                  {/* The entry UNCOVERS left to right on the same scroll range
-                      as the rule that reaches it, offset into the back half of
-                      that draw — so the line arrives at a station and the
-                      station's text is what it delivers, rather than the two
-                      being separate events that happen to overlap.
-
-                      A wipe rather than the lift this used to be, and it is the
-                      right gesture for two reasons. It matches the rail: the
-                      rule is already drawing left to right, and the year
-                      appearing the same way reads as the line delivering it
-                      rather than as a second, unrelated arrival. And it reads
-                      as APPEARING, which a 28px lift does not — at half
-                      progress a lift is 14px of offset on type that was legible
-                      the whole time.
-
-                      Reversal is free and exact. These are scroll ranges, not
-                      triggers, so scrolling back up runs the clip the other
-                      way: each entry re-covers right to left, and because the
-                      entries are staggered left to right on the way down, the
-                      LAST one is the first to go. Down the line assembles from
-                      2012 outward; up it retreats from the future back. Nothing
-                      had to be written for the reverse — it is the same
-                      animation read backwards.
-
-                      Fading was not an option and is worth recording as such:
-                      axe folds ancestor opacity into contrast, and a year held
-                      at part of its ink while it waits fails. `clip-path`
-                      hides without touching a single colour value.
-
-                      The dashed "ahead" entry gets the same treatment. What is
-                      static about it is its dashes, not its right to arrive. */}
-                  <div
-                    data-scene-part="uncover"
-                    style={{
-                      ['--scene-from' as string]: `contain ${5 + i * 17 + 7}%`,
-                      ['--scene-to' as string]: `contain ${5 + i * 17 + 25}%`,
-                    }}
-                  >
-                    <p
-                      className={
-                        'label tabular-nums ' + (ahead ? 'text-ink-3' : 'text-accent')
-                      }
-                    >
-                      {t.year}
-                      {ahead ? ' — ahead' : ''}
-                    </p>
-                    <h3 className="mt-3 text-ink lg:max-w-[22ch]">{t.title}</h3>
-                    <p className="caption mt-2 max-w-[38ch] text-ink-2 lg:max-w-[30ch] lg:pb-8">{t.body}</p>
-                  </div>
-                </li>
-              )
-            })}
-            </ol>
-          </div>
-        </div>
           </div>
         </div>
       </Container>
