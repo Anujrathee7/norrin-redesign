@@ -3876,9 +3876,19 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    That is not available: ancestor opacity folds into the contrast maths, so
    faded copy does not merely look weaker, it genuinely fails.
 
-   So the flanking cards recede on three things that are not opacity — SIZE (a
-   scale step per depth), a real measured SURFACE, and a BLUR (see
-   `--slide-blur`, which is the one that resolves what the other two could not).
+   So the flanking cards recede on two things that are not opacity — SIZE (a
+   scale step per depth) and a real measured SURFACE.
+
+   THERE WAS A THIRD, AND IT HAS BEEN REMOVED ON THE USER'S INSTRUCTION. A
+   depth-stepped blur used to do the work size and tone could not, and it was
+   permitted for a specific reason worth keeping on the record: a filter
+   composites at full alpha, so unlike an opacity it moves no ratio in
+   `tools/palette.mjs` by a thousandth. `cardstack-deal` still blurs the dealt
+   card at 7px on that same permission. What the blur bought here was honesty
+   about the ~14.6px effective serif a 0.86-scaled card sets — it made the
+   flanking cards decorative rather than nominally readable. Without it they are
+   simply small and sharp, and the tone below is the whole of their recession.
+
    The surface is measured rather than guessed. `--role-muted` is `--hairline`'s
    light value, #d8d7cc — a value this system already ships, which is the same
    discipline the three tones above were chosen under. Against it:
@@ -3889,11 +3899,9 @@ html.js [data-reveal='lines']:not([data-revealed]) {
      edge     #88967e   2.16:1     the card's own hairline
 
    All four are in `tools/palette.mjs` and all four must keep passing. They are
-   what the RESTING, SHARP card is measured at — which is every card in the
-   reduced-motion layout, and every card that reaches the front here. The blur
-   does not retire them and must not be used as an argument for retiring them: a
-   filter changes no ratio, and the layout it does not apply to is a reading
-   surface.
+   what the RESTING, SHARP card is measured at — which is now every card in this
+   row at every depth, as well as every card in the reduced-motion layout. They
+   were load-bearing while the blur was here and they are more so without it.
 
    THE THIRD RUNG IS ink-2, NOT ink-3, AND THAT IS A MEASUREMENT. `--ink-3`
    (#696d5f) lands at 3.67:1 on this surface and fails. Scope renders no
@@ -4084,38 +4092,26 @@ html.js [data-reveal='lines']:not([data-revealed]) {
        cards keep their proportion rather than their spacing. */
     --slide-gap: clamp(0.75rem, 1.6vw, 1.75rem);
 
-    /* DEPTH OF FIELD. One blur step per depth, the same shape as the scale
-       step: 0 at the front, 3px on the two beside it, 6px on the one behind.
+    /* THE DEPTH-OF-FIELD BLUR IS GONE, ON THE USER'S INSTRUCTION.
 
-       IT IS A FILTER, NOT AN OPACITY, AND THAT DISTINCTION IS THE WHOLE
-       PERMISSION. §3 refuses `opacity` on text because ancestor opacity folds
-       into the contrast maths — a faded paragraph genuinely fails a ratio. A
-       blur composites at full alpha: every pixel is still the card's own colour
-       against the card's own surface, so no ratio in `tools/palette.mjs` moves
-       by a thousandth. The precedent is already in this file: `cardstack-deal`
-       blurs the dealt card at 7px and documents it as a speed cue.
+       It was `--slide-blur: 3px`, stepped by depth, and the argument for it is
+       preserved in the block header because it was a real argument and not a
+       decoration: a filter composites at full alpha, so unlike an opacity it
+       moved no contrast ratio, and it made the ~14.6px effective serif on a
+       0.86-scaled card honestly decorative instead of nominally readable.
 
-       3px WAS TUNED AGAINST THE 0.86 SCALE, NOT PICKED. The brief is
-       depth-of-field, not a smear: the flanking card has to stay identifiable
-       as a card of that tone with a name on its floor. At 388px wide, 3px puts
-       the serif past reading and leaves the block, the edge and the tone intact;
-       at 6px the shape starts dissolving into the ground, which is why the
-       hidden card takes that value and the visible pair does not.
+       WHAT THE REMOVAL COSTS, AND WHAT NOW CARRIES THE RECESSION. Size and tone
+       do it alone: a 0.86 scale step and the muted surface against the front
+       card's sun. Nothing recedes by opacity, which was the §3 constraint the
+       blur existed to satisfy without — that constraint is untouched and no card
+       here is anything but `opacity: 1`.
 
-       WHAT IT COSTS, STATED PLAINLY. The two flanking cards are now decorative
-       rather than readable, which is the honest end of the ~14.6px effective
-       serif they were setting at 0.86 scale — type that small was claiming to be
-       readable and was not really offering it. Their measured contrast is
-       therefore no longer load-bearing HERE. The gated pairs stay in
-       `tools/palette.mjs` and must keep passing, because the reduced-motion
-       layout renders all four cards flat, sharp and full size, and that is a
-       reading surface.
-
-       ON THE CARD, NOT ON THE `li`. A filter creates a containing block and a
-       stacking context; on the `li` it would sit on the element that owns the
-       transform and the z-index, and the controls are siblings that must never
-       inherit it. On the card it is one paint effect on one box. */
-    --slide-blur: 3px;
+       WHAT IT DOES NOT CHANGE. The four `--role-muted` pairs stay gated in
+       `tools/palette.mjs` and must keep passing. They already had to: the
+       reduced-motion layout renders all four cards flat, sharp and full size,
+       and that is a reading surface. The blur never licensed dropping them, and
+       removing it does not tighten anything either. The flanking cards are now
+       small, sharp and measured rather than small, soft and measured. */
 
     /* THE EXTRA PUSH THAT PARKS THE SIDE CARDS OFF-SCREEN in one-card mode.
        Without it a phone renders 12px of the right-hand card's edge at the
@@ -4196,22 +4192,19 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     --tone-ink-3: var(--role-muted-ink-3);
   }
 
-  /* THE FOCUS PULL. Zero at the front, one step per depth behind it.
+  /* THE FOCUS PULL IS GONE WITH THE BLUR. There was a
+     `filter: blur(calc(var(--slide-depth) * var(--slide-blur)))` here, drawn on
+     the card rather than on the `li` so the filter's containing block and
+     stacking context could not reach the transform or the controls. Removed on
+     the user's instruction; the token's declaration site carries the full note.
+     No `filter` is declared on these cards at all now — not even an identity
+     one — because a filter nothing varies is a compositor layer bought for
+     nothing.
 
-     `blur(0px)` on the front card rather than `filter: none`, and that is
-     deliberate: `none` and a blur DO interpolate in every engine that matters,
-     but the identity filter makes the two ends of the transition the same shape,
-     which is the version that cannot be got wrong by a future edit. It costs a
-     compositor layer on a card that already has one from its transform. */
-  [data-slidetrack] > li > .card {
-    filter: blur(calc(var(--slide-depth) * var(--slide-blur)));
-  }
-
-  /* Surface, edge, every ink rung AND the focus pull move together over the same
-     0.5s the card travels in, so a card sharpens as it arrives and softens as it
-     leaves rather than snapping at either end. The tone arrives with the card
-     rather than a beat before it; where its midpoint goes is argued in the block
-     header.
+     Surface, edge and every ink rung move together over the same 0.5s the card
+     travels in, so a card takes its tone as it arrives rather than snapping at
+     either end. The tone arrives with the card rather than a beat before it;
+     where its midpoint goes is argued in the block header.
 
      A TRANSITION CANNOT STRAND A CARD, which is the §3 guard rail this is
      answering. If the timer fires, or an arrow is pressed, part-way through, the
@@ -4227,8 +4220,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       background-color 0.5s var(--ease-ui),
       border-color 0.5s var(--ease-ui),
       color 0.5s var(--ease-ui),
-      box-shadow 0.5s var(--ease-ui),
-      filter 0.5s var(--ease-ui);
+      box-shadow 0.5s var(--ease-ui);
   }
 
   /* THE ONE SHADOW. See the header for the §2.7 argument; the tokens are the

@@ -108,32 +108,33 @@ export type SlideItem = {
  * THE THREE CARDS DO NOT OVERLAP, AND NOTHING RECEDES BY FADING (§3)
  * ---------------------------------------------------------------------------
  * The two flanking cards are entirely visible with a real gap either side of the
- * front one. They recede on SIZE (a scale step), TONE (a muted surface, with its
- * ink measured against that surface and gated in `tools/palette.mjs`) and BLUR —
+ * front one. They recede on SIZE (a scale step) and TONE (a muted surface, with
+ * its ink measured against that surface and gated in `tools/palette.mjs`) —
  * never on opacity.
  *
- * THE DIFFERENCE BETWEEN A BLUR AND A FADE IS NOT COSMETIC HERE. Ancestor
- * opacity folds into the contrast maths, so faded copy does not merely look
- * weaker, it genuinely fails a ratio. A blur composites at full alpha — every
- * pixel is still the card's colour on the card's surface — so it moves no ratio
- * at all. This file's own `cardstack-deal` already blurs a card and says so.
+ * THERE WAS A THIRD, A DEPTH-STEPPED BLUR, AND THE USER HAD IT REMOVED. It was
+ * permitted where a fade is not, and the distinction still holds for anything
+ * that comes after it: ancestor opacity folds into the contrast maths, so faded
+ * copy does not merely look weaker, it genuinely fails a ratio, whereas a blur
+ * composites at full alpha and moves no ratio at all. `cardstack-deal` still
+ * blurs the dealt card on exactly that permission.
  *
- * The blur is what makes the flanking cards honestly DECORATIVE rather than
- * nominally readable, which is the right resolution to type that was setting at
- * roughly 14.6px once the 0.86 scale was applied. Nothing is lost that a reader
- * could reach: a card is sharp the moment it is at the front, it gets there on
- * its own every five seconds, it can be held still with a press, and any of the
- * four can be reached directly with a dot. Under reduced motion there is no blur at all and all four are sharp.
+ * What it bought was honesty about the ~14.6px effective serif a 0.86-scaled
+ * card sets — it made the flanking pair decorative rather than nominally
+ * readable. They are small and sharp now, which is why the muted tone's four
+ * gated pairs matter more than they did and not less. Nothing else changes: a
+ * card is fully sized the moment it is at the front, it gets there on its own
+ * every five seconds, it can be held still with a press, and any of the four can
+ * be reached directly with a dot.
  *
  * The front card is popped out rather than merely middle: it is the largest, it
- * is the only sharp one, it is the only sun-coloured object in the section, and
- * it carries the one shadow — §2.7's floating-layer clause, argued at its
- * declaration in `index.css`.
+ * is the only sun-coloured object in the section, and it carries the one shadow
+ * — §2.7's floating-layer clause, argued at its declaration in `index.css`.
  *
- * THE SWITCH IS TRAVEL, NOT A RE-RENDER. Position, scale, tone and focus all
- * transition together over 0.5s on `--ease-ui`, so a card visibly crosses the
- * row — growing and sharpening as it takes the front, shrinking and softening as
- * it leaves — rather than the three slots repainting in place. 0.5s sits between
+ * THE SWITCH IS TRAVEL, NOT A RE-RENDER. Position, scale and tone all transition
+ * together over 0.5s on `--ease-ui`, so a card visibly crosses the row — growing
+ * and taking the sun as it reaches the front, shrinking and going muted as it
+ * leaves — rather than the three slots repainting in place. 0.5s sits between
  * the customer pile's 0.34s transitions and its 0.62s deal: the pile moves one
  * card a short distance, this moves three across a whole row, and at 0.34s the
  * travel read as a jump. An automatic advance and a press on an arrow or a dot

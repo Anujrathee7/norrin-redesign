@@ -562,13 +562,14 @@ export function StyleGuide() {
                 it can be compared rather than watched; in Scope it advances
                 every 5s, pauses on hover, on focus, and while a card is held.
 
-                THE BLUR IS ABSENT AT REST HERE ONLY BECAUSE THE SPECIMEN IS
-                PAUSED-BUT-NOT-REDUCED. Under `prefers-reduced-motion` the real
-                section falls back to a flat 2x2 grid with no blur and no travel,
-                and every card sharp — which is why the flanking cards' contrast
-                pairs are still gated and must stay gated. The blur is a
-                depth-of-field cue, not a licence to stop measuring the type it
-                sits on. */}
+                THE DEPTH-OF-FIELD BLUR IS GONE, on the user's instruction, so
+                this specimen and the live section now render the flanking cards
+                the same way: small, sharp, and receding on scale and tone alone.
+                Under `prefers-reduced-motion` the real section still falls back
+                to a flat 2x2 grid with no travel and every card at full size.
+                The flanking cards' contrast pairs were gated while the blur was
+                here and remain gated — removing it makes them more
+                load-bearing, not less. */}
             <h3 className="display-4 mt-14 mb-5">Card slider</h3>
             <CardSlider
               paused
@@ -581,8 +582,8 @@ export function StyleGuide() {
               }))}
             />
             <p className="caption mt-6 max-w-[62ch] text-ink-3">
-              Three cards across, the centre one focused. It recedes by scale, by tone and by a 3px
-              blur &mdash; never by opacity, because ancestor opacity folds into contrast maths and
+              Three cards across, the centre one focused. The pair beside it recedes by scale and by
+              tone &mdash; never by opacity, because ancestor opacity folds into contrast maths and
               faded copy genuinely fails. Every card here is <code>opacity: 1</code>. The arrows and
               dots are real buttons, which is what lets a keyboard or touch user stop it: hover is
               unreachable on touch, and the customer stack records that gap as an accepted cost.
