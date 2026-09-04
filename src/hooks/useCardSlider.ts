@@ -62,14 +62,14 @@ import { usePageVisible } from '@/hooks/usePageVisible'
  * on a control is an ordinary tap.
  *
  * ---------------------------------------------------------------------------
- * FIVE SECONDS, NOT THE PILE'S 3.2
+ * FIVE SECONDS, NOT THE PILE'S 2.5
  * ---------------------------------------------------------------------------
- * The pile keeps 3.2s and is not touched. This is slower on purpose, and it is
- * the one place the two rotations deliberately disagree: the pile's card is a
- * company and a sector, this one's is a whole sentence, and the longest of the
- * four claims runs 137 characters. The travel is 0.5s of every cycle, so 3.2s
- * left 2.7s of still, sharp card to read that sentence in — under a comfortable
- * pace for it. 5s leaves 4.5s.
+ * The pile runs at 2.5s and this does not follow it down. This is slower on
+ * purpose, and it is the one place the two rotations deliberately disagree: the
+ * pile's card is a company and a sector, this one's is a whole sentence, and the
+ * longest of the four claims runs 137 characters. The travel is 0.5s of every
+ * cycle, so even the pile's old 3.2s left only 2.7s of still, sharp card to read
+ * that sentence in — under a comfortable pace for it. 5s leaves 4.5s.
  *
  * WHAT IS COPIED, DELIBERATELY UNCHANGED. `running` as a single ANDed expression
  * rather than five things clearing a shared flag — that is the version that goes

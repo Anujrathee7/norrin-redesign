@@ -33,10 +33,21 @@ import { usePageVisible } from '@/hooks/usePageVisible'
  * would throw itself off the page on load, before anything had happened. So the
  * leaving card is tracked explicitly and is `null` until a rotation has actually
  * occurred.
+ *
+ * ---------------------------------------------------------------------------
+ * 2.5s, DOWN FROM 3.2s
+ * ---------------------------------------------------------------------------
+ * The user watched the pile and called the cadence slow. It is set by hand
+ * rather than derived: the deal keyframe is 0.62s and the tone transitions are
+ * 0.34s, so 2.5s still leaves ~1.9s of a still, finished card before the next
+ * one goes. Anything under about 2s would start the next deal while the last
+ * one was still landing, which is the point where a pile reads as a flicker
+ * rather than a deck being turned. `useCardSlider` is deliberately slower and
+ * says why — its cards are whole sentences, these are a company and a sector.
  */
 export function useCardStack(
   count: number,
-  { interval = 3200, paused = false }: { interval?: number; paused?: boolean } = {},
+  { interval = 2500, paused = false }: { interval?: number; paused?: boolean } = {},
 ) {
   const reduced = useReducedMotion()
   const visible = usePageVisible()
