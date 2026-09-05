@@ -71,53 +71,30 @@ const COMPANY_LINKS = [
 ]
 
 export function Footer() {
-  // Group offices by country so the footprint reads as five countries, not
-  // seven addresses.
-  const byCountry = offices.reduce<Record<string, typeof offices[number][]>>((acc, o) => {
-    ;(acc[o.country] ??= []).push(o)
-    return acc
-  }, {})
+  // NO `byCountry` GROUPING ANY MORE. The footprint band grouped seven offices
+  // under five country headings because it had five columns to fill across the
+  // full width. In one column that shape costs five sub-headings to label seven
+  // rows, so the country rides on the city line instead and the list is flat.
 
   return (
     <footer id="footer" data-shot="footer" className="border-t border-hairline pt-20 pb-10">
       <Container>
-        {/* Footprint */}
-        <Grid className="gap-y-10">
-          <div
-            data-scroll="enter"
-            style={{ ['--scrub-to' as string]: 'cover 30%' }}
-            className="col-span-4 md:col-span-3"
-          >
-            <p className="label text-ink-3">Footprint</p>
-          </div>
-          <ul className="col-span-4 grid grid-cols-2 gap-x-6 gap-y-8 md:col-span-9 lg:grid-cols-5">
-            {/* Staggered across the five countries, left to right — the same
-                sweep the customer roster uses, and for the same reason: this is
-                one list read across, not five things arriving separately. */}
-            {Object.entries(byCountry).map(([country, list], i) => (
-              <li
-                key={country}
-                data-scroll="enter"
-                style={{
-                  ['--enter-y' as string]: '22px',
-                  ['--scrub-from' as string]: `cover ${12 + i * 4}%`,
-                  ['--scrub-to' as string]: `cover ${12 + i * 4 + 26}%`,
-                }}
-              >
-                <p className="label mb-3 border-b border-hairline pb-2 text-ink">{country}</p>
-                <ul className="space-y-2.5">
-                  {list.map((o) => (
-                    <li key={o.city}>
-                      <p className="ui text-ink-2">{o.city}</p>
-                      <p className="caption text-ink-3">{o.address}</p>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-        </Grid>
+        {/* THE FOOTPRINT BLOCK WAS HERE AND IS DELETED.
 
+            It was a full-width row: a "Footprint" label in the first three
+            columns and then five country groups across the remaining nine, each
+            with its cities and addresses under a ruled heading. Seven addresses
+            in a five-across grid, above the real footer, with about 260px of
+            empty first column beside it.
+
+            It was a second footer stacked on the first. The block underneath
+            already had a Company column and an Elsewhere column and room for a
+            third; splitting the offices out into their own full-width band gave
+            an address list more площадь than the site's own navigation, and left
+            two ruled rows doing the same job one above the other.
+
+            The offices are not lost — every one of the seven is in the Locations
+            column below, with its address. What is gone is the band. */}
         {/* Navigation */}
         {/* `entry`, NOT `cover`, AND THIS IS A BUG FIX RATHER THAN A TASTE.
 
@@ -145,7 +122,7 @@ export function Footer() {
             The check at the bottom of `tools/anim.mjs` asserts nothing down here
             is left mid-transform when the page stops scrolling. It was reporting
             this correctly the whole time. */}
-        <Grid className="mt-20 gap-y-10 border-t border-hairline pt-12">
+        <Grid className="gap-y-10 border-t border-hairline pt-12">
           <div
             data-scroll="enter"
             style={{
@@ -174,6 +151,49 @@ export function Footer() {
             <p className="caption mt-5 max-w-[38ch] text-ink-3">{footerBlurb.text}</p>
           </div>
 
+          {/* LOCATIONS — the footprint band, folded into a column.
+
+              THE COUNTRY IS ON THE CITY LINE RATHER THAN OVER A GROUP. Grouping
+              seven offices under five headings needs five headings; "Espoo,
+              Finland" needs none and loses nothing, because the country was only
+              ever there to say which country the city is in.
+
+              THE ADDRESSES STAY. They were the one thing the deleted band had
+              that the rest of the footer did not, and a footer that lists where a
+              company is without saying where is a list of city names. Three
+              columns is ~330px at 1512, which takes the longest of the seven —
+              Bangkok's "496-502 Gaysorn Amarin Tower, 5th Floor" — to two lines.
+
+              NOT A `<nav>`, unlike the two columns after it. Nothing here is a
+              link: there are no office pages to point at and no map URLs in
+              `norrin.ts`, and wrapping seven addresses in a navigation landmark
+              would announce a set of destinations to a screen reader that it
+              then cannot go to. It is a list of facts, so it is a list.
+
+              Every string is from `norrin.ts` and traceable to Norrin's own
+              pages (§3). None of the seven is edited to fit the column. */}
+          <div
+            data-scroll="enter"
+            style={{
+              ['--enter-y' as string]: '20px',
+              ['--scrub-from' as string]: 'entry 13%',
+              ['--scrub-to' as string]: 'entry 73%',
+            }}
+            className="col-span-4 md:col-span-3 md:col-start-5"
+          >
+            <p className="label mb-4 text-ink-3">Locations</p>
+            <ul className="space-y-3">
+              {offices.map((o) => (
+                <li key={o.city}>
+                  <p className="ui text-ink-2">
+                    {o.city}, {o.country}
+                  </p>
+                  <p className="caption text-ink-3">{o.address}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           <nav
             aria-label="Company"
             data-scroll="enter"
@@ -182,7 +202,7 @@ export function Footer() {
               ['--scrub-from' as string]: 'entry 18%',
               ['--scrub-to' as string]: 'entry 78%',
             }}
-            className="col-span-2 md:col-span-2 md:col-start-6"
+            className="col-span-2 md:col-span-2 md:col-start-9"
           >
             <p className="label mb-4 text-ink-3">Company</p>
             <ul className="space-y-2.5">
@@ -214,7 +234,7 @@ export function Footer() {
               ['--scrub-from' as string]: 'entry 28%',
               ['--scrub-to' as string]: 'entry 88%',
             }}
-            className="col-span-2 md:col-span-2 md:col-start-9"
+            className="col-span-2 md:col-span-2 md:col-start-11"
           >
             <p className="label mb-4 text-ink-3">Elsewhere</p>
             <ul className="space-y-2.5">
