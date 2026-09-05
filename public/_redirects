@@ -1,0 +1,11 @@
+# SPA fallback for Netlify and Cloudflare Pages.
+#
+# The site uses browser history, not hash history, so `/work` is a URL the
+# static host has no file for. Without this line it answers 404 — and it answers
+# it on the one visit nobody tests locally: the second one, arriving from
+# somebody else's link, or from a refresh. 200 rather than 301/302 because the
+# path must survive to the client for the router to match it.
+#
+# Vercel reads `vercel.json` at the repo root instead and ignores this file.
+# GitHub Pages reads neither and needs a copied `404.html`.
+/*    /index.html   200

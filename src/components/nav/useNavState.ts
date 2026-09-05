@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router'
 import { NAV } from './navData'
 
 /**
  * Everything every navbar variant needs to know, in one place: whether the page
- * has scrolled, which section is being read, and which drawer is open.
+ * has scrolled, which page is being read, and which drawer is open.
  *
  * This began as shared plumbing for four competing bars. Three are gone; the
  * hook stays split out because the observers and the hover-intent timers are
@@ -21,6 +22,16 @@ import { NAV } from './navData'
  * stays on the SECTIONS: it still drives the sun focus-ring substitution, the
  * inverse ink sets, `tools/audit.mjs` and `tools/shot.mjs`. Nothing about it was
  * for the nav except this observer.
+ *
+ * A SECOND OBSERVER HAS GONE THE SAME WAY, for a better reason: it has nothing
+ * left to observe. The current-item marker used to be driven by an
+ * IntersectionObserver over `main section[id]`, taking the topmost section
+ * crossing a band 20% down the viewport and matching its id against each item's
+ * `owns` list. That was an INFERENCE about which page the reader was on, made
+ * from geometry, on a document where all five pages were stacked in one scroll.
+ * The pages are five routes now, so the answer is `useLocation().pathname` —
+ * known exactly, correct on first paint rather than after the first scroll
+ * event, and with no band to be caught between two sections in.
  */
 
 /** Long enough that crossing the nav on the way to Contact doesn't open anything. */
@@ -34,7 +45,8 @@ export function useNavState() {
   const [openItem, setOpenItem] = useState<string | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [currentSection, setCurrentSection] = useState<string | null>(null)
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
   /** Assume a mouse until told otherwise: the desktop bar is hidden below `lg` anyway. */
   const [canHover, setCanHover] = useState(true)
 
@@ -148,8 +160,15 @@ export function useNavState() {
    * `detail === 0` is a keyboard activation, where a disclosure must toggle —
    * navigating on Enter would close the drawer the same keypress just opened.
    * A real mouse click on a hover-capable pointer navigates instead, because
-   * otherwise `#roles`, `#thinking` and `#proof` are unreachable on desktop:
-   * the trigger is a button, and hovering is the only thing that ever opened it.
+   * otherwise `/what-we-do`, `/thinking` and `/company` are unreachable on
+   * desktop: the trigger is a button, and hovering is the only thing that ever
+   * opened it.
+   *
+   * `navigate()` AND NOT `window.location.hash`. The destinations are routes
+   * now, and assigning to `location.hash` with a path in it would have written
+   * `#/what-we-do` into the URL — a fragment matching no element, on the page
+   * the reader was already on. The router also has to be the one that moves, or
+   * the bar's own current-item marker is reading a pathname nothing updated.
    */
   const activateTrigger = useCallback(
     (e: { detail: number }, item: Trigger) => {
@@ -159,14 +178,17 @@ export function useNavState() {
       }
       clearTimers()
       setOpenItem(null)
-      window.location.hash = item.href
+      void navigate(item.href)
     },
-    [canHover, clearTimers, toggleMenu],
+    [canHover, clearTimers, navigate, toggleMenu],
   )
 
   useEffect(() => clearTimers, [clearTimers])
 
-  /* ── observers ───────────────────────────────────────────────────────────── */
+  /* ── scroll ──────────────────────────────────────────────────────────────
+     The last listener in here. This was "observers", plural, when the current
+     item was also inferred from geometry; the only thing left that genuinely
+     has to be measured is whether the page has moved at all. */
 
   useEffect(() => {
     let frame = 0
@@ -183,23 +205,6 @@ export function useNavState() {
       if (frame) cancelAnimationFrame(frame)
       window.removeEventListener('scroll', onScroll)
     }
-  }, [])
-
-  /** Which section the reader is in, for the nav's current state. */
-  useEffect(() => {
-    const sections = document.querySelectorAll<HTMLElement>('main section[id]')
-    if (!sections.length) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0]
-        if (visible) setCurrentSection(visible.target.id)
-      },
-      { rootMargin: '-20% 0px -60% 0px', threshold: 0 },
-    )
-    for (const s of sections) observer.observe(s)
-    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -249,7 +254,8 @@ export function useNavState() {
     mobileOpen,
     setMobileOpen,
     scrolled,
-    currentSection,
+    /** The route the reader is on. Compared against each item's `owns`. */
+    currentPath: pathname,
     /**
      * Whether the bar draws its bottom hairline.
      *

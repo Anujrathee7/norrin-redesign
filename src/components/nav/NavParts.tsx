@@ -1,17 +1,36 @@
-import { useState } from 'react'
+import { useState, type ComponentProps } from 'react'
+import { Link } from 'react-router'
 import { Container } from '@/components/primitives/Layout'
-import { LocaleMenu } from '@/components/primitives/LocaleMenu'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { cx } from '@/lib/cx'
-import { NAV, type NavItem } from './navData'
+import { NAV, isRoute, type NavItem } from './navData'
 
-/** Wordmark. Held at `production` — the mark must read at 26px in every state. */
+/**
+ * A nav destination, rendered as whatever it actually is.
+ *
+ * `<Link>` for a route, a plain `<a>` for a bare fragment. Not a stylistic
+ * choice: a `<Link>` to `#contact` would push a router location for a scroll
+ * that never left the page, and an `<a href="/work">` would reload the whole
+ * document — the exact full-page flash this split was supposed to remove. One
+ * component so the call sites below stop having to remember which is which.
+ */
+function NavLink({ href, ...rest }: { href: string } & Omit<ComponentProps<'a'>, 'href'>) {
+  return isRoute(href) ? <Link to={href} {...rest} /> : <a href={href} {...rest} />
+}
+
+/**
+ * Wordmark. Held at `production` — the mark must read at 26px in every state.
+ *
+ * It was `#top`, which was a scroll to the top of the one page there was. Home
+ * is a route now, and a wordmark that scrolls instead of going home on four of
+ * five pages would be the only broken thing in the bar.
+ */
 export function Wordmark() {
   return (
-    <a href="#top" className="flex w-fit shrink-0 items-center gap-2.5 text-accent">
+    <Link to="/" className="flex w-fit shrink-0 items-center gap-2.5 text-accent">
       <span className="wordmark text-ink">Norrin</span>
       <span className="sr-only">Norrin — home</span>
-    </a>
+    </Link>
   )
 }
 
@@ -107,7 +126,7 @@ export function Drawer({
               <ul className="max-w-[46rem] pt-1 pb-3">
                 {shown.children.map((child, i, rows) => (
                   <li key={child.label}>
-                    <a
+                    <NavLink
                       href={child.href}
                       onClick={onNavigate}
                       onKeyDown={(e) => {
@@ -134,7 +153,7 @@ export function Drawer({
                         aria-hidden="true"
                         className="absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-accent transition-transform duration-[280ms] ease-(--ease-entrance) group-hover/row:scale-x-100 group-focus-visible/row:scale-x-100"
                       />
-                    </a>
+                    </NavLink>
                   </li>
                 ))}
               </ul>
@@ -196,16 +215,16 @@ export function MobileSheet({ onNavigate, barHeight = 72 }: { onNavigate: () => 
           <ul className="divide-y divide-hairline">
             {NAV.map((item) => (
               <li key={item.label} className="py-5">
-                <a href={item.href} onClick={onNavigate} className="display-3 block">
+                <NavLink href={item.href} onClick={onNavigate} className="display-3 block">
                   {item.label}
-                </a>
+                </NavLink>
                 {item.children ? (
                   <ul className="mt-3 space-y-2.5">
                     {item.children.map((c) => (
                       <li key={c.label}>
-                        <a href={c.href} onClick={onNavigate} className="text-ink-2">
+                        <NavLink href={c.href} onClick={onNavigate} className="text-ink-2">
                           {c.label}
-                        </a>
+                        </NavLink>
                       </li>
                     ))}
                   </ul>
@@ -220,17 +239,22 @@ export function MobileSheet({ onNavigate, barHeight = 72 }: { onNavigate: () => 
           >
             Contact
           </a>
-          {/* Was desktop-only, which quietly stranded four of five languages.
-              The theme joins it on the same terms and for the same reason: the
-              toggle lives in the desktop utilities row, which is `hidden` below
-              lg, so without this the entire phone audience is locked to the
-              default with no way out of it. Two rows, one rule between them —
-              the ruled-table idiom the hero stats and the drawer both use. */}
-          <div className="mt-8 divide-y divide-hairline border-t border-hairline">
-            <div className="flex items-center justify-between py-4">
-              <span className="label text-ink-3">Language</span>
-              <LocaleMenu />
-            </div>
+          {/* ONE ROW, NOT TWO. A Language row sat above this one, added here
+              because the desktop utilities row is `hidden` below lg and without
+              it the entire phone audience was locked out of the locale menu.
+              The menu itself is gone from both — it listed five languages over
+              one set of strings, and a control that changes nothing is the same
+              fabricated affordance §3 bans a made-up number for — so the row
+              that existed to reach it went with it. `LocaleMenu.tsx` stays in
+              the repo for when the translations are real, and this row comes
+              back with it.
+
+              The theme toggle keeps the argument that put it here: it is the one
+              real preference on the site, and leaving it desktop-only locks
+              every phone reader to the default with no way out. The ruled-table
+              idiom stays too — it is what the hero stats and the drawer are
+              built from, and a single row is still a row in a table. */}
+          <div className="mt-8 border-t border-hairline">
             <div className="flex items-center justify-between py-4">
               <span className="label text-ink-3">Appearance</span>
               {/* The sheet sets `bg-ground` itself, which is now the same thing

@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+import { isRoute } from '@/components/nav/navData'
 import { Container, Grid } from '@/components/primitives/Layout'
 import { footerBlurb, offices, social } from '@/data/norrin'
 
@@ -28,16 +30,33 @@ import { footerBlurb, offices, social } from '@/data/norrin'
  * Deliberately not a sitemap of itself. This was three columns of eleven links,
  * six of which were aliases for two anchors — four separate labels all landing
  * on #pillars, three all landing on #thinking — plus a "Careers" link pointing at
- * a values section with no careers content. A one-page document does not need a
- * menu of its own headings, and the bar above already carries every one of them.
- * What survives is what a footer is actually for: where the company is, what it
- * is, where else it lives, and who built this.
+ * a values section with no careers content. A document does not need a menu of
+ * its own headings, and the bar above already carries every one of them. What
+ * survives is what a footer is actually for: where the company is, what it is,
+ * where else it lives, and who built this.
+ *
+ * THE FOOTER IS IN THE LAYOUT, so it is under all five pages. Everything in it
+ * has to be true from any of them, which is what decides the two link kinds
+ * below and the back-to-top above.
  */
 
+/**
+ * Three destinations, and each one is exactly the kind of link it looks like.
+ *
+ * "About us" pointed at `#proof` when Proof was a section of the one page there
+ * was. Proof lives on `/work` now, so the row is relabelled to what that section
+ * calls itself — an "About us" link landing the reader on the customer cases is
+ * a promise the destination does not keep — and the bar's Company drawer carries
+ * the identical label and target. One name per thing.
+ *
+ * Contact stays a bare `#contact`, and stays correct on every page, because the
+ * layout renders the Contact strip after every route's content. It is a scroll,
+ * not a navigation, wherever it is clicked.
+ */
 const COMPANY_LINKS = [
-  { label: 'About us', href: '#proof' },
+  { label: 'Track record', href: '/work#proof' },
   // Was "Customer cases"; the bar calls the same section Work. One name per thing.
-  { label: 'Work', href: '#work' },
+  { label: 'Work', href: '/work' },
   { label: 'Contact', href: '#contact' },
 ]
 
@@ -126,6 +145,17 @@ export function Footer() {
             }}
             className="col-span-4 md:col-span-3"
           >
+            {/* BACK TO TOP, AND IT STAYS A PLAIN FRAGMENT ON ALL FIVE PAGES.
+                `#top` is the hero's id, so on `/` this scrolls to the hero the
+                way it always did. On the other four there is no element with
+                that id — and that is not a dead link: the HTML spec names
+                `#top`, case-insensitively, as the fragment that means the top of
+                the document when nothing matches it. So the one anchor is right
+                everywhere, which a `<Link to="/">` would not be: this is the
+                bottom of a page the reader has just finished reading, and
+                sending them to a different page is not what "back to top"
+                offers. The wordmark in the BAR does go home; that one is
+                identity, this one is a scroll. */}
             <a href="#top" className="flex w-fit items-center gap-2.5 text-accent">
               <span className="wordmark text-ink">
                 Norrin
@@ -146,16 +176,21 @@ export function Footer() {
           >
             <p className="label mb-4 text-ink-3">Company</p>
             <ul className="space-y-2.5">
-              {COMPANY_LINKS.map((l) => (
-                <li key={l.label}>
-                  <a
-                    href={l.href}
-                    className="ui text-ink-2 transition-colors hover:text-ink"
-                  >
-                    {l.label}
-                  </a>
-                </li>
-              ))}
+              {COMPANY_LINKS.map((l) =>
+                isRoute(l.href) ? (
+                  <li key={l.label}>
+                    <Link to={l.href} className="ui text-ink-2 transition-colors hover:text-ink">
+                      {l.label}
+                    </Link>
+                  </li>
+                ) : (
+                  <li key={l.label}>
+                    <a href={l.href} className="ui text-ink-2 transition-colors hover:text-ink">
+                      {l.label}
+                    </a>
+                  </li>
+                ),
+              )}
             </ul>
           </nav>
 

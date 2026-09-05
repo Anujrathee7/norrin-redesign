@@ -87,6 +87,27 @@ async function assertVisible(page, label, scope = '[data-reveal], .line-mask > *
 // 3. The failure mode that can actually happen in this app: React mounts, but
 //    IntersectionObserver never fires (unsupported, or an observer that misses).
 //    Reveal must fall back to showing everything.
+//
+//    SCOPED TO `[data-reveal]` ONLY, for the same reason check 4 below already
+//    is, and it should have been narrowed at the same time. This check never
+//    scrolls: it loads the page and reads it where it sits. A `[data-scroll]` or
+//    `[data-scene-part]` element at 0% progress is clipped BY DESIGN — the
+//    header at the top of this file says so in as many words — so including
+//    them here asks whether an entrance has finished before anything has
+//    happened, which is not a question with a passing answer.
+//
+//    It went unnoticed while every scroll-driven scene on `/` sat below the
+//    fold, where `assertVisible` skips zero-sized boxes and the rest simply were
+//    not rendered yet. Splitting the site into five routes put The Gap's pinned
+//    scene at the top of `/`, so ten of its parts — and Contact's, now that
+//    Contact closes every page — are on screen at load, at 0%, correctly
+//    clipped, and this check started reporting them as stuck. Nothing about
+//    their behaviour changed; the harness was asking the wrong elements.
+//
+//    What still has to be true of the scroll-driven parts is checked, twice and
+//    properly: that they COMPLETE (check 1's full-scroll pass, and the
+//    bottom-of-page pass), and that a browser without `animation-timeline` never
+//    sees the start state at all (the `@supports` guard at the end of this file).
 {
   const ctx = await browser.newContext({ viewport: { width: 1512, height: 950 } })
   const page = await ctx.newPage()
@@ -96,7 +117,7 @@ async function assertVisible(page, label, scope = '[data-reveal], .line-mask > *
   })
   await page.goto(BASE, { waitUntil: 'networkidle' })
   await page.waitForTimeout(1000)
-  const ok = await assertVisible(page, 'no IntersectionObserver')
+  const ok = await assertVisible(page, 'no IntersectionObserver', '[data-reveal]')
   await page.screenshot({ path: '.shots/anim/no-io.png' })
   if (!ok) process.exitCode = 1
   await ctx.close()

@@ -124,7 +124,10 @@ out.
 | `src/index.css` | the whole design system: tokens, type roles, controls, the scroll-motion layer |
 | `src/components/primitives/` | `Container`, `Grid`, `SectionHeader`, `Eyebrow`, `Reveal`, `SplitLines`, `Counter`, `Photo` |
 | `src/components/mascot/nori/` | placement and sizing only, never repainting |
-| `src/components/sections/` | one file per homepage section, plus `Compare` and `MascotLab` |
+| `src/components/sections/` | one file per section, plus `Compare` and `MascotLab` |
+| `src/pages/` | one file per route, plus `SiteLayout` — the shell every route renders into |
+| `src/routes.tsx` | the five-route table; `App.tsx` still gates the hash surfaces ahead of it |
+| `public/_redirects`, `vercel.json` | SPA fallback — Netlify and Cloudflare Pages read the first, Vercel reads the second |
 | `tools/nori.mjs` | draws the character once, emits all 13 poses + the mark |
 | `tools/photos.mjs` | re-encodes Norrin's own photography to AVIF/WebP/JPEG at three widths |
 | `tools/shot.mjs` | screenshot harness — viewports, themes, section clips, nav states |

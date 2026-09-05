@@ -1,5 +1,6 @@
 import { Container, Eyebrow, Grid } from '@/components/primitives/Layout'
 import { contactEmail, contacts } from '@/data/norrin'
+import { Link } from 'react-router'
 
 /**
  * Closing CTA.
@@ -119,7 +120,7 @@ export function Contact() {
                 ['--scrub-to' as string]: 'cover 34%',
               }}
             >
-              <Eyebrow index="08" label="Next" tone="inverse" className="mb-8" />
+              <Eyebrow label="Next" tone="inverse" className="mb-8" />
             </div>
             <h2
               id="contact-heading"
@@ -158,12 +159,26 @@ export function Contact() {
               >
                 Contact us
               </a>
-              <a
-                href="#thinking"
+              {/* A ROUTE, NOT A FRAGMENT, AND THAT IS A BUG FIX RATHER THAN A
+                  TIDY-UP. This read `href="#thinking"` back when Contact was
+                  the last section of a single page and Thinking was five
+                  sections above it. Contact is now the closing strip on every
+                  route, and `#thinking` exists on exactly one of them — so on
+                  `/`, `/what-we-do`, `/work` and `/company` this button pointed
+                  at nothing and threw the reader to scrollY 0. Measured on two
+                  of those routes.
+
+                  §3 calls that a fabricated affordance in as many words: a link
+                  whose destination is not what it says it is belongs in the same
+                  class as a fabricated statistic. A `Link` to the page that
+                  actually holds the paper is the honest version, and it is the
+                  only control in this section that leaves the current route. */}
+              <Link
+                to="/thinking#thinking"
                 className="btn btn-ghost"
               >
                 Or start with the Vision Paper
-              </a>
+              </Link>
             </div>
           </div>
 

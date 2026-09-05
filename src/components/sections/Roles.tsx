@@ -173,21 +173,26 @@ export function Roles() {
       id="roles"
       data-shot="roles"
       aria-labelledby="roles-heading"
-      // ASYMMETRIC PADDING, AND THAT IS THE POINT. The rest of the page runs
-      // `py-20 md:py-28`; this section runs about a third of that at the top and
-      // the page's usual value at the bottom.
+      // THE ASYMMETRIC PADDING IS GONE, AND THE SPLIT IS WHAT RETIRED IT.
       //
-      // Two things paid for the old top value and neither exists now. The
-      // opening rule sat at the section's top edge and needed air above it to
-      // read as a rule rather than as a border; the header then needed
-      // `mt-14 md:mt-16` to clear it. That is 177px of vertical at 1512 spent on
-      // an element that has been removed. Leaving the padding where it was would
-      // have left a hole exactly the size of the thing taken out of it, on top
-      // of TheGap's own `pb-28 md:pb-12` — which is not this file's to change
-      // and is documented there as a deliberate fix for a scroll-scene join.
+      // It used to run `pt-8 md:pt-10` — about a third of the page's usual
+      // `py-20 md:py-28` — and the argument was sound at the time: this section
+      // followed The Gap, whose own `pb-28 md:pb-12` was already paying for the
+      // join, and an opening rule that needed air above it had been deleted, so
+      // keeping the old value would have left a hole exactly the size of the
+      // thing taken out of it.
       //
-      // Measured rather than picked; the before and after are in the commit.
-      className="overflow-clip pt-8 pb-20 md:pt-10 md:pb-28"
+      // Every clause of that argument assumed a section with another section
+      // above it. Roles now OPENS `/what-we-do`, so what is above it is not The
+      // Gap's bottom padding, it is a 72px opaque fixed header. At `md:pt-10`
+      // the "Scope" eyebrow rendered at y=40 and the bar covered it outright —
+      // measured, not inferred, and invisible in both themes.
+      //
+      // So it takes the page's usual value, which is also what every other
+      // route-opening section already clears the bar with: Work and Thinking
+      // open at 112px and were never affected. One number, one reason, no
+      // special case.
+      className="overflow-clip py-20 md:py-28"
     >
       <Container>
         <Grid>
@@ -196,7 +201,7 @@ export function Roles() {
               band shape §1.5 is about, and stopping the measure at column seven
               leaves the right-hand fifth of the section open above the row. */}
           <div className="col-span-4 md:col-span-10 lg:col-span-7">
-            <SectionHeader index="02" label="Scope" id="roles-heading" gap="none">
+            <SectionHeader label="Scope" id="roles-heading" gap="none">
               What we take responsibility for.
             </SectionHeader>
           </div>

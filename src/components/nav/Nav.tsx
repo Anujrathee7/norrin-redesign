@@ -1,5 +1,5 @@
+import { Link } from 'react-router'
 import { Container } from '@/components/primitives/Layout'
-import { LocaleMenu } from '@/components/primitives/LocaleMenu'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { cx } from '@/lib/cx'
 import { NAV } from './navData'
@@ -11,8 +11,10 @@ import { useNavState } from './useNavState'
  *
  * Four directions were built and compared on the real page behind `?nav=1..4`.
  * This one won: logo left, links optically centred via a 1fr/auto/1fr grid,
- * utilities right, and the current section marked by its own length of the
- * bar's bottom rule.
+ * utilities right, and the current PAGE marked by its own length of the bar's
+ * bottom rule. It marked the current SECTION when the site was one document;
+ * the mark is the same, what it reads has moved from an IntersectionObserver's
+ * guess to `useLocation().pathname`.
  *
  * The runner-up made the nav items stations on the production line — solid
  * behind you, dashed ahead. It was the only option that could not be lifted
@@ -43,7 +45,7 @@ export function Nav() {
     setMobileOpen,
     scrolled,
     edged,
-    currentSection,
+    currentPath,
   } = useNavState()
 
   /* The condensed height, as a STATE rather than a scrub. See the long note in
@@ -133,7 +135,7 @@ export function Nav() {
                 className="flex items-center gap-1 transition-[height] duration-300 ease-(--ease-ui)"
               >
                 {NAV.map((item) => {
-                  const isCurrent = !!currentSection && item.owns.includes(currentSection)
+                  const isCurrent = item.owns.includes(currentPath)
                   const isOpen = openItem === item.label
                   return (
                     <li key={item.label} className="relative flex h-full items-center">
@@ -145,7 +147,7 @@ export function Nav() {
                           aria-expanded={isOpen}
                           aria-haspopup="true"
                           aria-controls="nav-drawer"
-                          aria-current={isCurrent ? 'true' : undefined}
+                          aria-current={isCurrent ? 'page' : undefined}
                           onClick={(e) => activateTrigger(e, item)}
                           onKeyDown={(e) => handoffIntoDrawer(e, isOpen)}
                           onMouseEnter={() => canHover && openMenu(item.label)}
@@ -154,17 +156,17 @@ export function Nav() {
                           {item.label}
                         </button>
                       ) : (
-                        <a
-                          href={item.href}
+                        <Link
+                          to={item.href}
                           ref={(el) => {
                             registerTrigger(item.label, el)
                           }}
-                          aria-current={isCurrent ? 'true' : undefined}
+                          aria-current={isCurrent ? 'page' : undefined}
                           onMouseEnter={() => canHover && scheduleClose()}
                           className={cx('control block px-3.5 py-2 ui', tone(isCurrent))}
                         >
                           {item.label}
-                        </a>
+                        </Link>
                       )}
                       <RuleSegment show={isCurrent || isOpen} />
                     </li>
@@ -174,13 +176,20 @@ export function Nav() {
             </nav>
 
             <div data-nav-end className="hidden items-center gap-3 justify-self-end lg:flex">
-              {/* Left of the locale, not right of it: both are quiet controls
-                  and they belong in one group, with the action on the outside.
-                  The gap tightened from 4 to 3 because there are three objects
-                  in this corner now — at gap-4 the pair read as two separate
-                  utilities rather than as a set. */}
+              {/* TWO OBJECTS, NOT THREE. A locale menu used to sit between
+                  these, and this note used to explain the gap in terms of the
+                  three of them. It is gone from the bar because it changed no
+                  locale: five languages listed, one set of strings behind them,
+                  which is a control that promises a thing the site cannot do —
+                  the same fabricated affordance §3 bans a made-up statistic
+                  for. `LocaleMenu.tsx` is still in the repo, untouched, for the
+                  day the translations are real.
+
+                  The gap stays at 3 rather than going back to 4. It was
+                  tightened so the quiet control and the action would read as one
+                  group with the action on the outside, and that is still what
+                  they are; the pair is just shorter now. */}
               <ThemeToggle />
-              <LocaleMenu />
               <ContactButton />
             </div>
             <Hamburger

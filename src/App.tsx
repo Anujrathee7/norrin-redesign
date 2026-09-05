@@ -1,43 +1,47 @@
 import { useEffect, useState } from 'react'
-import { Nav } from '@/components/nav/Nav'
+import { RouterProvider } from 'react-router'
 import { Compare } from '@/components/sections/Compare'
 import { StyleGuide } from '@/components/sections/StyleGuide'
 import { GapBackdrops } from '@/components/sections/GapBackdrops'
 import { FontLab } from '@/components/sections/FontLab'
-import { Hero } from '@/components/sections/Hero'
-import { TheGap } from '@/components/sections/TheGap'
-import { Proof } from '@/components/sections/Proof'
-import { Roles } from '@/components/sections/Roles'
-import { Work } from '@/components/sections/Work'
-import { Careers } from '@/components/sections/Careers'
-import { Pillars } from '@/components/sections/Pillars'
-import { Thinking } from '@/components/sections/Thinking'
-import { Contact } from '@/components/sections/Contact'
-import { Footer } from '@/components/sections/Footer'
+import { router } from '@/routes'
 
 /**
- * Page order is also nav order.
+ * PAGE ORDER IS STILL NAV ORDER — it is just spread over five documents now.
  *
- * The bar marks the section you are reading with its own length of the bottom
- * rule. That only reads as wayfinding if the marker travels one way: previously
- * it lit positions 4 → 1 → 2 → 1 → 3 on the way down, because "Company" pointed
- * at Proof (then the second section) while "What we do" owned Roles and Pillars,
- * which sat either side of Work. Two backward jumps.
+ * The bar marks the item you are reading with its own length of the bottom
+ * rule. That only reads as wayfinding if the marker travels one way: it used to
+ * light positions 4 → 1 → 2 → 1 → 3 on the way down, because "Company" pointed
+ * at Proof (then the second section) while "What we do" owned Roles and
+ * Pillars, which sat either side of Work. Two backward jumps. The fix was to
+ * give each nav item a CONTIGUOUS run of sections, in bar order.
  *
- * Each nav item now owns a contiguous run, in bar order:
- *   What we do → Roles, Pillars   Work → Work   Thinking → Thinking
- *   Company → Careers, Proof
+ * That constraint is why this split was possible at all, and it is worth
+ * saying plainly: a run of adjacent sections owned by one nav item is already a
+ * page in everything but URL. The runs became the routes, unchanged:
+ *   /            → Hero, The Gap
+ *   /what-we-do  → Roles, Pillars
+ *   /work        → Work, Proof
+ *   /thinking    → Thinking
+ *   /company     → Careers
  *
- * Careers is why Company owns two sections rather than one. It is content for
- * a different audience than the rest of the page, it belongs beside the track
- * record under "Company", and the contiguity rule above is what decides where
- * it goes: placed between Work and Thinking — which is Norrin’s own order —
- * it would split Company’s run and reintroduce the backward jump this note
- * exists to record. So it follows Thinking instead.
+ * What forced it was length. The single document measured 13.6 viewport-heights
+ * at 1512x860 — measured with Playwright, not estimated — with The Gap (3.12),
+ * Pillars (2.46) and Proof (2.46) carrying eight of those screens between them.
+ * The repo owner's reading: "everything is congested in one page, each page
+ * should be 3-4 scrolls, right now it is up to 10."
  *
- * The narrative it produces is the better one anyway: the problem, then what we
- * take responsibility for, then what you can buy, then who we did it for, then
- * the thinking, then who we are, then the track record, then the ask.
+ * ONE THING MOVED: Proof, from Company to Work. Careers used to be why Company
+ * owned two sections; it now owns only itself, and Proof sits with the cases it
+ * is evidence for. The narrative each page tells is the same one the scroll
+ * told: the problem, then what we take responsibility for and what you can buy,
+ * then who we did it for and what that record is, then the thinking, then who
+ * we are — and the ask at the end of every one of them, because Contact is
+ * rendered by the layout rather than by a page. See `SiteLayout.tsx`.
+ *
+ * The route table itself lives in `routes.tsx`, not here, because this file's
+ * remaining job is the one below: deciding whether the hash has taken the
+ * document over before a router ever gets a say.
  */
 /**
  * Three surfaces hang off the hash rather than living in the page.
@@ -66,31 +70,66 @@ import { Footer } from '@/components/sections/Footer'
  * measured off the live DOM. It is a review gate, which is why it is here and
  * not in `docs/`.
  *
- * Gated on the hash rather than on a router because the project has no router
- * and needs none for two standalone surfaces; it also means both work on a
- * static host with no rewrite rules. `hashchange` does not fire for the hash the
- * page LOADED with, so the initial value is read from `location` directly and
- * not defaulted to empty.
+ * STILL GATED ON THE HASH, AND STILL AHEAD OF THE ROUTER, though the sentence
+ * that used to justify it — "the project has no router and needs none" — is no
+ * longer true. Three reasons it did not become four more routes when the site
+ * became five pages. They are not nav items and must never appear as URLs
+ * anyone could arrive at by guessing. They are documented as hashes in
+ * CLAUDE.md §6, and `tools/compare.mjs`, `tools/backdrops.mjs` and the style
+ * guide probes navigate to them by that name. And a hash needs no rewrite rule,
+ * so a review surface keeps working on any static host even if the SPA
+ * fallbacks below ever get lost.
+ *
+ * `hashchange` does not fire for the hash the page LOADED with, so the initial
+ * value is read from `location` directly and not defaulted to empty.
  *
  * A surface OWNS the whole document when its hash matches — it is not a section
- * of the homepage — so anchors like `#contact` must never collide with these
- * two names. They do not: every in-page anchor is a section id, and `compare`
- * is not one.
+ * of any page — so anchors like `#contact` must never collide with these four
+ * names. They do not: every in-page anchor is a section id, and `compare` is
+ * not one. The listener is what makes the reverse true as well — clicking
+ * `#contact` on any route sets a hash these four do not match, so the router
+ * keeps the document and nothing swaps out underneath the reader.
+ */
+const SURFACES: Record<string, string> = {
+  '#compare': 'compare',
+  '#styleguide': 'styleguide',
+  '#backdrops': 'backdrops',
+  '#fonts': 'fonts',
+}
+
+function readSurface() {
+  if (typeof window === 'undefined') return null
+  return SURFACES[window.location.hash] ?? null
+}
+
+/**
+ * THE STATE IS THE SURFACE, NOT THE HASH.
+ *
+ * This used to hold `window.location.hash` and derive the surface from it on
+ * every render, which meant every in-page anchor on the site — `#contact` in the
+ * bar, `#gap` in the hero, `#footer` in the drawer — wrote a new string into
+ * React state and re-rendered the whole application, router included, for a
+ * scroll that changed nothing this hook cares about. Storing the derived value
+ * ends that: the four anchors all map to `null`, and React bails out of a
+ * re-render when the next state is the value it already holds.
+ *
+ * WHAT THIS IS NOT, recorded because it was written down as a fix before it was
+ * checked: it is not what made in-page anchors work again after a back-restore.
+ * That bug looked exactly like a stray re-render and this change did not move it
+ * one pixel. The cause was Chrome firing `popstate` for same-document fragment
+ * navigations and react-router restoring a saved scroll position off the back of
+ * it, and the fix is the `getKey` on `<ScrollRestoration />` — see the note in
+ * `SiteLayout.tsx`. This one stands on its own merits, which are smaller and
+ * honest: not re-rendering the application on every anchor click.
  */
 function useHashSurface() {
-  const [hash, setHash] = useState(() =>
-    typeof window === 'undefined' ? '' : window.location.hash,
-  )
+  const [surface, setSurface] = useState(readSurface)
   useEffect(() => {
-    const onChange = () => setHash(window.location.hash)
+    const onChange = () => setSurface(readSurface())
     window.addEventListener('hashchange', onChange)
     return () => window.removeEventListener('hashchange', onChange)
   }, [])
-  if (hash === '#compare') return 'compare'
-  if (hash === '#styleguide') return 'styleguide'
-  if (hash === '#backdrops') return 'backdrops'
-  if (hash === '#fonts') return 'fonts'
-  return null
+  return surface
 }
 
 export default function App() {
@@ -100,49 +139,5 @@ export default function App() {
   if (surface === 'backdrops') return <GapBackdrops />
   if (surface === 'fonts') return <FontLab />
 
-  return (
-    <>
-      <a href="#main" className="skip-link">
-        Skip to content
-      </a>
-      <Nav />
-      <main id="main">
-        {/* SEAM 1. The deck: two cards in one containing block, the lower one
-            pinned, the upper one riding up over it. The wrapper is what makes
-            it possible — `position: sticky` is clamped to its containing
-            block, so this div is both what lets the hero hold and what
-            guarantees it stops holding. It ends at TheGap's bottom, which is
-            why nothing is ever left pinned behind `Roles`.
-
-            The order matters and is doing real work: both sections are
-            positioned with `z-index: auto`, so they paint in tree order and
-            TheGap covers the hero with no z-index anywhere. Never give TheGap
-            a negative one — it would drop behind the hero's own plate. */}
-        <div data-deck>
-          <Hero />
-          {/* The hold. A real box, because `position: sticky` is clamped to its
-              containing block and this is what gives the card something to
-              travel against — the same lesson the hero's own curtain learned
-              the expensive way: padding does not extend sticky travel at all.
-
-              TheGap is OUTSIDE the deck and pulled back up over this box by
-              exactly its height, so the page is not one pixel taller than it
-              was and TheGap starts exactly where it always started. It still
-              covers the pinned hero: both are positioned, neither sets a
-              z-index, and TheGap is later in tree order. Never give it a
-              negative one — it would drop behind the hero's own plate. */}
-          <div aria-hidden="true" data-deck-hold />
-        </div>
-        <TheGap />
-        <Roles />
-        <Pillars />
-        <Work />
-        <Thinking />
-        <Careers />
-        <Proof />
-        <Contact />
-      </main>
-      <Footer />
-    </>
-  )
+  return <RouterProvider router={router} />
 }
