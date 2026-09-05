@@ -20,9 +20,9 @@ import { router } from '@/routes'
  * saying plainly: a run of adjacent sections owned by one nav item is already a
  * page in everything but URL. The runs became the routes — five of them at
  * first, three now that the two thinnest were merged into their neighbours:
- *   /            → Hero, The Gap, Pillars, Roles, Contact
- *   /work        → Work, Proof, Thinking
- *   /careers     → Careers
+ *   /            → Hero, The Gap, Pillars, Contact
+ *   /work        → Work, Roles, Proof
+ *   /company     → Thinking, Careers
  *
  * What forced it was length. The single document measured 13.6 viewport-heights
  * at 1512x860 — measured with Playwright, not estimated — with The Gap (3.12),

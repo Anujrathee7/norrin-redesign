@@ -2,7 +2,7 @@ import { Navigate, createBrowserRouter } from 'react-router'
 import { SiteLayout } from '@/pages/SiteLayout'
 import { Home } from '@/pages/Home'
 import { WorkPage } from '@/pages/WorkPage'
-import { CareersPage } from '@/pages/CareersPage'
+import { CompanyPage } from '@/pages/CompanyPage'
 
 /**
  * Three routes, and the table is still the nav taxonomy.
@@ -14,15 +14,23 @@ import { CareersPage } from '@/pages/CareersPage'
  * the page; that requirement is exactly what makes the runs separable, and each
  * route below is one of them.
  *
- * THE TABLE HAS BEEN REDEALT TWICE AND THE CURRENT HAND IS: the argument on
- * `/`, the evidence on `/work`, and the invitation on `/careers`.
+ * THE CURRENT HAND: the argument on `/`, the evidence on `/work`, and who we
+ * are on `/company`. Three pages, three audiences — somebody deciding whether
+ * to hire Norrin reads the first two; somebody deciding what Norrin is like
+ * reads the third.
  *
  * `/what-we-do` is gone because Pillars and Roles were the whole of it and the
  * two have been split: Pillars sits under The Gap, continuing that section's
  * argument instead of restating it a click away, and Roles sits under the
- * customer cases on `/work`, where the commitment follows the evidence. They
- * were adjacent because one nav item owned them both, not because they answered
- * the same question. `/thinking` and `/company` went earlier, for being
+ * customer cases on `/work`, where the commitment follows the claim. They were
+ * adjacent because one nav item owned them both, not because they answered the
+ * same question.
+ *
+ * `/careers` lasted one commit as a page of its own and is now half of
+ * `/company`, with Thinking. The two are addressed to the same reader and
+ * NorrInsights is the evidence for the claim Careers makes, so the second
+ * follows from the first. It also fixes the thinness that was accepted rather
+ * than answered when Careers was alone: 1.42 screens becomes ~3.3. `/thinking` and `/company` went earlier, for being
  * a single section each. Careers came back OUT of `/` in the same move that
  * brought those two in — not because it is long enough to be a page, but because
  * it addresses a different reader than every other page here.
@@ -48,7 +56,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: 'work', element: <WorkPage /> },
-      { path: 'careers', element: <CareersPage /> },
+      { path: 'company', element: <CompanyPage /> },
 
       /* RETIRED PATHS, KEPT AS REDIRECTS RATHER THAN DELETED.
          `/what-we-do`, `/thinking` and `/company` were all live on production
@@ -61,8 +69,8 @@ export const router = createBrowserRouter([
          a real answer rather than a dump to the homepage. `replace` so the dead
          URL does not sit in history behind the live one. */
       { path: 'what-we-do', element: <Navigate to="/" replace /> },
-      { path: 'thinking', element: <Navigate to="/work" replace /> },
-      { path: 'company', element: <Navigate to="/careers" replace /> },
+      { path: 'thinking', element: <Navigate to="/company" replace /> },
+      { path: 'careers', element: <Navigate to="/company" replace /> },
     ],
   },
 ])

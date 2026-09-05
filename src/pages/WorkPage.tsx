@@ -2,7 +2,6 @@ import { PageHead } from '@/pages/PageHead'
 import { Work } from '@/components/sections/Work'
 import { Roles } from '@/components/sections/Roles'
 import { Proof } from '@/components/sections/Proof'
-import { Thinking } from '@/components/sections/Thinking'
 
 /**
  * `/work` — the customer cases, then the track record they came out of.
@@ -38,20 +37,14 @@ export function WorkPage() {
           never going to agree, but checked at 25% rather than assumed, because
           this pairing has never been rendered before. */}
       <Roles />
+      {/* TRACK RECORD LAST, WHICH IS WHERE IT ENDS UP RATHER THAN WHERE IT
+          STARTED. Thinking sat under it for two commits and has gone to
+          `/company` with Careers; with that out, Proof is the page's floor and
+          that is the right place for it. The page runs claim, commitment,
+          evidence — who we did it for, what we take on, and the record that
+          backs both — so the numbers are the last word rather than a middle
+          movement. */}
       <Proof />
-      {/* THINKING CAME HERE FROM ITS OWN ROUTE, WHICH IS NOW DELETED.
-          `/thinking` was one 0.91-screen section, and a route that thin is a
-          page you reach the bottom of before the bar has finished condensing.
-          It reads better as the third movement of this one: who we did it for,
-          what it produced, and what we think about it — evidence, then outcome,
-          then argument, which is the order a reader who got this far is already
-          travelling in.
-
-          `ThinkingPage.tsx` is deleted rather than left unrouted, and the bar's
-          Thinking item went with it. Everything it pointed at is still reachable
-          — the Work drawer carries the row, and `#thinking` resolves on this
-          page. */}
-      <Thinking />
     </>
   )
 }

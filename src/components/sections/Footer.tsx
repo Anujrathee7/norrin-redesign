@@ -65,8 +65,8 @@ const COMPANY_LINKS = [
   // Was "Customer cases"; the bar calls the same section Work. One name per thing.
   { label: 'Work', href: '/work' },
   { label: 'Track record', href: '/work#proof' },
-  { label: 'Thinking', href: '/work#thinking' },
-  { label: 'Careers', href: '/careers' },
+  { label: 'Thinking', href: '/company#thinking' },
+  { label: 'Careers', href: '/company#careers' },
   { label: 'Contact', href: '/#contact' },
 ]
 

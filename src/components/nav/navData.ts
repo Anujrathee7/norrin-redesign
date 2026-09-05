@@ -78,5 +78,5 @@ export function isRoute(href: string) {
 export const NAV: NavItem[] = [
   { label: 'Home', href: '/', owns: ['/'] },
   { label: 'Work', href: '/work', owns: ['/work'] },
-  { label: 'Careers', href: '/careers', owns: ['/careers'] },
+  { label: 'Company', href: '/company', owns: ['/company'] },
 ]

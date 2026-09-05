@@ -174,7 +174,7 @@ export function Contact() {
                   actually holds the paper is the honest version, and it is the
                   only control in this section that leaves the current route. */}
               <Link
-                to="/work#thinking"
+                to="/company#thinking"
                 className="btn btn-ghost"
               >
                 Or start with the Vision Paper

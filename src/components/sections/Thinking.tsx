@@ -85,7 +85,14 @@ export function Thinking() {
       id="thinking"
       data-shot="thinking"
       aria-labelledby="thinking-heading"
-      className="bg-surface py-20 md:py-28"
+      // TOP PADDING IS 112px AT EVERY WIDTH, NOT 80 BELOW `md`. This section
+      // opens `/company`, so what sits above it is not another section, it is a
+      // 72px OPAQUE fixed header. At `py-20` an opener's eyebrow renders at y=80
+      // against a bar edge of 73 — seven pixels, which reads as type resting on
+      // the chrome rather than as a page starting. Measured, on the fifth
+      // section to need it; every route opener is checked at 1512x950 and
+      // 390x844 before it ships.
+      className="bg-surface pt-28 pb-20 md:py-28"
     >
       <Container>
         <SectionHeader label="Thinking" id="thinking-heading">
