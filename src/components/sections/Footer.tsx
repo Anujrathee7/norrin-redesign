@@ -77,7 +77,30 @@ export function Footer() {
   // rows, so the country rides on the city line instead and the list is flat.
 
   return (
-    <footer id="footer" data-shot="footer" className="border-t border-hairline pt-20 pb-10">
+    <footer
+      id="footer"
+      data-shot="footer"
+      // ONE RULE, NOT TWO, AND NO TOP PADDING.
+      //
+      // This carried `border-t border-hairline pt-20` and the Grid below carries
+      // `border-t border-hairline pt-12`, so the footer opened with two hairlines
+      // 81px apart — measured — with nothing between them. The first was the
+      // footer separating itself from the page; the second was the columns
+      // separating themselves from the footer. Two rules drawing one boundary.
+      //
+      // The FIRST one goes, which is the one that was doing less: the Grid's rule
+      // has content directly under it and belongs to the columns, while this one
+      // had 80px of empty space beneath it and belonged to nothing.
+      //
+      // `pt-20` GOES WITH IT rather than being kept, because that padding existed
+      // only to hold the two rules apart. Left in place it would push the
+      // surviving rule 192px below the last section's content — 112px of the
+      // section's own bottom padding plus 80 of this — which is most of a screen
+      // of nothing before the footer starts. Removing both leaves the gap as the
+      // section's own `pb`, which is what separates every other pair of blocks on
+      // the page.
+      className="pb-10"
+    >
       <Container>
         {/* THE FOOTPRINT BLOCK WAS HERE AND IS DELETED.
 

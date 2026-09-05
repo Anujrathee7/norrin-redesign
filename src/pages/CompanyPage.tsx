@@ -1,6 +1,6 @@
 import { PageHead } from '@/pages/PageHead'
-import { Thinking } from '@/components/sections/Thinking'
 import { Careers } from '@/components/sections/Careers'
+import { Thinking } from '@/components/sections/Thinking'
 
 /**
  * Company: how we think, and the invitation that follows from it.
@@ -15,8 +15,10 @@ import { Careers } from '@/components/sections/Careers'
  * the claim Careers is making, so putting them on one page lets the second
  * follow from the first instead of restating it.
  *
- * The order is that argument: how we think, then come and do it with us. Careers
- * closes the page because it is the ask, the same way Contact closes `/`.
+ * The order was "how we think, then come and do it with us" for one commit and
+ * is now the other way round: Careers opens and Thinking follows. A page reached
+ * from a bar item called Company should start on who Norrin is, and the writing
+ * then supports that claim rather than delaying it.
  *
  * ---------------------------------------------------------------------------
  * "COMPANY", AND WHY THE NAME MOVED AGAIN
@@ -39,8 +41,13 @@ export function CompanyPage() {
   return (
     <>
       <PageHead title="Company" />
-      <Thinking />
+      {/* CAREERS FIRST, THINKING UNDER IT — reversed from the order this page
+          shipped with. The page is named Company and reached from a bar item
+          called Company, so it should open on who Norrin is rather than on what
+          it published; Thinking then reads as the evidence for the invitation
+          instead of a preamble to it. */}
       <Careers />
+      <Thinking />
     </>
   )
 }

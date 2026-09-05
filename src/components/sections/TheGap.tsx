@@ -585,7 +585,27 @@ export function TheGap() {
           not zero on purpose: the two sections still need a boundary, and
           Roles' top padding alone would put the eyebrow hard against the
           drawing's lower shore. */}
-      <div data-scroll="recede" className="relative bg-ground pt-16 pb-28 md:pt-14 md:pb-12">
+      {/* THE JOIN INTO THE NEXT SECTION, TIGHTENED. Measured at 1512x950: from
+          the last line of type in this scene to the top of the section below was
+          288px, made of three things — 126px of trailing space inside the pinned
+          scene itself, 48px of this wrapper's bottom padding, and 114px of void
+          left by `recede` lifting the whole wrapper as it departs.
+
+          Two of the three are cut here. The padding goes entirely: with `recede`
+          creating a gap of its own underneath, it was separation on top of
+          separation. And `--recede` is halved for this instance, from the -12svh
+          default to -6svh, which keeps the departure gesture and stops it
+          stranding a screen-eighth of bare ground above the next heading.
+
+          The 126px inside the scene is NOT touched. It is the pinned
+          composition's own trailing room, the scroll ranges of three stations
+          are solved against it, and trimming it to close a seam would be paying
+          for a join with the thing the section is actually for. */}
+      <div
+        data-scroll="recede"
+        style={{ ['--recede' as string]: '-6svh' }}
+        className="relative bg-ground pt-16 pb-28 md:pt-14 md:pb-0"
+      >
         <Container>
           <div className="grid grid-cols-4 items-end gap-x-6 md:grid-cols-12">
             {/* Desktop drops this eyebrow, not just visually: below, the pinned
