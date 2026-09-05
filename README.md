@@ -128,6 +128,28 @@ out.
 | `src/pages/` | one file per route, plus `SiteLayout` — the shell every route renders into |
 | `src/routes.tsx` | the five-route table; `App.tsx` still gates the hash surfaces ahead of it |
 | `public/_redirects`, `vercel.json` | SPA fallback — Netlify and Cloudflare Pages read the first, Vercel reads the second |
+
+### Why the host config looks the way it does
+
+`vercel.json` states `framework`, `buildCommand` and `outputDirectory` rather than
+leaving them to the dashboard, because the first deploy failed on exactly that gap:
+`No Output Directory named "build" found after the Build completed`. The build had
+already succeeded — Vite wrote `dist/` as it always does — and Vercel then went
+looking in `build/`, which is Create React App's directory and has never been this
+project's. `vercel.json` takes precedence over project settings, so declaring it here
+means the deploy no longer depends on a setting invisible from the source tree.
+`outputDirectory` is `dist` because that is Vite's default and `vite.config` does not
+override it; if it ever does, the two move together.
+
+The reasoning lives in this file and not in `vercel.json` because Vercel validates
+that file against a strict schema and rejects unknown keys — including the `"//"`
+convention normally used to smuggle a comment into JSON. It fails the deploy outright
+rather than ignoring it.
+
+The rewrite is what makes the five routes deep-linkable. The site is client-rendered
+with no SSR, so `/work` exists only once React has booted; without a catch-all, every
+route but `/` returns a 404 from the static host and the split ships broken for anyone
+who does not enter through the homepage.
 | `tools/nori.mjs` | draws the character once, emits all 13 poses + the mark |
 | `tools/photos.mjs` | re-encodes Norrin's own photography to AVIF/WebP/JPEG at three widths |
 | `tools/shot.mjs` | screenshot harness — viewports, themes, section clips, nav states |

@@ -1,31 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-
-  "//": [
-    "THE BUILD SETTINGS ARE DECLARED HERE, NOT LEFT TO THE DASHBOARD.",
-    "The first deploy failed with 'No Output Directory named build found after",
-    "the Build completed'. The build itself had already succeeded — Vite wrote",
-    "dist/ exactly as it always does — and Vercel then went looking in build/,",
-    "which is Create React App's directory and has never been this project's.",
-    "The project settings were answering a question this repo is the authority",
-    "on, so the repo answers it: framework, command and output directory are",
-    "all stated, and vercel.json takes precedence over the dashboard.",
-    "",
-    "outputDirectory is 'dist' because that is Vite's default and vite.config",
-    "does not override it. If it ever does, these two move together.",
-    "",
-    "THE REWRITE IS WHAT MAKES DEEP LINKS WORK. The site is a client-rendered",
-    "SPA with five routes and no server rendering, so /work exists only once",
-    "React has booted. Without this, every route but / returns a 404 from the",
-    "static host and the split ships broken for anyone who does not enter",
-    "through the homepage. public/_redirects is the same rule for Netlify and",
-    "Cloudflare Pages; whichever host is in use reads its own and ignores the",
-    "other."
-  ],
-
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
