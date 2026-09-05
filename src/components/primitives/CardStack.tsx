@@ -128,22 +128,36 @@ function splitTitle(title: string) {
  * dot that looks pressable and is not would be a fabricated affordance (§3),
  * and a bar cannot be mistaken for four buttons.
  *
- * The cost is written down rather than hidden: WCAG 2.2.2 wants a mechanism to
- * pause content that auto-updates for more than five seconds alongside other
- * content, and hovering is not a mechanism a keyboard reader can reach. The
- * rotation still stops for a mouse and for a backgrounded tab, and never starts
- * under `prefers-reduced-motion`. Making the dots real buttons is the one-line
- * change that would close it.
+ * THE COST IS NOW TOTAL, AND IT IS WRITTEN DOWN RATHER THAN HIDDEN. WCAG 2.2.2
+ * wants a mechanism to pause content that auto-updates for more than five
+ * seconds alongside other content. This component has none. Not an imperfect
+ * one — none.
+ *
+ * It had one until this commit: a hover pause, which was never reachable by
+ * keyboard or by thumb but did stop the pile for a mouse. It is removed on the
+ * repo owner's instruction, because crossing the cards on the way somewhere else
+ * stopped the rotation and that is what they watched happen.
+ *
+ * WHAT REMAINS ARE TWO STOPS, AND NEITHER IS A CONTROL. Under
+ * `prefers-reduced-motion` the timer never starts at all, so a reader who has
+ * asked the OS for less motion gets a permanently still pile — which is the
+ * population 2.2.2 most exists for, served by a different route. A backgrounded
+ * tab stops it, which is about throttled timers rather than about the reader.
+ *
+ * THE FIX, IF ONE IS WANTED, IS A REAL CONTROL. A pause or previous/next button
+ * — reachable by tab and by thumb — not another pointer heuristic. That was
+ * already this file's conclusion before the hover pause was removed, and
+ * removing it only makes the case shorter: there is now nothing to argue about.
  *
  * HAVING NO CONTROLS IS ALSO WHAT MADE HOVER-PAUSE DANGEROUS HERE, and that is
  * a defect this component actually shipped rather than a hypothetical. A pause
- * with nothing to un-pause it has to be certain it was asked for. It was not:
- * `pointerenter` fires when the pile scrolls up under a cursor the reader never
- * touched, so the rotation stopped before the first card turned and stayed
- * stopped. It is armed by `pointermove` now — see `useCardStack`, which measures
- * both cases — and the handlers sit on the PILE rather than on the region, so
- * the position bar and the air beneath it no longer pause a card the pointer is
- * nowhere near.
+ * with nothing to un-pause it has to be certain it was asked for, and it was
+ * not: `pointerenter` fires when the pile scrolls up under a cursor the reader
+ * never touched, so the rotation stopped before the first card turned and
+ * stayed stopped. That was fixed — armed on `pointermove`, handlers moved onto
+ * the pile — and then the whole mechanism was removed anyway. `useCardStack`
+ * keeps the measurements, because the lesson outlives the code: a pointer is a
+ * bad way to infer intent when nothing can undo the inference.
  *
  * ---------------------------------------------------------------------------
  * WHY THIS RENDERS ITS OWN CARD BODY
@@ -164,7 +178,7 @@ export function CardStack({
   /** `#styleguide` holds the pile still so it can be compared rather than watched. */
   paused?: boolean
 }) {
-  const { index, leaving, pileProps } = useCardStack(items.length, { paused })
+  const { index, leaving } = useCardStack(items.length, { paused })
 
   return (
     // The count is written here rather than on the list because BOTH children
@@ -196,11 +210,10 @@ export function CardStack({
           paper it was not about. */}
       <Progress aria-hidden="true" className="stack-progress" value={((index + 1) / items.length) * 100} />
 
-      {/* THE HOVER PAUSE IS ON THE PILE, NOT ON THE REGION ABOVE IT. The region
-          is the pile PLUS the position bar and the 3rem of air under it — 51px
-          of a 515px box where a pointer is not over any card, and where hovering
-          used to hold the front card still anyway. */}
-      <ol {...pileProps} data-cardstack className="m-0 list-none p-0">
+      {/* NO POINTER HANDLERS AT ALL. `pileProps` carried a hover pause and is
+          deleted: crossing the cards must not stop the rotation. `useCardStack`
+          holds the history and the WCAG 2.2.2 cost. */}
+      <ol data-cardstack className="m-0 list-none p-0">
         {items.map((item, i) => {
           const d = (i - index + items.length) % items.length
           return (

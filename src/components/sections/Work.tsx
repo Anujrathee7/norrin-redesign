@@ -60,7 +60,31 @@ export function Work() {
       // `hidden` would create a scroll container that freezes the roster's
       // `view()` timeline at 0% forever. The comment above says so at length.
       data-tone="inverse"
-      className="overflow-clip bg-band-night py-20 text-inverse-ink md:py-28"
+      // THE SECTION MOVES DOWN. THE PILE DOES NOT MOVE INSIDE IT.
+      //
+      // The position row — the 3px bar above the front card — was invisible, and
+      // measured rather than eyeballed: the pile column carries `md:-mt-18`, so
+      // against a 112px top padding the region began at y=40 and the bar
+      // occupied y=40 to 43, entirely beneath a 72px OPAQUE fixed header whose
+      // edge sits at 73. It was 33px the wrong side of it. Work opens `/work`
+      // now; when it was the fifth section of one long document there was
+      // nothing above it to hide under.
+      //
+      // THIS IS NOT THE FROZEN PILE OFFSET BEING ADJUSTED. The note further down
+      // this file says the column start and the negative top margin are the
+      // repo owner's own edit and that nothing here may move the pile to
+      // compensate for something else. Both are untouched: `md:-mt-18` still
+      // pulls the pile exactly 72px above the content top, so the card's top
+      // edge still rides 21px above the heading's and the two columns still
+      // refuse to read as two halves of one band. What changed is where the
+      // section's content top IS — 168px instead of 112 — which moves the pile
+      // and the heading together and leaves every relationship inside the
+      // section identical. The bar lands at y=96, clearing the header by 23px.
+      //
+      // Mobile takes 112 rather than 80 for the same reason Pillars does: at
+      // `py-20` the eyebrow rendered 7px under the bar's edge. `-mt-18` is `md:`
+      // only, so the pile is not involved down there.
+      className="overflow-clip bg-band-night pt-28 pb-20 text-inverse-ink md:pt-42 md:pb-28"
     >
       <Container>
         {/* READING MATTER LEFT, THE PILE RIGHT.

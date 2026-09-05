@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePageVisible } from '@/hooks/usePageVisible'
 
@@ -58,43 +58,52 @@ import { usePageVisible } from '@/hooks/usePageVisible'
  * WHY THERE IS NO FLOOR UNDER THE REMAINDER, which is where this deliberately
  * differs from `useCardSlider`'s `nudge`. That hook restarts the whole clock on
  * a manual move, because a reader who pressed "next" asked for THAT card and
- * would otherwise get it for a fifth of a second. Nobody asked for anything
- * here: the reader has just moved the pointer AWAY from the pile, so resuming
- * mid-beat is the pile carrying on where it was rather than a card being
- * snatched.
+ * would otherwise get it for a fifth of a second. Nothing here is a request, so
+ * resuming mid-beat is the pile carrying on where it was rather than a card
+ * being snatched.
+ *
+ * WITH HOVER GONE THE ONLY REMAINING PAUSE IS A BACKGROUNDED TAB, so this now
+ * does one job: a reader who leaves and comes back finishes the beat they left
+ * rather than being handed a fresh 2.5s. That is a smaller job than it was and
+ * the mechanism is kept rather than simplified away, because the alternative —
+ * a plain interval restarted on every visibility flip — is exactly the shape
+ * that produced the "takes too long" defect in the first place.
  *
  * ---------------------------------------------------------------------------
- * HOVER MEANS THE READER MOVED THE POINTER HERE, NOT THAT THE PAGE MOVED
+ * THERE IS NO HOVER PAUSE. THE POINTER DOES NOT STOP THE PILE AT ALL
  * ---------------------------------------------------------------------------
- * This is the "does not work at all" defect, and it needed no unusual input to
- * hit. `pointerenter` fires when the element arrives under a STATIONARY cursor,
- * so scrolling the page down until the pile appeared — with the mouse untouched,
- * parked wherever it happened to be in the right-hand column — set `hovered` and
- * stopped the rotation before the reader had seen a single card turn. There is
- * no control to start it again. Measured on the production preview: mouse never
- * moved, page scrolled, zero rotations in twelve seconds.
+ * Removed on the repo owner's instruction: moving over the cards must not stop
+ * the rotation.
  *
- * The two cases separate cleanly, and this was measured too rather than assumed.
- * Scrolling the pile under a still cursor fires `pointerover`/`pointerenter` and
- * `pointermove` EXACTLY ZERO TIMES. A real mouse moving onto the pile fires
- * `pointermove` immediately, with non-zero `movementX/Y`. So the pause is armed
- * by movement, and `pointerenter` is not listened for at all.
+ * IT IS WORTH KNOWING WHAT THIS FILE JUST DELETED, because it was fixed twice
+ * before it was removed. The original bug was that `pointerenter` fires when an
+ * element arrives under a STATIONARY cursor — so scrolling the page until the
+ * pile appeared, mouse untouched and parked anywhere in the right-hand column,
+ * stopped the rotation before a single card had turned, with no control to start
+ * it again. Measured on the production preview: zero rotations in twelve
+ * seconds. The fix was to arm the pause on `pointermove` instead, since
+ * scrolling under a still cursor fires `pointermove` exactly zero times.
  *
- * `setHovered(true)` on every move is deliberate rather than sloppy: React
- * compares eagerly and bails out when the value is unchanged, so a pointer
- * crossing the card schedules exactly one render.
+ * That made hover mean hover. It did not change the fact that a reader crossing
+ * the pile on the way somewhere else stopped it, which is what the owner
+ * watched and asked for. `hovered`, `onPointerMove`, `onPointerLeave` and
+ * `pileProps` are all deleted rather than left inert.
  *
- * STILL MOUSE-ONLY, AND THAT GATE IS UNCHANGED. `pointermove` fires for a touch
- * drag, and `pointerleave` frequently does not fire until the next tap somewhere
- * else — so on a phone one drag across the stack would stop the rotation
- * indefinitely with no control to start it again.
+ * WHAT THIS COSTS, WRITTEN DOWN RATHER THAN HIDDEN. The pile now has NO pause
+ * mechanism of any kind. WCAG 2.2.2 wants one for content that auto-updates
+ * alongside other content, and hover was the only thing this component had —
+ * imperfect, since it was never reachable by keyboard or touch, but present.
+ * `CardStack.tsx` carries the full note; this is the file that made it true.
  *
- * WHAT HOVER-PAUSE STILL BUYS, now that it can no longer strand the pile. A
- * mouse reader who moves onto a card to finish reading it holds it there, and
- * moving away resumes — including when the reader scrolls the pile out from
- * under the cursor, which fires `pointerleave`. It is the only pause mechanism
- * this component has (see the WCAG 2.2.2 note in `CardStack.tsx`), so the fix
- * was to make it mean hover, not to delete it.
+ * TWO STOPS REMAIN AND NEITHER IS A CONTROL. `prefers-reduced-motion` means the
+ * timer never starts, so a reader who has asked the OS for less motion gets a
+ * still pile — which is the case 2.2.2 exists for, served by a different route.
+ * A backgrounded tab stops it too, which is about throttled timers rather than
+ * about the reader.
+ *
+ * If a pause is wanted back, it should be a real control — a button, reachable
+ * by keyboard and thumb — not a pointer heuristic. That was already the
+ * conclusion in `CardStack.tsx` before any of this.
  *
  * ---------------------------------------------------------------------------
  * 2.5s, DOWN FROM 3.2s
@@ -115,9 +124,12 @@ export function useCardStack(
   const visible = usePageVisible()
 
   const [rotations, setRotations] = useState(0)
-  const [hovered, setHovered] = useState(false)
 
-  const running = !reduced && !paused && !hovered && visible
+  // Every reason to stop, in one expression. It is ANDed in one place rather
+  // than each condition clearing a shared flag — which is the version that goes
+  // wrong, because whichever condition ends last un-pauses the others. `hovered`
+  // used to be a third term and is gone; see the note above.
+  const running = !reduced && !paused && visible
 
   // The deadline, carried across pauses. `left` is what the current card still
   // owes; `since` is when it last started being spent.
@@ -153,20 +165,5 @@ export function useCardStack(
   // page and back every beat.
   const leaving = rotations === 0 || count < 2 ? null : (rotations - 1) % count
 
-  const onPointerMove = useCallback((e: PointerEvent) => {
-    if (e.pointerType === 'mouse') setHovered(true)
-  }, [])
-  const onPointerLeave = useCallback(() => setHovered(false), [])
-
-  return {
-    index,
-    leaving,
-    reduced,
-    /**
-     * Spread onto the PILE, not onto the region around it. The region also holds
-     * the position bar and the 3rem of air under it, and a hover there paused a
-     * card the pointer was nowhere near.
-     */
-    pileProps: { onPointerMove, onPointerLeave },
-  }
+  return { index, leaving, reduced }
 }
