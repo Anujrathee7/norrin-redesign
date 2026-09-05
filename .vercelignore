@@ -1,0 +1,13 @@
+# The CLI does NOT read .gitignore. Without this file `vercel --prod` uploads the
+# whole working directory, and .shots/ alone is 197MB of screenshots and probe
+# output — which is what made every upload attempt abort with "Upload aborted".
+#
+# The Git integration was never affected: it deploys from GitHub, and everything
+# below is already git-ignored there. This is only for a deploy run from a laptop.
+.shots
+.vercel
+
+# Not needed to build the site. The gates in CLAUDE.md §5 run locally and in CI,
+# never on the deploy host.
+docs
+tools
