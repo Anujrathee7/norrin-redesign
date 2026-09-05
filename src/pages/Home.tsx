@@ -1,5 +1,7 @@
 import { Hero } from '@/components/sections/Hero'
 import { TheGap } from '@/components/sections/TheGap'
+import { Careers } from '@/components/sections/Careers'
+import { Contact } from '@/components/sections/Contact'
 
 /**
  * `/` — the hero and the problem it names.
@@ -48,6 +50,31 @@ export function Home() {
         <div aria-hidden="true" data-deck-hold />
       </div>
       <TheGap />
+      {/* CAREERS CAME HERE FROM `/company`, AND IT TOOK THAT ROUTE WITH IT.
+          Careers was the only section on `/company`, so moving it did not
+          rebalance that page, it emptied it — the route and its nav item are
+          deleted rather than left pointing at nothing. `CompanyPage.tsx` is
+          gone for the same reason.
+
+          It follows The Gap rather than opening the page: the argument runs
+          problem, then the people who answer it, then the ask. */}
+      <Careers />
+      {/* CONTACT IS HOME'S ALONE NOW, AND THAT REVERSES A DECISION MADE HERE
+          THREE COMMITS AGO. It was rendered in `SiteLayout` after every route's
+          outlet, on the argument that the ask belongs at the end of whatever was
+          just read and that `#contact` then resolved from anywhere.
+
+          The cost of that was five copies of one section and four pages ending
+          the same way — which is also what weakened §1.5 across pages: two of
+          the five were a single section followed by the same forest Contact and
+          the same paper footer. One page owns the ask now.
+
+          What it costs in return is written down rather than hidden: the bar's
+          Contact button and the footer's Contact row are no longer scrolls. They
+          are `/#contact`, a navigation, and from any other route they move the
+          reader off the page they were on. That is the trade, and it is the
+          reason those two links had to change kind in the same commit. */}
+      <Contact />
     </>
   )
 }

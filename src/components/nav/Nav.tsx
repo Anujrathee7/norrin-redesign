@@ -3,7 +3,7 @@ import { Container } from '@/components/primitives/Layout'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { cx } from '@/lib/cx'
 import { NAV } from './navData'
-import { ContactButton, Drawer, Hamburger, MobileSheet, RuleSegment, Wordmark } from './NavParts'
+import { ContactButton, Hamburger, MobileSheet, RuleSegment, Wordmark } from './NavParts'
 import { useNavState } from './useNavState'
 
 /**
@@ -29,24 +29,7 @@ import { useNavState } from './useNavState'
 const BAR_HEIGHT = 72
 
 export function Nav() {
-  const {
-    rootRef,
-    openItem,
-    canHover,
-    openMenu,
-    closeMenu,
-    scheduleClose,
-    cancelClose,
-    activateTrigger,
-    registerTrigger,
-    focusTrigger,
-    exitForward,
-    mobileOpen,
-    setMobileOpen,
-    scrolled,
-    edged,
-    currentPath,
-  } = useNavState()
+  const { mobileOpen, setMobileOpen, scrolled, edged, currentPath } = useNavState()
 
   /* The condensed height, as a STATE rather than a scrub. See the long note in
      index.css where `condense` used to be declared: driving this from an
@@ -55,18 +38,18 @@ export function Nav() {
      is the hero and nothing else.
 
      `scrolled` and not `edged`. They differ, and the difference matters:
-     `edged` is also true when a drawer or the mobile sheet is open, and opening
-     a menu must not make the bar it is hanging from shrink underneath it. */
+     `edged` is also true when the mobile sheet is open, and opening the sheet
+     must not make the bar it is hanging from shrink underneath it. */
   const rowHeight = scrolled ? BAR_HEIGHT - 16 : BAR_HEIGHT
 
   return (
     <header
-      ref={rootRef}
-      onMouseEnter={cancelClose}
-      onMouseLeave={scheduleClose}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) closeMenu()
-      }}
+      // NO POINTER OR FOCUS HANDLERS. This element carried `onMouseEnter`,
+      // `onMouseLeave` and an `onBlur` that checked `relatedTarget` — the whole
+      // hover-intent and focus-containment apparatus for the drawers. The
+      // drawers are deleted (see `navData.ts`) and so is all of it: a bar with
+      // nothing to open does not need to know when the pointer leaves it.
+      //
       // THE BAR NO LONGER DECLARES A TONE, BECAUSE IT NO LONGER HAS ONE TO
       // DECLARE. It used to carry `data-tone="inverse"` while an inverted
       // section was under it, and everything inside — ink, hairline, wordmark,
@@ -134,41 +117,29 @@ export function Nav() {
                 style={{ height: rowHeight }}
                 className="flex items-center gap-1 transition-[height] duration-300 ease-(--ease-ui)"
               >
+                {/* EVERY ITEM IS A LINK, AND THERE IS NO SECOND KIND.
+                    Three of the four used to be `<button aria-haspopup>` with a
+                    click handler that had to tell a keyboard activation from a
+                    mouse one, because on a hover-only trigger the parent page
+                    was otherwise unreachable on desktop. That entire branch is
+                    gone with the drawers: an item is a page, so it is a link to
+                    that page, which is what it always should have been able to
+                    be. */}
                 {NAV.map((item) => {
                   const isCurrent = item.owns.includes(currentPath)
-                  const isOpen = openItem === item.label
                   return (
                     <li key={item.label} className="relative flex h-full items-center">
-                      {item.children ? (
-                        <button
-                          ref={(el) => {
-                            registerTrigger(item.label, el)
-                          }}
-                          aria-expanded={isOpen}
-                          aria-haspopup="true"
-                          aria-controls="nav-drawer"
-                          aria-current={isCurrent ? 'page' : undefined}
-                          onClick={(e) => activateTrigger(e, item)}
-                          onKeyDown={(e) => handoffIntoDrawer(e, isOpen)}
-                          onMouseEnter={() => canHover && openMenu(item.label)}
-                          className={cx('control px-3.5 py-2 ui', tone(isCurrent || isOpen))}
-                        >
-                          {item.label}
-                        </button>
-                      ) : (
-                        <Link
-                          to={item.href}
-                          ref={(el) => {
-                            registerTrigger(item.label, el)
-                          }}
-                          aria-current={isCurrent ? 'page' : undefined}
-                          onMouseEnter={() => canHover && scheduleClose()}
-                          className={cx('control block px-3.5 py-2 ui', tone(isCurrent))}
-                        >
-                          {item.label}
-                        </Link>
-                      )}
-                      <RuleSegment show={isCurrent || isOpen} />
+                      <Link
+                        to={item.href}
+                        aria-current={isCurrent ? 'page' : undefined}
+                        className={cx('control block px-3.5 py-2 ui', tone(isCurrent))}
+                      >
+                        {item.label}
+                      </Link>
+                      {/* Only the current page is marked. It used to also light
+                          for an open drawer, which is a second meaning on one
+                          line — and there are no drawers to have a state. */}
+                      <RuleSegment show={isCurrent} />
                     </li>
                   )
                 })}
@@ -201,29 +172,16 @@ export function Nav() {
         </Container>
       </div>
 
-      <Drawer
-        item={NAV.find((i) => i.label === openItem) ?? null}
-        onNavigate={closeMenu}
-        onFocusTrigger={() => focusTrigger(openItem)}
-        onExitForward={() => exitForward(openItem)}
-      />
-      {mobileOpen ? <MobileSheet onNavigate={() => setMobileOpen(false)} /> : null}
+      {mobileOpen ? <MobileSheet /> : null}
     </header>
   )
 }
 
-/** Tab off an open trigger belongs in the drawer, not three items further along. */
-function handoffIntoDrawer(e: React.KeyboardEvent, isOpen: boolean) {
-  if (e.key !== 'Tab' || e.shiftKey || !isOpen) return
-  const first = document.querySelector<HTMLElement>('#nav-drawer a')
-  if (!first) return
-  e.preventDefault()
-  first.focus()
-}
-
 /* One ramp, because there is now one ground. The inverse branch went with the
    bar's tone flip: a nav item is always ink on paper (or ink on the dark
-   ground), never inverse ink on forest. */
+   ground), never inverse ink on forest.
+
+   It took `isCurrent || isOpen` before. There is no open state to fold in. */
 function tone(isCurrent: boolean) {
   return cx('transition-colors duration-200', isCurrent ? 'text-ink' : 'text-ink-2 hover:text-ink')
 }

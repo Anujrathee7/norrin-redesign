@@ -1,5 +1,3 @@
-export type NavChild = { label: string; href: string; note?: string }
-
 export type NavItem = {
   label: string
   href: string
@@ -7,93 +5,64 @@ export type NavItem = {
    * Route paths this item is "current" for, used for the active state.
    *
    * This used to be a list of SECTION IDS, read off an IntersectionObserver
-   * watching `main section[id]`. The sections are on five documents now, so
+   * watching `main section[id]`. The sections are on separate documents now, so
    * there is nothing to observe and nothing to disagree about: the reader's
    * location is `useLocation().pathname` and the marker is exact rather than
    * inferred from what happens to be crossing a band 20% down the viewport.
    */
   owns: string[]
-  children?: NavChild[]
 }
 
 /**
  * A path is a route; anything else is a fragment on the page you are already
- * on. One predicate, used by the bar, the drawer, the mobile sheet and the
- * footer, so a link's kind is decided in one place rather than four.
+ * on. One predicate, used by the bar, the mobile sheet and the footer, so a
+ * link's kind is decided in one place rather than three.
  */
 export function isRoute(href: string) {
   return href.startsWith('/')
 }
 
 /**
- * Norrin's live nav exposes roughly 25 primary destinations — Services alone
- * fans out to eleven links across three subgroups, Technologies to seven, and
- * five locales sit alongside them as if they were content. This collapses that
- * to five items on the three pillars, a taxonomy Norrin already uses internally
- * and which absorbs every one of the eleven service links.
+ * THE BAR IS THE ROUTE TABLE. NOTHING MORE.
  *
- * Shared by every navbar variant so the options differ in layout and character,
- * never in what the site actually offers.
+ * ---------------------------------------------------------------------------
+ * THE DRAWERS ARE GONE, AND SO IS EVERYTHING THAT FED THEM
+ * ---------------------------------------------------------------------------
+ * Three of the four items used to open a hover drawer — eleven rows in total,
+ * with hover-intent timers, focus hand-off at both edges of the panel, an
+ * `inert` collapsed state and a keyboard/mouse split on what activating a
+ * parent even meant. All of it is deleted rather than hidden.
  *
- * EVERY `href` IS NOW EITHER A ROUTE PATH OR A FRAGMENT, and which one it is
- * decides how it renders: a path is a `<Link>` (client navigation, no reload),
- * a bare fragment is a plain `<a>` (the browser's own scroll, valid on every
- * route). `/what-we-do#pillars` is both — react-router pushes the path and
- * `<ScrollRestoration />` scrolls to the id once the page has rendered.
+ * It was built for a bar that stood in front of one long document, where an
+ * item was a scroll target and a drawer was the only way to say what was inside
+ * it. There are three routes now, and a route says what is inside it by being a
+ * page. A drawer over a two-item bar is a mechanism with nothing left to
+ * disclose.
  *
- * The only bare fragments left are `#footer` and `#contact`, and they are bare
- * because both of those live in the shared layout: they are on whatever page
- * the reader is already on, so turning them into navigations would move
- * somebody who only asked to scroll.
+ * The eleven rows were mostly not destinations anyway. Four of the five under
+ * "What we do" pointed at the same `#pillars` id with different labels, and all
+ * three under "Thinking" pointed at `#thinking` — a menu whose rows differ in
+ * text and agree in destination is a list of topics wearing a navigation's
+ * clothes. §3 is about links promising things they do not deliver, and this is
+ * the shape that rule takes in a nav.
+ *
+ * ---------------------------------------------------------------------------
+ * TWO ITEMS, AND THAT IS A REAL CONSEQUENCE RATHER THAN AN OVERSIGHT
+ * ---------------------------------------------------------------------------
+ * There are three routes and the third is `/`, which the wordmark already owns —
+ * a "Home" item beside a logo that goes home is the same destination twice. So
+ * the list is What we do and Work.
+ *
+ * What the deleted items carried is still reachable and is not orphaned:
+ * Careers and Contact are sections of `/` and are in the footer's Company
+ * column; Track record is on `/work` and is in that same column; Thinking is on
+ * `/work` too. Nothing lost a destination — two things lost a menu.
+ *
+ * Norrin's own live nav exposes roughly 25 primary destinations, Services alone
+ * fanning out to eleven links across three subgroups. This is the opposite
+ * position, arrived at by deleting rather than by collapsing.
  */
 export const NAV: NavItem[] = [
-  {
-    label: 'What we do',
-    href: '/what-we-do',
-    owns: ['/what-we-do'],
-    children: [
-      {
-        label: 'Applied AI Solutions',
-        href: '/what-we-do#pillars',
-        note: 'Agentic solutions · AI-first services · Software',
-      },
-      {
-        label: 'Enterprise AI Foundation',
-        href: '/what-we-do#pillars',
-        note: 'Data · Integration · Cloud · Continuous services',
-      },
-      { label: 'AI Transformation', href: '/what-we-do#pillars', note: 'Advisory · Governance · Adoption' },
-      { label: 'Platforms we run', href: '/what-we-do#platforms', note: 'Azure · Fabric · Databricks · Anthropic' },
-    ],
-  },
+  { label: 'What we do', href: '/what-we-do', owns: ['/what-we-do'] },
   { label: 'Work', href: '/work', owns: ['/work'] },
-  {
-    label: 'Thinking',
-    href: '/thinking',
-    owns: ['/thinking'],
-    children: [
-      { label: 'NorrInsights', href: '/thinking#thinking', note: 'Writing · Newsletter' },
-      { label: 'Norrin Pod', href: '/thinking#thinking', note: 'The podcast' },
-      { label: 'Face of AI Vision Paper', href: '/thinking#thinking', note: 'Gated download' },
-    ],
-  },
-  {
-    label: 'Company',
-    href: '/company',
-    owns: ['/company'],
-    children: [
-      // WAS "About us", POINTING AT `#proof`. Proof is on `/work` now — it is
-      // evidence about the work and reads better beside the cases it came from
-      // — so this row had to move with it. It is relabelled rather than
-      // repointed, because "About us" promising a page the reader does not land
-      // on is precisely the fabricated affordance §3 bans; "Track record" is
-      // what the section's own eyebrow calls itself, and it is where the link
-      // actually goes.
-      { label: 'Track record', href: '/work#proof', note: 'Our story · Milestones' },
-      // This used to point at the values section, which held no careers
-      // content. There is a Careers section now, so the link is real.
-      { label: 'Careers', href: '/company#careers', note: 'Work at Norrin' },
-      { label: 'Offices & billing', href: '#footer', note: 'Seven offices · Five countries' },
-    ],
-  },
 ]

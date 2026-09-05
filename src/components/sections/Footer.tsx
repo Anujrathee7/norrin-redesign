@@ -49,15 +49,25 @@ import { footerBlurb, offices, social } from '@/data/norrin'
  * a promise the destination does not keep — and the bar's Company drawer carries
  * the identical label and target. One name per thing.
  *
- * Contact stays a bare `#contact`, and stays correct on every page, because the
- * layout renders the Contact strip after every route's content. It is a scroll,
- * not a navigation, wherever it is clicked.
+ * THIS COLUMN IS NOW THE ONLY PLACE SOME OF THESE ARE LINKED, and it grew from
+ * three rows to five because of it. The bar lost its Thinking and Company items
+ * when those routes were merged away, and it lost its drawers entirely — so
+ * Track record, Thinking and Careers have no other link on the site. A footer is
+ * the right home for them; being the ONLY home is the thing to know before
+ * deleting a row here.
+ *
+ * CONTACT AND CAREERS ARE `/#...`, NOT BARE FRAGMENTS. Contact was a bare
+ * `#contact` while the layout rendered that strip after every route, which made
+ * it a scroll wherever it was clicked. Both sections live on `/` alone now, so a
+ * bare fragment would do nothing on two of the three routes.
  */
 const COMPANY_LINKS = [
-  { label: 'Track record', href: '/work#proof' },
   // Was "Customer cases"; the bar calls the same section Work. One name per thing.
   { label: 'Work', href: '/work' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Track record', href: '/work#proof' },
+  { label: 'Thinking', href: '/work#thinking' },
+  { label: 'Careers', href: '/#careers' },
+  { label: 'Contact', href: '/#contact' },
 ]
 
 export function Footer() {

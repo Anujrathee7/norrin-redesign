@@ -1,19 +1,25 @@
 import { Outlet, ScrollRestoration } from 'react-router'
 import { Nav } from '@/components/nav/Nav'
-import { Contact } from '@/components/sections/Contact'
 import { Footer } from '@/components/sections/Footer'
 
 /**
  * The shell every route is poured into: skip link, bar, `<main>`, footer.
  *
- * CONTACT IS PART OF THE SHELL, NOT OF A PAGE, and that is a decision rather
- * than a convenience. The ask belongs at the end of whatever was just read, so
- * a reader who finishes the cases and a reader who finishes the careers page
- * both arrive at it — and it is what keeps `#contact` an IN-PAGE anchor on
- * every route. The bar's Contact button and the footer's Contact row stay plain
- * fragment links because of it; if Contact lived on one page they would become
- * a navigation AWAY from what the reader is in the middle of, which is the
- * opposite of what a closing ask is for.
+ * CONTACT IS NO LONGER PART OF THE SHELL, AND THAT REVERSES WHAT THIS COMMENT
+ * USED TO ARGUE. It was rendered here after every route's outlet, so the ask
+ * landed at the end of whatever had just been read and `#contact` stayed an
+ * in-page anchor everywhere.
+ *
+ * What that actually produced was five copies of one section and four pages
+ * ending identically — which is where §1.5 was weakest across the site, since
+ * two of the five routes were a single section followed by the same forest
+ * Contact and the same paper footer. Contact belongs to `/` now; see the note in
+ * `Home.tsx`.
+ *
+ * The cost is paid in the two links that pointed at it: the bar's Contact button
+ * and the footer's Contact row are `/#contact` and are navigations rather than
+ * scrolls. Both say so at their call sites. The `getKey` note below is what
+ * makes them land on the section rather than at the top of the page.
  *
  * `<ScrollRestoration />` rather than a hand-rolled scroll-to-top (§2.1: never
  * hand-roll what the library ships). It is three behaviours, not one, and the
@@ -35,7 +41,7 @@ import { Footer } from '@/components/sections/Footer'
  * hits the position saved for the page the reader was already on. The effect
  * takes the `typeof number` branch, scrolls back to it, and the anchor does
  * nothing. Measured, from `.shots/probe/routing.mjs`: load `/`, scroll, go to
- * `/thinking`, press Back, then click Contact — the URL said `#contact` and the
+ * another route, press Back, then click Contact — the URL said `#contact` and the
  * page sat at 569px, and stayed there for every anchor for the rest of the
  * visit.
  *
@@ -58,7 +64,6 @@ export function SiteLayout() {
       <Nav />
       <main id="main">
         <Outlet />
-        <Contact />
       </main>
       <Footer />
     </>

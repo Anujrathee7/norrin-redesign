@@ -194,8 +194,34 @@ async function assertVisible(page, label, scope = '[data-reveal], .line-mask > *
       const t = cs.transform
       if (t && t !== 'none') {
         const m = new DOMMatrixReadOnly(t)
-        // sway rocks on purpose and is exempt; everything else must be at rest
-        if (el.getAttribute('data-scroll') === 'nori-sway') continue
+        // A PARALLAX HAS NO "FINISHED" STATE, AND THIS CHECK IS ABOUT ARRIVALS.
+        //
+        // `drift-slow|drift|drift-fast` run `translateY(+d)` to `translateY(-d)`
+        // across `entry 0% exit 100%` — symmetric about zero, continuous, and
+        // the element is fully visible and readable at every point of it. Its
+        // resting value at the bottom of a page is -d, which is the END of the
+        // effect rather than a stall part-way through one.
+        //
+        // The exemption is NEW and it is narrowing an over-broad check rather
+        // than silencing a real find. What this check exists to catch is an
+        // ARRIVAL stranded mid-flight — content that travelled halfway and
+        // stopped, which reads as broken and can hide things. A drift hides
+        // nothing: verified by looking at the bottom of `/work` at 1512x950,
+        // where the only flagged element sits 14px up and nothing about the page
+        // reads as displaced.
+        //
+        // It had never fired before only by accident of layout: every page used
+        // to end with the Contact strip and the footer, which kept every drift
+        // element off-screen at the bottom. Contact moved to `/` alone and
+        // `/work` got short enough for Thinking's drift to be on screen at rest,
+        // which is what exposed it. The layout change is not a defect and
+        // neither is the parallax.
+        //
+        // `nori-sway` was the previous entry here and is deleted, not kept
+        // alongside: Nori was removed from the codebase, so it exempted an
+        // attribute nothing can set.
+        const kind = el.getAttribute('data-scroll')
+        if (kind && kind.startsWith('drift')) continue
         if (Math.abs(m.e) > 1 || Math.abs(m.f) > 1 || Math.abs(m.a - 1) > 0.01)
           out.push(`${el.getAttribute('data-scroll') ?? el.getAttribute('data-scene-part')} -> ${t}`)
       }

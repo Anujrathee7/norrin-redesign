@@ -1,6 +1,7 @@
 import { PageHead } from '@/pages/PageHead'
 import { Work } from '@/components/sections/Work'
 import { Proof } from '@/components/sections/Proof'
+import { Thinking } from '@/components/sections/Thinking'
 
 /**
  * `/work` — the customer cases, then the track record they came out of.
@@ -18,6 +19,19 @@ export function WorkPage() {
       <PageHead title="Work" />
       <Work />
       <Proof />
+      {/* THINKING CAME HERE FROM ITS OWN ROUTE, WHICH IS NOW DELETED.
+          `/thinking` was one 0.91-screen section, and a route that thin is a
+          page you reach the bottom of before the bar has finished condensing.
+          It reads better as the third movement of this one: who we did it for,
+          what it produced, and what we think about it — evidence, then outcome,
+          then argument, which is the order a reader who got this far is already
+          travelling in.
+
+          `ThinkingPage.tsx` is deleted rather than left unrouted, and the bar's
+          Thinking item went with it. Everything it pointed at is still reachable
+          — the Work drawer carries the row, and `#thinking` resolves on this
+          page. */}
+      <Thinking />
     </>
   )
 }

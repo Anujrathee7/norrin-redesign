@@ -54,11 +54,24 @@ for (const theme of ['light', 'dark']) {
   }
 
   /**
-   * axe again with a drawer open, at the top and over a forest band.
+   * axe again with the bar's OPEN state showing, at the top and over a forest
+   * band.
    *
-   * The drawer only exists while a pointer is on a trigger, so the plain pass
-   * above has never once seen it — every claim about the dropdown being clean
-   * was, until now, taken on trust.
+   * THIS USED TO OPEN THE DESKTOP DRAWER, and it hovered
+   * `getByRole('button', { name: /What we do/ })` to do it. There are no drawers
+   * and no `<button>` nav items any more — every item is a `<Link>` to a route —
+   * so that hover waited 30s for an element that cannot exist and took the whole
+   * gate down with a TimeoutError.
+   *
+   * The check is kept rather than deleted, because its reason survives the
+   * drawers: the plain pass above only ever sees the bar closed, so any claim
+   * about its open state was taken on trust. The open state is now the MOBILE
+   * SHEET, so that is what gets opened. The two scroll positions stay — a bar
+   * over the page ground and a bar over an inverse band are different contrast
+   * problems, and that was never about the drawer.
+   *
+   * The closed bar is audited at both positions too, which is new coverage: the
+   * old shape only ever ran the closed pass once, at the top.
    */
   for (const spot of ['top', 'inverse']) {
     const reached = await page.evaluate((where) => {
@@ -66,51 +79,75 @@ for (const theme of ['light', 'dark']) {
         window.scrollTo(0, 600)
         return true
       }
-      // Scoped to main. The fixed header now carries data-tone="inverse" too
-      // while it sits over a band, and an unscoped query would latch onto it,
+      // Scoped to main. The fixed header used to carry data-tone="inverse" too
+      // while it sat over a band, and an unscoped query would latch onto it,
       // scroll by ~72px, and quietly audit the same place twice.
-      // Scoped to main — the fixed header carries the same attribute now.
-    const el = document.querySelector('main [data-tone="inverse"]')
+      const el = document.querySelector('main [data-tone="inverse"]')
       if (!el) return false
       window.scrollTo(0, window.scrollY + el.getBoundingClientRect().top + 200)
       return true
     }, spot)
     if (!reached) continue
     await page.waitForTimeout(700)
-    await page.getByRole('button', { name: /What we do/ }).first().hover()
-    await page.waitForTimeout(600)
 
-    const openState = await page.locator('#nav-drawer').evaluate((el) => ({
-      rows: el.querySelectorAll('a').length,
-      height: Math.round(el.getBoundingClientRect().height),
-    }))
-    if (openState.height < 40) {
-      failures++
-      console.log(`
-[error] drawer did not open at "${spot}" — height ${openState.height}px`)
-    }
-
-    const open = await new AxeBuilder({ page })
+    const closed = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'])
       .analyze()
 
-    console.log(
-      `
-=== axe · ${theme} · drawer open (${spot}) · ${openState.rows} rows, ${openState.height}px ===`,
-    )
-    if (open.violations.length === 0) {
+    console.log(`
+=== axe · ${theme} · bar closed (${spot}) ===`)
+    if (closed.violations.length === 0) {
       console.log('no violations')
     } else {
-      for (const v of open.violations) {
+      for (const v of closed.violations) {
         failures++
         console.log(`
 [${v.impact}] ${v.id} — ${v.help}  (${v.nodes.length} node(s))`)
         for (const n of v.nodes.slice(0, 4)) console.log(`   ${n.target.join(' ')}`)
       }
     }
-    await page.mouse.move(20, 700)
-    await page.waitForTimeout(400)
   }
+
+  /* The sheet, at a width where the hamburger is not `lg:hidden`. Opened by
+     clicking the real control rather than by setting state, so the thing being
+     audited is the thing a reader gets. */
+  await page.setViewportSize({ width: 430, height: 900 })
+  await page.waitForTimeout(400)
+  await page.getByRole('button', { name: /Open menu/ }).click()
+  await page.waitForTimeout(500)
+
+  const sheetState = await page.locator('#mobile-nav').evaluate((el) => ({
+    rows: el.querySelectorAll('a').length,
+    height: Math.round(el.getBoundingClientRect().height),
+  }))
+  if (sheetState.height < 40) {
+    failures++
+    console.log(`
+[error] mobile sheet did not open — height ${sheetState.height}px`)
+  }
+
+  const sheet = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'])
+    .analyze()
+
+  console.log(
+    `
+=== axe · ${theme} · mobile sheet open · ${sheetState.rows} rows, ${sheetState.height}px ===`,
+  )
+  if (sheet.violations.length === 0) {
+    console.log('no violations')
+  } else {
+    for (const v of sheet.violations) {
+      failures++
+      console.log(`
+[${v.impact}] ${v.id} — ${v.help}  (${v.nodes.length} node(s))`)
+      for (const n of v.nodes.slice(0, 4)) console.log(`   ${n.target.join(' ')}`)
+    }
+  }
+
+  await page.keyboard.press('Escape')
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.waitForTimeout(400)
 
   if (theme === 'light') {
     const structure = await page.evaluate(() => {

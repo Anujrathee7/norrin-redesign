@@ -289,8 +289,19 @@ node tools/palette.mjs                         # every declared colour pair
 node tools/audit.mjs http://localhost:4173/    # axe, PRODUCTION PREVIEW
 ```
 
-Axe must be clean light **and** dark, closed **and** nav-drawer-open, at the top and
-over an inverse band.
+Axe must be clean light **and** dark, closed **and** with the bar's open state
+showing, at the top and over an inverse band — **and on every route, not just `/`**.
+
+*This line said "nav-drawer-open" until the hover drawers were deleted.* The bar had
+four items, three of which opened a mega-menu; there are two now and both are plain
+links to routes, so the only open state the bar still has is the mobile sheet, and that
+is what `tools/audit.mjs` opens. The wording changed because the thing changed — the
+requirement did not. What it has always meant is that the closed bar is the only state
+the plain pass ever sees, so any claim about an open one is taken on trust unless
+something opens it.
+
+*The per-route clause is new and was learned the same way.* The site is five — now
+three — documents, and a gate run against `/` says nothing about the others.
 
 **Axe does not automate focus-indicator contrast.** A clean run has never been evidence
 about focus rings; two real ring bugs here were found by hand after clean runs. Check

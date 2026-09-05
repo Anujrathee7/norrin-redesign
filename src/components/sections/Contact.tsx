@@ -164,8 +164,8 @@ export function Contact() {
                   the last section of a single page and Thinking was five
                   sections above it. Contact is now the closing strip on every
                   route, and `#thinking` exists on exactly one of them — so on
-                  `/`, `/what-we-do`, `/work` and `/company` this button pointed
-                  at nothing and threw the reader to scrollY 0. Measured on two
+                  every route but one this button pointed at nothing and threw
+                  the reader to scrollY 0. Measured on two
                   of those routes.
 
                   §3 calls that a fabricated affordance in as many words: a link
@@ -174,7 +174,7 @@ export function Contact() {
                   actually holds the paper is the honest version, and it is the
                   only control in this section that leaves the current route. */}
               <Link
-                to="/thinking#thinking"
+                to="/work#thinking"
                 className="btn btn-ghost"
               >
                 Or start with the Vision Paper

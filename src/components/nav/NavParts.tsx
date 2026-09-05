@@ -1,9 +1,9 @@
-import { useState, type ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 import { Link } from 'react-router'
 import { Container } from '@/components/primitives/Layout'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { cx } from '@/lib/cx'
-import { NAV, isRoute, type NavItem } from './navData'
+import { NAV, isRoute } from './navData'
 
 /**
  * A nav destination, rendered as whatever it actually is.
@@ -36,8 +36,17 @@ export function Wordmark() {
 
 export function ContactButton() {
   return (
-    <a
-      href="#contact"
+    // A NAVIGATION NOW, NOT A SCROLL, and the change is forced rather than
+    // preferred. This was `href="#contact"` while the Contact strip was
+    // rendered in `SiteLayout` after every route — the target was on whatever
+    // page you were already on, so a fragment was the honest kind of link.
+    //
+    // Contact lives on `/` alone now, so a bare `#contact` would resolve to
+    // nothing from the other two routes: a control that scrolls somewhere on one
+    // page and does nothing on the rest. §3 has no patience for that, so it says
+    // what it does — it goes to the home page, at the ask.
+    <Link
+      to="/#contact"
       // `.btn-solid` in both themes and at every scroll position. It used to
       // swap to `.btn-signal` while the bar was inverted, which was the right
       // call on a forest bar and is meaningless on a bar that is always the
@@ -47,7 +56,7 @@ export function ContactButton() {
       className="btn btn-sm btn-solid"
     >
       Contact
-    </a>
+    </Link>
   )
 }
 
@@ -56,8 +65,11 @@ export function ContactButton() {
  *
  * This replaces a 3px square that floated in the dead space above the rule and
  * read as a speck. Sitting *on* the rule, it is the production line doing
- * wayfinding — and when a drawer is open it is what the drawer hangs from, so
- * the pop-out is visibly attached to the word that opened it.
+ * wayfinding.
+ *
+ * It used to double as the thing an open drawer hung from, so the pop-out read
+ * as attached to the word that opened it. There are no drawers, so it says one
+ * thing: this is the page you are on.
  */
 export function RuleSegment({ show }: { show: boolean }) {
   return (
@@ -71,102 +83,17 @@ export function RuleSegment({ show }: { show: boolean }) {
   )
 }
 
-/**
- * The drawer.
- *
- * Not a panel over the page — the header temporarily getting taller. It shares
- * the bar's ground, takes the bar's own `border-b` as its top edge, and aligns
- * its rows to the same `Container` the bar uses, so nothing about it reads as a
- * card. Rows are the hero stat table's idiom: name left, mono metadata right,
- * hairline between. Hovering completes that hairline in moss, left to right —
- * the page's production line at its smallest scale.
- *
- * One drawer per bar rather than one per item, so moving between menus resizes
- * a thing that is already open instead of hard-cutting between two panels.
- */
-export function Drawer({
-  item,
-  onNavigate,
-  onFocusTrigger,
-  onExitForward,
-}: {
-  item: NavItem | null
-  onNavigate: () => void
-  /** Shift+Tab off the first row goes back to the word that opened the drawer. */
-  onFocusTrigger: () => void
-  /** Tab off the last row closes and carries on to the next item in the bar. */
-  onExitForward: () => void
-}) {
-  // Held so the content does not vanish before the height finishes collapsing.
-  // Adjusted during render rather than in an effect, so the content and the open
-  // state land in the same commit — an effect would leave the drawer animating
-  // open around an empty box for a frame.
-  const [lastItem, setLastItem] = useState<NavItem | null>(null)
-  const open = !!item?.children
-  if (open && item !== lastItem) setLastItem(item)
-  const shown = open ? item : lastItem
+/* THE DRAWER LIVED HERE, and it is deleted rather than parked. It was a
+   full-width pop-out sharing the bar's ground and Container, with rows in the
+   hero stat table's idiom, a hairline completing in moss on hover, an `inert`
+   collapsed state, a held `lastItem` so content did not vanish mid-collapse,
+   and focus hand-off at both edges so tab order read trigger, rows, next item.
 
-  return (
-    <div
-      id="nav-drawer"
-      inert={!open}
-      className={cx(
-        'hidden overflow-hidden bg-ground transition-[grid-template-rows] duration-200 ease-(--ease-entrance) lg:grid',
-        open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
-      )}
-    >
-      <div className="min-h-0">
-        {shown?.children ? (
-          <>
-            <Container>
-              {/* Bounded, like the hero's stat table. Run the rows the full width of
-                  the bar and the name loses all relationship with its metadata across
-                  a thousand pixels of nothing; the full-bleed rule below still
-                  terminates the drawer. */}
-              <ul className="max-w-[46rem] pt-1 pb-3">
-                {shown.children.map((child, i, rows) => (
-                  <li key={child.label}>
-                    <NavLink
-                      href={child.href}
-                      onClick={onNavigate}
-                      onKeyDown={(e) => {
-                        if (e.key !== 'Tab') return
-                        if (e.shiftKey && i === 0) {
-                          e.preventDefault()
-                          onFocusTrigger()
-                        } else if (!e.shiftKey && i === rows.length - 1) {
-                          e.preventDefault()
-                          onExitForward()
-                        }
-                      }}
-                      className="group/row relative grid grid-cols-[1fr_auto] items-baseline gap-8 border-b border-hairline py-[0.875rem]"
-                    >
-                      <span className="ui text-ink transition-colors duration-200 group-hover/row:text-accent group-focus-visible/row:text-accent">
-                        {child.label}
-                      </span>
-                      {child.note ? (
-                        <span className="label whitespace-nowrap text-ink-3">{child.note}</span>
-                      ) : null}
-                      {/* The rule completing. Reduced motion snaps it to full via the
-                          global duration override, so the state never depends on movement. */}
-                      <span
-                        aria-hidden="true"
-                        className="absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-accent transition-transform duration-[280ms] ease-(--ease-entrance) group-hover/row:scale-x-100 group-focus-visible/row:scale-x-100"
-                      />
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </Container>
-            {/* Full-bleed, like every other divider on the page: it terminates the
-                drawer without drawing a box around it. */}
-            <div aria-hidden="true" className="h-px w-full bg-hairline-strong" />
-          </>
-        ) : null}
-      </div>
-    </div>
-  )
-}
+   None of that was wrong. It had nothing left to disclose: see `navData.ts`.
+   Keeping it behind a flag would be keeping a disclosure widget's focus
+   management warm for a menu that may never return, and if one does it will be
+   a Radix primitive under §2.1 rather than this. `NavItem.children` went with
+   it, which is why nothing can construct one any more. */
 
 export function Hamburger({
   open,
@@ -203,7 +130,7 @@ export function Hamburger({
 }
 
 /** Shared by every variant — the phone experience does not need four takes. */
-export function MobileSheet({ onNavigate, barHeight = 72 }: { onNavigate: () => void; barHeight?: number }) {
+export function MobileSheet({ barHeight = 72 }: { barHeight?: number }) {
   return (
     <div
       id="mobile-nav"
@@ -215,30 +142,24 @@ export function MobileSheet({ onNavigate, barHeight = 72 }: { onNavigate: () => 
           <ul className="divide-y divide-hairline">
             {NAV.map((item) => (
               <li key={item.label} className="py-5">
-                <NavLink href={item.href} onClick={onNavigate} className="display-3 block">
+                {/* NO `onClick` CLOSING THE SHEET, AND NO SUB-LIST UNDER IT.
+                    The sub-list is gone with the drawers it mirrored. The
+                    handler is gone because closing on click is one handler per
+                    row that is silently wrong for every other way of leaving the
+                    page — `useNavState` closes the sheet when the pathname
+                    changes, which covers a row, the Contact button, and the
+                    browser's own back button alike. */}
+                <NavLink href={item.href} className="display-3 block">
                   {item.label}
                 </NavLink>
-                {item.children ? (
-                  <ul className="mt-3 space-y-2.5">
-                    {item.children.map((c) => (
-                      <li key={c.label}>
-                        <NavLink href={c.href} onClick={onNavigate} className="text-ink-2">
-                          {c.label}
-                        </NavLink>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
               </li>
             ))}
           </ul>
-          <a
-            href="#contact"
-            onClick={onNavigate}
-            className="btn btn-solid btn-block mt-8"
-          >
+          {/* `/#contact`, for the reason `ContactButton` above sets out at
+              length: Contact is a section of `/` now, not of every page. */}
+          <Link to="/#contact" className="btn btn-solid btn-block mt-8">
             Contact
-          </a>
+          </Link>
           {/* ONE ROW, NOT TWO. A Language row sat above this one, added here
               because the desktop utilities row is `hidden` below lg and without
               it the entire phone audience was locked out of the locale menu.
@@ -252,8 +173,8 @@ export function MobileSheet({ onNavigate, barHeight = 72 }: { onNavigate: () => 
               The theme toggle keeps the argument that put it here: it is the one
               real preference on the site, and leaving it desktop-only locks
               every phone reader to the default with no way out. The ruled-table
-              idiom stays too — it is what the hero stats and the drawer are
-              built from, and a single row is still a row in a table. */}
+              idiom stays too — it is what the hero stats are built from, and a
+              single row is still a row in a table. */}
           <div className="mt-8 border-t border-hairline">
             <div className="flex items-center justify-between py-4">
               <span className="label text-ink-3">Appearance</span>

@@ -18,12 +18,11 @@ import { router } from '@/routes'
  *
  * That constraint is why this split was possible at all, and it is worth
  * saying plainly: a run of adjacent sections owned by one nav item is already a
- * page in everything but URL. The runs became the routes, unchanged:
- *   /            → Hero, The Gap
- *   /what-we-do  → Roles, Pillars
- *   /work        → Work, Proof
- *   /thinking    → Thinking
- *   /company     → Careers
+ * page in everything but URL. The runs became the routes — five of them at
+ * first, three now that the two thinnest were merged into their neighbours:
+ *   /            → Hero, The Gap, Careers, Contact
+ *   /what-we-do  → Pillars, Roles
+ *   /work        → Work, Proof, Thinking
  *
  * What forced it was length. The single document measured 13.6 viewport-heights
  * at 1512x860 — measured with Playwright, not estimated — with The Gap (3.12),
