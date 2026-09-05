@@ -34,11 +34,18 @@ import { usePageVisible } from '@/hooks/usePageVisible'
  * Holding a finger on the card is the mechanism that was missing.
  *
  * SO THIS ONE IS NOT GATED ON `pointerType`, AND THAT IS THE WHOLE POINT. The
- * hover pause above IS gated to a mouse, deliberately, because `pointerenter`
- * fires on a touch tap while `pointerleave` frequently does not fire until the
- * next tap somewhere else — an ungated hover stops the rotation on a phone for
- * good. This is the opposite case: it exists FOR touch, and it is safe ungated
- * precisely because it is bounded by a RELEASE rather than by an exit.
+ * hover pause above IS gated to a mouse, deliberately, because a touch pointer
+ * raises the same enter/move events a mouse does while `pointerleave` frequently
+ * does not fire until the next tap somewhere else — an ungated hover stops the
+ * rotation on a phone for good. This is the opposite case: it exists FOR touch,
+ * and it is safe ungated precisely because it is bounded by a RELEASE rather
+ * than by an exit.
+ *
+ * `useCardStack` no longer arms its pause from `pointerenter` at all — that
+ * event fires when the pile scrolls up under a cursor nobody touched, which
+ * stopped the pile before it had turned once. It arms from `pointermove` now,
+ * and the mouse-only gate is unchanged. The paragraph above still holds; only
+ * the event it names has moved.
  *
  * EVERY WAY A PRESS CAN END, AND WHY NONE OF THEM IS DECORATION. `pointerup` is
  * the ordinary release. `pointercancel` is the browser taking the gesture over,

@@ -135,6 +135,16 @@ function splitTitle(title: string) {
  * under `prefers-reduced-motion`. Making the dots real buttons is the one-line
  * change that would close it.
  *
+ * HAVING NO CONTROLS IS ALSO WHAT MADE HOVER-PAUSE DANGEROUS HERE, and that is
+ * a defect this component actually shipped rather than a hypothetical. A pause
+ * with nothing to un-pause it has to be certain it was asked for. It was not:
+ * `pointerenter` fires when the pile scrolls up under a cursor the reader never
+ * touched, so the rotation stopped before the first card turned and stayed
+ * stopped. It is armed by `pointermove` now — see `useCardStack`, which measures
+ * both cases — and the handlers sit on the PILE rather than on the region, so
+ * the position bar and the air beneath it no longer pause a card the pointer is
+ * nowhere near.
+ *
  * ---------------------------------------------------------------------------
  * WHY THIS RENDERS ITS OWN CARD BODY
  * ---------------------------------------------------------------------------
@@ -154,7 +164,7 @@ export function CardStack({
   /** `#styleguide` holds the pile still so it can be compared rather than watched. */
   paused?: boolean
 }) {
-  const { index, leaving, regionProps } = useCardStack(items.length, { paused })
+  const { index, leaving, pileProps } = useCardStack(items.length, { paused })
 
   return (
     // The count is written here rather than on the list because BOTH children
@@ -162,11 +172,7 @@ export function CardStack({
     // 1.25rem below the front card by subtracting the pile's full travel. On the
     // list it was out of scope for the dots, which is why they were centred on
     // the column instead of on the card.
-    <div
-      {...regionProps}
-      data-cardstack-region
-      style={{ ['--stack-count' as string]: String(items.length) }}
-    >
+    <div data-cardstack-region style={{ ['--stack-count' as string]: String(items.length) }}>
       {/* POSITION, NOT NAVIGATION — AND IT STAYS OUT OF THE ACCESSIBILITY TREE.
 
           `aria-hidden` is a decision, not an omission, and it is the same one
@@ -190,7 +196,11 @@ export function CardStack({
           paper it was not about. */}
       <Progress aria-hidden="true" className="stack-progress" value={((index + 1) / items.length) * 100} />
 
-      <ol data-cardstack className="m-0 list-none p-0">
+      {/* THE HOVER PAUSE IS ON THE PILE, NOT ON THE REGION ABOVE IT. The region
+          is the pile PLUS the position bar and the 3rem of air under it — 51px
+          of a 515px box where a pointer is not over any card, and where hovering
+          used to hold the front card still anyway. */}
+      <ol {...pileProps} data-cardstack className="m-0 list-none p-0">
         {items.map((item, i) => {
           const d = (i - index + items.length) % items.length
           return (
