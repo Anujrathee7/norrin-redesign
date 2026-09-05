@@ -990,24 +990,61 @@ export function TheGap() {
               percentages of the rail's own passage through the viewport, not
               `contain` percentages of a hold. */}
           <Container className="md:hidden">
-            <ol data-scene className="gap-rail">
+            <ol className="gap-rail">
               {STATIONS.map((s, i) => {
-                /* One number per station, 20% apart, and everything below is
-                   written as an offset from it so a station cannot be retimed
-                   half-way. The mark lands first, then the line leaves it and
-                   the caption uncovers on the same range — the line arrives and
-                   the caption is what it delivers, rather than two events that
-                   happen to overlap.
+                /* EVERY STATION READS ITS OWN ROW'S TIMELINE, AND THE STAGGER
+                   IS THE ROWS THEMSELVES.
 
-                   The last segment finishes at cover 74%. Measured on a 390x844
-                   viewport that puts station 03 around 170px from the top of the
-                   screen as its line completes — still being read, rather than
-                   on its way out, which is the failure the desktop STEP_RANGE
-                   note records for the same beat. */
-                const at = 12 + i * 20
+                   `data-scene` used to sit on the <ol> — one timeline for the
+                   whole list — and each station was retimed off it by hand,
+                   `at = 12 + i * 20`, so the three fired at cover 12/32/52%.
+                   That shipped a real hole, found by screenshotting the page
+                   rather than by any gate, all of which passed.
+
+                   THE ARITHMETIC, because it is the whole argument. At 390x844
+                   the rail is 598px, so its `cover` range spans 844 + 598 =
+                   1442px of scroll and the rail's top edge sits at
+                   `844 - 1442p`. Station 03 begins 397px down the rail, so it
+                   crosses into the viewport at p = 397/1442 = 27.5% — but its
+                   mark did not start until 52% and its caption did not finish
+                   until 70%. That is 613px of scrolling with station 03 on
+                   screen and completely blank. Worse, the rail is SHORTER than
+                   the viewport, so at p = 50% the entire list was visible at
+                   once with its last third an empty 200px of bare line.
+
+                   A list shorter than the screen is exactly the case a
+                   whole-list timeline cannot express: `cover` asks where the
+                   LIST is, and by the time the list has finished entering, every
+                   row has been readable for hundreds of pixels.
+
+                   So the timeline moved down one level. Each <li> declares
+                   `--scene`, `[data-scene-part]` resolves it by walking up to
+                   the nearest declaration, and every part inside a row now
+                   measures that ROW's own passage through the viewport. The
+                   numbers below are therefore identical for all three stations
+                   and the sequence still runs in order — the stagger comes from
+                   the rows being at different heights on the page, which is
+                   where it was always coming from visually.
+
+                   IT ALSO RETIRES TWO FRAGILITIES RATHER THAN RETUNING THEM.
+                   The old percentages were solved against one viewport height
+                   and one set of copy lengths; the previous note on this block
+                   warned in as many words that a station growing a line would
+                   need them re-solved. A per-row range is immune to both, and to
+                   a fourth station being added.
+
+                   18/24/40 rather than 12/32/52: a row is ~200px in an 844px
+                   viewport, so its own cover range is 1044px and its top reaches
+                   a comfortable reading height around 23%. The mark lands just
+                   before that, the line leaves the mark, and the caption
+                   uncovers on the line's range — the line arrives and the
+                   caption is what it delivers, rather than two events that
+                   happen to overlap. Unchanged from the old block, which had
+                   that part right. */
+                const at = 18
 
                 return (
-                  <li key={s.name} className="gap-rail-item">
+                  <li key={s.name} data-scene className="gap-rail-item">
                     {/* The rail hangs off the <li>, not off the gutter column.
                         A flex child only stretches to the row's CONTENT box, so
                         anchoring it there stopped every segment short by the
