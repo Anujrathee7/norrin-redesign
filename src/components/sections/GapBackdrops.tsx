@@ -342,7 +342,7 @@ export function GapBackdrops() {
             />
             <Container className="relative flex h-full items-end pb-14">
               <Plate className="max-w-[46ch]">
-                <Eyebrow index="01" label="The gap" />
+                <Eyebrow label="The gap" />
                 <h3 className="display-3 mt-4">{positioning.thesisOpening}</h3>
               </Plate>
             </Container>
@@ -371,7 +371,7 @@ export function GapBackdrops() {
             <Container className="relative flex h-full items-start pt-14">
               <div className="ml-auto">
                 <Plate className="max-w-[40ch] text-right">
-                  <Eyebrow index="01" label="The gap" className="justify-end" />
+                  <Eyebrow label="The gap" className="justify-end" />
                   <h3 className="thesis mt-4">{positioning.thesisOpening}</h3>
                 </Plate>
               </div>
@@ -400,7 +400,7 @@ export function GapBackdrops() {
                 />
               </div>
               <div className="col-span-5 flex flex-col justify-center bg-ground py-12 pr-(--spacing-gutter) pl-10">
-                <Eyebrow index="01" label="The gap" />
+                <Eyebrow label="The gap" />
                 <h3 className="display-2 mt-4 max-w-[16ch]">{positioning.thesisOpening}</h3>
                 <div className="mt-10">
                   <MiniRail />
@@ -431,7 +431,7 @@ export function GapBackdrops() {
             </div>
             <Container className="relative grid h-full grid-cols-12 gap-x-6 pt-14">
               <div className="col-span-6">
-                <Eyebrow index="01" label="The gap" />
+                <Eyebrow label="The gap" />
                 <h3 className="thesis mt-4 max-w-[20ch]">{positioning.thesisOpening}</h3>
               </div>
               <div className="col-span-5 col-start-8">
@@ -452,7 +452,7 @@ export function GapBackdrops() {
             <LineCauseway />
             <Container className="relative grid h-full grid-cols-12 items-center gap-x-6">
               <div className="col-span-6">
-                <Eyebrow index="01" label="The gap" />
+                <Eyebrow label="The gap" />
                 <h3 className="display-2 mt-4 max-w-[15ch]">{positioning.thesisOpening}</h3>
               </div>
               <div className="col-span-4 col-start-9">
@@ -472,7 +472,7 @@ export function GapBackdrops() {
           <div className={STAGE + ' bg-ground'}>
             <CelCauseway />
             <Container className="relative flex h-full flex-col justify-center">
-              <Eyebrow index="01" label="The gap" />
+              <Eyebrow label="The gap" />
               <h3 className="display-1 mt-4 max-w-[13ch]">{positioning.thesisOpening}</h3>
             </Container>
           </div>
@@ -516,7 +516,7 @@ export function GapBackdrops() {
             </svg>
             <Container className="relative flex h-full items-start pt-14">
               <Plate className="max-w-[34ch]">
-                <Eyebrow index="01" label="The gap" />
+                <Eyebrow label="The gap" />
                 <h3 className="thesis mt-4">{positioning.thesisOpening}</h3>
               </Plate>
             </Container>

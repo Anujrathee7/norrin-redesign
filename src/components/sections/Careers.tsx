@@ -70,7 +70,7 @@ export function Careers() {
               column under the CTA — the same dead-corner problem the hero had.
               Below `lg` they stack and there is nothing to centre against. */}
           <div className="col-span-4 md:col-span-8 lg:col-span-5 lg:self-center">
-            <SectionHeader index="06" label="Careers" id="careers-heading" gap="tight">
+            <SectionHeader label="Careers" id="careers-heading" gap="tight">
               {careers.title}
             </SectionHeader>
 

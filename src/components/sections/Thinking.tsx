@@ -88,7 +88,7 @@ export function Thinking() {
       className="bg-surface py-20 md:py-28"
     >
       <Container>
-        <SectionHeader index="05" label="Thinking" id="thinking-heading">
+        <SectionHeader label="Thinking" id="thinking-heading">
           Start anywhere you like.
         </SectionHeader>
 

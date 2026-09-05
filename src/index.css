@@ -965,6 +965,78 @@
     line-height: 1.2;
   }
 
+  /* ------------------------------------------------------------------------
+     THE EYEBROW — ITS OWN ROLE, AND NOT `.label` WITH A COLOUR ON IT.
+
+     It used to be `label flex items-center gap-3` plus `text-ink-3`, and the
+     repo owner's verdict was that the result was "very invisible". Three
+     things were true at once: 10.5px uppercase mono tracked to 0.14em, the
+     quietest rung of the ink ramp, and an `opacity-50` separator that violated
+     §3 outright. The separator and the index are deleted (see `Eyebrow` in
+     Layout.tsx); this is the rest of the fix.
+
+     WHY A SEPARATE CLASS RATHER THAN CHANGING `.label`. `.label` is used 122
+     times — the hero's statistics strip, the station names on both rails, the
+     date pills on the timeline, units, addresses, telemetry. Those are
+     annotations sitting beside something larger, and 10.5px is right for them:
+     the TYPE block above this one already records that the bottom of a scale
+     has a floor the top does not, and that a uniform multiplier on `.label`
+     takes it somewhere unreadable. An eyebrow is not an annotation. It is the
+     first line of a section and it introduces a 58px heading, so it is the one
+     consumer of that voice that needs to be read rather than consulted. One
+     class moves; the other 122 uses do not.
+
+     THE NUMBERS.
+       12px, up from 10.5. The smallest size at which uppercase mono still
+       reads as type rather than as a texture, and it is the same 0.75rem the
+       rest of the system's small type sits at.
+       0.10em, eased from 0.14em. Tracking exists to open up uppercase at small
+       sizes; at 12px there is less to open, and 0.14em at this size reads as
+       spaced-out rather than as set.
+       `--ink`, up from `--ink-3` — two rungs, and the top of the ramp. The
+       label IS the section's name at this point; there is nothing above it in
+       the header for it to defer to.
+
+     THE RULE IS 20px x 1px OF `--accent`. It is a `::before` rather than a
+     span so no call site can forget it and no call site can restyle it. On the
+     inverse bands it becomes `--signal`, which is not a new decision: moss
+     measures 1.40:1 on forest, and this file already substitutes sun for it on
+     `[data-tone='inverse'] :focus-visible` for exactly that reason. See the
+     `--signal` token, which names the substitution as the band's standing
+     rule rather than as a spend from the three-solid budget.
+     ------------------------------------------------------------------------ */
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  .eyebrow::before {
+    content: '';
+    /* `flex: none` because a flex item's default `min-width: auto` lets a
+       20px box shrink when the label wraps, and a lead-in rule that changes
+       length between sections is not a system. */
+    flex: none;
+    inline-size: 20px;
+    block-size: 1px;
+    background-color: var(--accent);
+  }
+
+  .eyebrow-inverse {
+    color: var(--inverse-ink);
+  }
+
+  .eyebrow-inverse::before {
+    background-color: var(--signal);
+  }
+
   /* Sun is a fixed colour in both themes, so anything sitting on it must be
      fixed dark ink too. Inheriting --ink puts near-white type on yellow in
      dark mode, which is illegible. */
@@ -3032,6 +3104,38 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
     }
 
+    /* The same wipe turned ninety degrees — top to bottom — for a rail that
+       runs down the page.
+
+       WHY THIS EXISTS WHEN `rule-v` ALREADY DOES A VERTICAL LINE. `rule-v` is
+       a `scaleY`, and scaling a box stretches whatever is painted inside it.
+       That is fine for a solid 1px rule and wrong for a DASHED one: the dash
+       period would grow with the animation, so a provisional line would arrive
+       with dashes four times their settled length and shrink into place. It is
+       the same distinction `RoadHalf` in TheGap.tsx already records for the
+       desktop road, where the dashed half is an `uncover` and never a `rule`.
+       A clip reveals the geometry underneath untouched.
+
+       Same fail-safe as its horizontal twin: it animates FROM hidden TO the
+       finished state, the `@supports` gate keeps it out of browsers without
+       scroll timelines, and the reduced-motion block sets `clip-path: none` on
+       every `[data-scene-part]`. In all three of those cases the line is
+       simply drawn. */
+    [data-scene-part='uncover-v'] {
+      animation-name: scrub-uncover-v;
+      animation-range: var(--scene-from, cover 12%) var(--scene-to, cover 44%);
+      --scrub-ease: var(--ease-entrance);
+    }
+
+    @keyframes scrub-uncover-v {
+      from {
+        clip-path: inset(0 0 100% 0);
+      }
+      to {
+        clip-path: inset(0 0 0 0);
+      }
+    }
+
     /* A line of type rising out from behind its own edge — the masked-line
        gesture every section header already uses, driven by scroll instead of
        by a transition.
@@ -3667,6 +3771,183 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   .tl-title {
     font-size: 1.125rem;
   }
+}
+
+/* ==========================================================================
+   THE GAP'S NARROW RAIL  (#gap, below 768px)
+   --------------------------------------------------------------------------
+   Below `md` the section's pinned road is not rendered at all — three stations
+   strung across a 390px screen would be three unreadable smudges — so the
+   narrow branch turns the same diagram ninety degrees. That much is unchanged.
+   What changed is that the vertical version was DEAD: a static rule with three
+   static marks on it, drawn complete before the reader arrived. The repo
+   owner's note was that the pathway is not being used on mobile, and it was
+   right — the majority breakpoint was getting the section's argument as a
+   diagram of it rather than as something that happens.
+
+   IT NOW TAKES `#proof`'s RAIL BEHAVIOUR. Same three layers, same order:
+
+     dim base     always painted, never animated. The track ahead.
+     travelling   scroll-driven, wipes downward from the station above.
+     node         arrives as the rail reaches it (`pop`).
+
+   WHAT SHARED AND WHAT DID NOT, STATED PLAINLY SO NOBODY RE-LITIGATES IT.
+   The BEHAVIOUR shared for free, because it was already factored out: the
+   parts `[data-scene-part='pop']` and the `uncover` family are generic, live
+   in the scroll layer above, and both rails read them off a named `--scene`
+   timeline. Nothing had to be generalised to get that.
+
+   The GEOMETRY did not share, and forcing it would have damaged `#proof`.
+   `.tl-*` is built around a 14px disc, a date pill, and a bordered card, laid
+   out on a grid that becomes four horizontal columns at 48rem. This rail has
+   no pill, no card, square marks rather than discs, and exists ONLY below
+   48rem — so every one of `.tl`'s defining declarations would have needed a
+   modifier to opt out of. That is the "do not break Proof by generalising its
+   rules underneath it" case exactly: a second consumer buying its way into a
+   class by adding escapes to it. Duplicated deliberately, and it is 40 lines.
+
+   THE `ahead` RATIONALE DOES NOT TRANSFER, AND THAT IS THE INTERESTING PART.
+   `#proof` refuses to animate its final segment because a progress bar that
+   ran to the end of the rail would assert a public listing that has not
+   happened — an honesty constraint (§3) about a FACT. Nothing here is a claim
+   about the future: all three stations are things Norrin does, and the dash
+   means "provisional work", not "has not happened yet". So this rail's drawn
+   line reaches the end, and what changes at station 03 is the line's STATE —
+   dashed lichen to solid accent — which is the section's whole argument and
+   the same thing the desktop road does. The two rails share a mechanism and
+   mean different things by their dashes; conflating them would have put an
+   `#proof`-shaped honesty constraint on copy that does not need one.
+
+   SEGMENT OWNERSHIP, SAME CONVENTION AS `#proof`: each station owns the
+   segment LEAVING it. So the state flips on the segment leaving station 03,
+   which is precisely "the rule goes solid at station 03, not 02" — the one
+   thing TheGap.tsx's header says the section cannot get wrong.
+
+   THE DRAWN STATE PAINTS OVER THE DIM ONE RATHER THAN BLENDING WITH IT. A
+   dashed lichen line laid on top of a solid dim line reads as a solid line
+   with dashes on it, so the provisional fill carries `--ground` in the gaps
+   between its dashes and erases the base as it travels. That is why the
+   gradient below names two colours where `#proof`'s names one and transparent.
+
+   FAIL-SAFE. The base rail, the dashes, the marks and every word of copy are
+   static CSS. The only animated things are three clip wipes and three marks,
+   all of which animate from hidden TO the finished state inside the
+   `@supports` gate. With no scroll timelines, and under reduced motion, the
+   rail renders complete: dashed to station 03, solid after it, three marks,
+   three captions.
+   ========================================================================== */
+
+/* The mark's centre line, measured from the leading edge of the row. Every
+   number in this block is written against it: the rail sits on it, the segment
+   starts on it and ends 0.5rem into the NEXT row (which is that row's own
+   mark), and the copy is padded to sit level with it. One name, so they cannot
+   drift apart. */
+.gap-rail {
+  --gap-rail-mark: 0.5rem;
+  /* The gutter column the marks stand in. It holds no content — the marks are
+     absolutely positioned — but the copy column begins where it ends, so its
+     width is what puts every caption clear of the rail. */
+  --gap-rail-gutter: 3.5rem;
+  position: relative;
+}
+
+.gap-rail-item {
+  position: relative;
+  display: flex;
+  gap: 1.5rem;
+  padding-block-end: 3.5rem;
+}
+
+.gap-rail-item:last-child {
+  padding-block-end: 4rem;
+}
+
+.gap-rail-gutter {
+  flex: none;
+  inline-size: var(--gap-rail-gutter);
+}
+
+/* The copy sits level with the mark rather than under it. `.label`'s 10.5px at
+   1.2 puts its own centre 6.3px down, so 2px of padding lands it within a
+   pixel of the 8px mark line. */
+.gap-rail-copy {
+  padding-block-start: 0.125rem;
+  min-inline-size: 0;
+}
+
+/* The un-drawn rail. Runs from this station's mark to the next one — which is
+   0.5rem INTO the following row, hence the negative block-end. Rows therefore
+   abut and the rail is one continuous line rather than three stubs with a gap
+   the height of every mark between them, which is what it used to be. */
+.gap-rail-seg {
+  position: absolute;
+  z-index: 0;
+  inset-block: var(--gap-rail-mark) calc(-1 * var(--gap-rail-mark));
+  /* Half the gutter, less half the rail's own width. The marks are centred on
+     the same number. */
+  inset-inline-start: calc(var(--gap-rail-gutter) / 2 - 0.5px);
+  inline-size: 1px;
+  background-color: var(--hairline-strong);
+}
+
+/* Past the last station the line has nowhere to arrive, so it stops at the
+   foot of the row instead of reaching into a row that is not there. */
+.gap-rail-item:last-child .gap-rail-seg {
+  inset-block-end: 0;
+}
+
+/* The drawn line. Solid accent — the committed stretch, station 03 onward. */
+.gap-rail-fill {
+  position: absolute;
+  inset: 0;
+  background-color: var(--accent);
+}
+
+/* Provisional: lichen dashes, with the ground between them so the dim base
+   underneath is erased rather than showing through. Same 4/8 period as the
+   timeline's dash and the desktop road's, so the page has one dash. */
+.gap-rail-seg[data-dash] .gap-rail-fill {
+  background-color: transparent;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--inactive) 0 4px,
+    var(--ground) 4px 8px
+  );
+}
+
+/* THE MARK IS A SQUARE, AND IT STAYS A SQUARE THOUGH `#proof`'s IS A DISC.
+   CLAUDE.md §4 calls a station on a track a point and draws it round, and that
+   is right for a timeline whose marks are only ever stations. This mark is
+   also the CROSSING — the moment the road commits — and `RoadNode` on the
+   desktop composition draws it square for that reason. Two shapes for the same
+   mark at two breakpoints would be two diagrams, not one turned sideways.
+
+   Sized against the rail rather than at a round number: 10px and 14px on a 1px
+   line, which is the same relationship `#proof` solved for when it found 9px
+   read as a tick on the line rather than a point on it. The crossing is the
+   larger of the two because it is the only thing in the section that changes
+   anything.
+
+   Positioned with `inset`, never with a centring `translate`: `pop` animates
+   `transform`, and an animation replaces a class-based transform on the same
+   property rather than composing with it. That is the bug `RoadNode` already
+   carries two boxes to avoid. */
+.gap-rail-node {
+  position: absolute;
+  z-index: 1;
+  inline-size: 10px;
+  block-size: 10px;
+  inset-block-start: calc(var(--gap-rail-mark) - 5px);
+  inset-inline-start: calc(var(--gap-rail-gutter) / 2 - 5px);
+  background-color: var(--inactive);
+}
+
+.gap-rail-node[data-crossing] {
+  inline-size: 14px;
+  block-size: 14px;
+  inset-block-start: calc(var(--gap-rail-mark) - 7px);
+  inset-inline-start: calc(var(--gap-rail-gutter) / 2 - 7px);
+  background-color: var(--accent);
 }
 
 /* ==========================================================================

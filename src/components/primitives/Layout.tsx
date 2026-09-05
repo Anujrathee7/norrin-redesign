@@ -81,7 +81,22 @@ export function Grid({ children, className, ...rest }: ContainerProps) {
 }
 
 /**
- * Section index + title.
+ * Section eyebrow + title.
+ *
+ * THE `index` PROP IS GONE, NOT MADE OPTIONAL, and deleting it was the whole
+ * point rather than tidying afterwards. CLAUDE.md §3 has always read
+ * "numbering only where content is a sequence — a timeline earns 01/02/03,
+ * eight unrelated sections do not", and the page was running 01–08 across
+ * eight sections that are not a sequence at all. The site is now being split
+ * into five routed pages, which turns a standing rule into an immediate
+ * defect: `/work` would open at "04" and `/thinking` at "05", so every page
+ * would read as a document with most of its sections missing.
+ *
+ * Left as an optional prop it is dead API that renders a number the standard
+ * forbids, and the next section added would have had a slot inviting it back.
+ * The numbers that ARE a sequence — the timeline stations in `Proof` and the
+ * three stations in `TheGap` — set their own `.label` and never went through
+ * here.
  *
  * `gap` is a prop rather than a className because `cx` is a plain join with no
  * tailwind-merge: passing `className="mb-6"` appended a second margin instead of
@@ -90,7 +105,6 @@ export function Grid({ children, className, ...rest }: ContainerProps) {
  * 80px. A prop cannot lose that argument.
  */
 export function SectionHeader({
-  index,
   label,
   id,
   children,
@@ -98,7 +112,6 @@ export function SectionHeader({
   tone = 'default',
   gap = 'section',
 }: {
-  index: string
   label: string
   id?: string
   children?: ReactNode
@@ -156,7 +169,7 @@ export function SectionHeader({
             the first third of it happened where nobody could see it and the
             eyebrow was already part-risen by the time the header appeared. */}
         <span data-scene-part="line" style={{ ['--scene-from' as string]: 'cover 22%', ['--scene-to' as string]: 'cover 44%' }}>
-          <Eyebrow index={index} label={label} tone={tone} />
+          <Eyebrow label={label} tone={tone} />
         </span>
       </span>
       {children ? (
@@ -180,44 +193,56 @@ export function SectionHeader({
 
 /**
  * The single eyebrow treatment used by every section, including the hero.
- * Index, separator, label — in that order, at that size, always.
+ * A short accent rule, then the label. That is the whole component.
  *
- * THE LEAD-IN RULE IS GONE. A 32px hairline sat before the index, and at label
- * size it did not read as structure — it read as an em dash, so every section on
- * the page opened with "— 04 / Customers", a punctuation mark introducing a
- * heading it had no grammatical relationship to. TheGap already suppressed it
- * with `rule={false}` for a related reason, which left the system with a part
- * that most callers wanted off. Removing it removes the prop too: one eyebrow,
- * one shape, nothing to pass.
+ * IT WAS ILLEGIBLE, AND THREE THINGS WERE DOING IT AT ONCE. The repo owner's
+ * words were "the heading 01/ The Gap design and colour is very invisible",
+ * and every part of that was measurable:
+ *
+ *   1. `.label` is 10.5px mono, uppercase, tracked to 0.14em. It is the right
+ *      size for a unit suffix on a metric and far too small to open a section.
+ *   2. The index sat on `--ink-3`, the quietest rung of the ramp, so the first
+ *      thing in the section was also the faintest thing in it.
+ *   3. The `/` carried `opacity-50`. That is a straight §3 violation — "text is
+ *      never faded for effect", because ancestor opacity folds into contrast
+ *      maths and faded copy genuinely fails — and it shipped for months inside
+ *      a primitive nobody re-read.
+ *
+ * The index and the separator are gone entirely (see `SectionHeader`), which
+ * settles (2) and (3) by deletion rather than by tuning: there is no branch
+ * left that could draw a faded glyph. What remains is (1), and the answer is
+ * `.eyebrow` in index.css — 12px, `--ink`, tracking eased to 0.10em, led by a
+ * 20px accent rule.
+ *
+ * THE LEAD-IN RULE IS BACK, AND IT IS A DIFFERENT MARK THAN THE ONE REMOVED.
+ * A 32px hairline used to sit here and was deleted because at 10.5px it read
+ * as an em dash — "— 04 / Customers", a punctuation mark introducing a heading
+ * it had no grammatical relationship to. That diagnosis was right about the
+ * mark and wrong about the cause: a hairline is a dash when the type beside it
+ * is 10.5px grey and there is a numeral and a slash to punctuate. Against 12px
+ * `--ink` with nothing between it and the label, 20px of `--accent` reads as
+ * what it is — a rule leading a heading, the same device the production line
+ * uses at section scale.
+ *
+ * `tone` picks a class rather than the ancestor `[data-tone='inverse']` the
+ * bands already carry, because this primitive is used inside `Contact` and
+ * `Work` (which do declare it) AND inside plain paper sections (which do not),
+ * and a component whose appearance depends on an attribute a caller might
+ * forget is a component that fails silently. Both classes resolve entirely
+ * through tokens; no call site writes a colour (§2.4).
  */
 export function Eyebrow({
-  index,
   label,
   tone = 'default',
   className,
 }: {
-  index?: string
   label: string
   tone?: 'default' | 'inverse'
   className?: string
 }) {
   return (
-    <p
-      className={cx(
-        'label flex items-center gap-3',
-        tone === 'inverse' ? 'text-inverse-ink-3' : 'text-ink-3',
-        className,
-      )}
-    >
-      {index ? (
-        <>
-          <span className="tabular-nums">{index}</span>
-          <span aria-hidden="true" className="opacity-50">
-            /
-          </span>
-        </>
-      ) : null}
-      <span className={tone === 'inverse' ? 'text-inverse-ink-2' : 'text-accent'}>{label}</span>
+    <p className={cx('eyebrow', tone === 'inverse' ? 'eyebrow-inverse' : null, className)}>
+      {label}
     </p>
   )
 }

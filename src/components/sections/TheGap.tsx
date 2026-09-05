@@ -327,7 +327,7 @@ const ROAD = {
    * composition far longer, so the committed half reads as the longest stretch
    * of the journey rather than a short diagonal that vanishes.
    *
-   * `26` IS NOT A ROUND NUMBER, IT IS THE EYEBROW'S LINE. Measured, `01 / The
+   * `26` IS NOT A ROUND NUMBER, IT IS THE EYEBROW'S LINE. Measured, `The
    * gap` sits at viewport y≈107 with the stage starting at 78 and running 872px
    * tall, which puts it at 23 in this 700-unit box. Landing the road within a
    * few units of that gives the composition a top edge two things agree on,
@@ -591,13 +591,13 @@ export function TheGap() {
             {/* Desktop drops this eyebrow, not just visually: below, the pinned
                 scene grows its own copy that travels into the sticky composition
                 with the heading. Keeping a second, purely decorative
-                "01 — The gap" sitting up here as well, permanently visible
+                "The gap" sitting up here as well, permanently visible
                 alongside the one in the pin, would print the same label twice on
                 one screen — so this one steps aside with a plain `md:hidden`. It
                 carries no id and nothing depends on it, so display:none costs
                 nothing. */}
             <div className="col-span-4 md:col-span-12 md:hidden">
-              <Eyebrow index="01" label="The gap" />
+              <Eyebrow label="The gap" />
             </div>
 
             {/* The heading itself cannot be dismissed the same way. It is the
@@ -763,11 +763,17 @@ export function TheGap() {
                     resolves against), and a screen reader meeting the same
                     sentence twice has been told nothing new.
 
-                    The eyebrow drops its lead-in rule here. At label size that
-                    rule reads as a dash — "— 01 / The gap" — and over a drawn
-                    backdrop, where the eyebrow is already sitting on a picture
-                    rather than in a plain margin, it is one mark too many.
-                    Everywhere else on the page it keeps the rule. */}
+                    THE EYEBROW KEEPS ITS LEAD-IN RULE HERE, WHICH REVERSES
+                    WHAT THIS COMMENT USED TO SAY. It used to drop it, on the
+                    grounds that at 10.5px beside a numeral and a slash the
+                    hairline read as a dash — "— 01 / The gap" — and that over
+                    a drawn backdrop one extra mark was one too many. The
+                    numeral and the slash are gone (CLAUDE.md §3), the label is
+                    12px `--ink`, and the rule is 20px of `--accent` rather
+                    than a hairline. It does not read as punctuation any more,
+                    and the last thing this section needs is an eyebrow that is
+                    shaped differently from the seven others on the page. One
+                    eyebrow, one shape, nothing to pass. */}
                 {/* `pt-[3svh]`, AND THE UNIT CHANGE MATTERS MORE THAN THE
                     NUMBER. This was `pt-[10%]`, which was ~151px of dead space
                     above the eyebrow — but the real problem is that percentage
@@ -783,7 +789,7 @@ export function TheGap() {
                     sit at a constant fraction of the screen at every width. */}
                 <Container className="relative pt-[3svh]">
                   <div aria-hidden="true" className="max-w-[30ch]">
-                    <Eyebrow index="01" label="The gap" />
+                    <Eyebrow label="The gap" />
                     <h2 className="thesis mt-3">{positioning.thesisOpening}</h2>
                   </div>
                 </Container>
@@ -947,72 +953,142 @@ export function TheGap() {
 
           {/* Mobile: the same single rule, turned vertical. Three marks side by
               side at phone width would be three unreadable smudges — and the
-              desktop rail above is the same diagram with more room, not a
+              desktop road above is the same diagram with more room, not a
               different one.
 
-              Each station owns TWO segments — above its waterline and below it —
-              so consecutive rows abut and the rail is continuous from station 01
-              down. The state changes at station 03's waterline, on the mark,
-              with the same crossing square the desktop rail has.
+              IT IS SCROLL-DRIVEN NOW, AND IT TAKES `#proof`'s RAIL LANGUAGE.
+              What was here was a finished picture: a static rule with three
+              static marks, drawn complete before the reader reached it. The
+              desktop composition is the section's argument HAPPENING — the
+              route gets laid out, it reaches a point, that point is marked, and
+              only then does anything solid leave it — and the majority
+              breakpoint was getting a diagram of that instead. So the narrow
+              branch adopts `#proof`'s three layers verbatim: a dim base that is
+              always painted, a drawn line that travels down it, and a mark that
+              arrives as the line reaches it. The segment ahead of the reader is
+              dim; the segment behind is drawn.
 
-              This previously ran `top-9 bottom-0` inside each `<li>`, which left
-              a gap the height of every mark: three disconnected stubs, no
-              visible dashed→solid junction and no crossing — the majority
-              breakpoint lost the one moment the section exists to show, while
-              the comment here claimed the opposite. */}
+              WHERE `#proof`'s REASONING STOPS APPLYING. That section refuses to
+              animate its last segment because a bar that ran to the end of the
+              rail would assert a public listing that has not happened — an §3
+              honesty constraint about a FACT. Nothing here is a claim about the
+              future. All three stations are work Norrin does, and the dash
+              means "provisional", not "not yet". So this line does reach the
+              end, and what changes at station 03 is its STATE. The two rails
+              share a mechanism and mean different things by a dash; the full
+              argument is in index.css under THE GAP'S NARROW RAIL.
+
+              Each station owns the segment LEAVING it — `#proof`'s convention,
+              and the only one that puts the dashed→solid flip on station 03's
+              own mark rather than a row boundary away from it. That is the rule
+              this section cannot get wrong: production is the crossing, and
+              deployment is not.
+
+              `data-scene` is on the <ol> rather than on a runway, because this
+              branch is in normal flow — there is nothing to pin at 390px and
+              nothing that would fit if there were. So the ranges are `cover`
+              percentages of the rail's own passage through the viewport, not
+              `contain` percentages of a hold. */}
           <Container className="md:hidden">
-            <ol className="relative">
-              {STATIONS.map((s, i) => (
-                <li key={s.name} className="relative flex gap-6 pb-14 last:pb-16">
-                  {/* The rail hangs off the <li>, not off the icon column.
-                      A flex child only stretches to the row's CONTENT box, so
-                      anchoring it there stopped every segment short by the row's
-                      own padding-bottom — which is exactly the gap that made
-                      this read as three stubs. On the <li>, `bottom-0` reaches
-                      the padding edge, so consecutive rows abut and the rail is
-                      one line. The icon column is w-14, so its centre is
-                      left-7. */}
-                  {i > 0 ? (
+            <ol data-scene className="gap-rail">
+              {STATIONS.map((s, i) => {
+                /* One number per station, 20% apart, and everything below is
+                   written as an offset from it so a station cannot be retimed
+                   half-way. The mark lands first, then the line leaves it and
+                   the caption uncovers on the same range — the line arrives and
+                   the caption is what it delivers, rather than two events that
+                   happen to overlap.
+
+                   The last segment finishes at cover 74%. Measured on a 390x844
+                   viewport that puts station 03 around 170px from the top of the
+                   screen as its line completes — still being read, rather than
+                   on its way out, which is the failure the desktop STEP_RANGE
+                   note records for the same beat. */
+                const at = 12 + i * 20
+
+                return (
+                  <li key={s.name} className="gap-rail-item">
+                    {/* The rail hangs off the <li>, not off the gutter column.
+                        A flex child only stretches to the row's CONTENT box, so
+                        anchoring it there stopped every segment short by the
+                        row's own padding-bottom — three disconnected stubs with
+                        a gap the height of every mark. */}
                     <span
                       aria-hidden="true"
-                      className="absolute top-0 left-7 h-9 w-0 -translate-x-1/2 border-l border-dashed border-inactive"
-                    />
-                  ) : null}
-                  <span
-                    aria-hidden="true"
-                    className={
-                      'absolute top-9 bottom-0 left-7 -translate-x-1/2 ' +
-                      (i === 2 ? 'w-px bg-accent' : 'w-0 border-l border-dashed border-inactive')
-                    }
-                  />
-                  {/* The node, on the same provisional/committed logic as the
-                      desktop rail: 4px of lichen for the two provisional
-                      stations, 6px of solid accent for the crossing. */}
-                  <span
-                    aria-hidden="true"
-                    className={
-                      'absolute top-9 left-7 z-10 -translate-x-1/2 -translate-y-1/2 ' +
-                      (i === 2 ? 'h-1.5 w-1.5 bg-accent' : 'h-1 w-1 bg-inactive')
-                    }
-                  />
+                      className="gap-rail-seg"
+                      data-dash={i === 2 ? undefined : ''}
+                    >
+                      {/* A CLIP AND NOT A `scaleY`. Two of these three lines are
+                          dashed, and scaling a box stretches the dash period
+                          with it — the same reason `RoadHalf` above wipes the
+                          desktop road rather than growing it. `uncover-v` is the
+                          vertical twin of the wipe the rest of the page uses. */}
+                      <span
+                        data-scene-part="uncover-v"
+                        style={{
+                          ['--scene-from' as string]: `cover ${at + 6}%`,
+                          ['--scene-to' as string]: `cover ${at + 22}%`,
+                        }}
+                        className="gap-rail-fill"
+                      />
+                    </span>
 
-                  {/* THE COLUMN STAYS `w-14` THOUGH IT IS EMPTY, and that is
-                      deliberate rather than leftover. The vertical rail is drawn
-                      at `left-7` — this column's centre — and the text column
-                      begins where this one ends, so both the rail's position and
-                      the caption's indent are measured against a width that must
-                      not change. Collapsing it would move the rail off the nodes
-                      and pull every caption left. It is a spacer with a job. */}
-                  <div aria-hidden="true" className="w-14 shrink-0" />
-                  <div className="pt-1">
-                    <p className={i === 2 ? 'label text-accent' : 'label text-ink-2'}>
-                      {s.index} {s.name}
-                    </p>
-                    <p className="body-serif mt-3 text-ink">{s.quote}</p>
-                    <p className="caption mt-2 text-ink-3">{s.detail}</p>
-                  </div>
-                </li>
-              ))}
+                    {/* The mark, on the same provisional/committed logic as the
+                        desktop road: lichen for the two provisional stations,
+                        solid accent and a size larger for the crossing.
+
+                        `pop` fades from 0, which every other entrance in this
+                        section is forbidden from doing. It qualifies on the
+                        same grounds `#proof`'s node does and the captions do
+                        not: it is `aria-hidden`, carries no text and has no
+                        contrast requirement to fail. A mark that only slid
+                        would be sitting on the rail before the rail got
+                        there. */}
+                    <span
+                      aria-hidden="true"
+                      data-scene-part="pop"
+                      data-crossing={i === 2 ? '' : undefined}
+                      style={{
+                        ['--scene-from' as string]: `cover ${at}%`,
+                        ['--scene-to' as string]: `cover ${at + 6}%`,
+                      }}
+                      className="gap-rail-node"
+                    />
+
+                    {/* THE COLUMN STAYS EMPTY AND KEEPS ITS WIDTH, and that is
+                        deliberate rather than leftover. The rail is drawn at the
+                        column's centre and the copy begins where the column
+                        ends, so both the rail's position and the caption's
+                        indent are measured against a width that must not change.
+                        Collapsing it would move the rail off the marks and pull
+                        every caption left. It is a spacer with a job. */}
+                    <div aria-hidden="true" className="gap-rail-gutter" />
+
+                    {/* Wiped, never faded — the constraint this whole section is
+                        built around. A scrubbed opacity holds body copy at every
+                        value between 0 and 1 as a function of scroll position,
+                        and axe folds ancestor opacity into contrast; this
+                        section failed the audit exactly that way once, on six
+                        nodes and then thirteen. `clip-path` hides without
+                        touching a colour, and when it does not run at all the
+                        caption is simply there. */}
+                    <div
+                      className="gap-rail-copy"
+                      data-scene-part="uncover"
+                      style={{
+                        ['--scene-from' as string]: `cover ${at + 6}%`,
+                        ['--scene-to' as string]: `cover ${at + 18}%`,
+                      }}
+                    >
+                      <p className={i === 2 ? 'label text-accent' : 'label text-ink-2'}>
+                        {s.index} {s.name}
+                      </p>
+                      <p className="body-serif mt-3 text-ink">{s.quote}</p>
+                      <p className="caption mt-2 text-ink-3">{s.detail}</p>
+                    </div>
+                  </li>
+                )
+              })}
             </ol>
           </Container>
         </div>

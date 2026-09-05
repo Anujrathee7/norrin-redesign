@@ -115,7 +115,13 @@ const TYPE: { cls: string; role: string; sample: string }[] = [
   },
   { cls: 'ui', role: 'Buttons, nav items, controls', sample: 'Contact us' },
   { cls: 'caption', role: 'Provenance and asides', sample: 'Source: norrin.com, read 2026-09-01.' },
-  { cls: 'label', role: 'Mono. Eyebrows and data.', sample: 'Who you will reach' },
+  /* `.label` NO LONGER SAYS "EYEBROWS", AND THE SPLIT IS THE POINT. It used to
+     do both jobs, which is why every section on the site opened at 10.5px on
+     `--ink-3` and read as invisible. The eyebrow is its own role now — 12px,
+     `--ink`, led by an accent rule — and `.label` keeps the 122 places it is
+     genuinely an annotation beside something larger. */
+  { cls: 'label', role: 'Mono. Units, indices, telemetry.', sample: '31 M€ / 7 offices' },
+  { cls: 'eyebrow', role: 'Mono. The first line of a section.', sample: 'Track record' },
 ]
 
 function TypeRow({ cls, role, sample }: { cls: string; role: string; sample: string }) {

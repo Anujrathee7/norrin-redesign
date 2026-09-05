@@ -58,7 +58,7 @@ export function Pillars() {
       <Container>
         <Grid>
           <div className="col-span-4 md:col-span-8">
-            <SectionHeader index="03" label="What you can buy" id="pillars-heading">
+            <SectionHeader label="What you can buy" id="pillars-heading">
               Three ways in.
             </SectionHeader>
           </div>

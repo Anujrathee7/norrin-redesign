@@ -100,7 +100,7 @@ export function Proof() {
             The hold IS their gesture. */}
         <div data-scene data-scene-runway className="h-[220svh]">
           <div data-scene-pin className="sticky top-[max(88px,12svh)]">
-            <Eyebrow index="07" label="Track record" className="mb-8" />
+            <Eyebrow label="Track record" className="mb-8" />
 
             <h2 id="proof-heading" className="display-2 max-w-[22ch]">
               {story.recognition}

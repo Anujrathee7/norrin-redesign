@@ -100,7 +100,7 @@ export function Work() {
             that changed is what gives. */}
         <Grid className="items-start">
           <div className="col-span-4 md:col-span-5">
-            <SectionHeader index="04" label="Customers" id="work-heading" gap="tight" tone="inverse">
+            <SectionHeader label="Customers" id="work-heading" gap="tight" tone="inverse">
               Forerunners, mostly Nordic.
             </SectionHeader>
             <p className="body-serif measure-serif mt-6 text-inverse-ink-2">{customersIntro}</p>
@@ -175,7 +175,7 @@ export function Work() {
               off the container's right edge, and the card is no longer near it.
               Keeping it would have cost the tablet column 50px of a 306px
               budget, which comes straight off the quote's measure. */}
-          <div className="col-span-4 mt-12 md:col-span-5 md:col-start-8 md:-mt-18">
+          <div className="col-span-4 mt-12 md:col-span-5 md:col-start-8  md:-mt-18">
             <CardStack
               items={cases.map((c) => ({
                 id: c.id,

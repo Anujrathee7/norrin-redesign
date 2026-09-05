@@ -258,6 +258,56 @@ const pairs = [
   // than as an outline on paper, which is the tighter of the two by a long way.
   { note: 'L role-muted/ ground   ', fg: '#d8d7cc', bg: '#f8f7f3', min: 1.25 },
   { note: 'D role-muted/ ground   ', fg: '#d8d7cc', bg: '#0e120f', min: 1.25 },
+
+  // --- THE EYEBROW, AND WHY IT ADDS NO LINE ---------------------------------
+  // `.eyebrow` was rebuilt (see index.css): 12px in `--ink` rather than 10.5px
+  // in `--ink-3`, led by a 20px `--accent` rule, with `--inverse-ink` and
+  // `--signal` on the dark planes. It renders on four grounds and nowhere else
+  // — `--ground` (TheGap, Proof, Careers, Roles), `--surface` (Pillars,
+  // Thinking), `--inverse` (Contact) and `--band-night` (Work) — which is eight
+  // ink pairs and eight rule pairs, and EVERY ONE of them is already gated
+  // above:
+  //
+  //   ink       L/D ink / ground .......... 16.90:1  16.80:1
+  //             L/D ink / surface ......... 15.87:1  15.53:1
+  //             L/D inv-ink / inverse ..... 10.45:1   9.49:1
+  //                 inv-ink / night ....... 16.40:1
+  //   rule      L/D accent / ground ........ 8.40:1   8.66:1
+  //             L/D accent / surface ....... 7.88:1   8.00:1
+  //             L/D signal / inverse ...... 10.25:1   9.31:1
+  //                 signal / night ........ 16.09:1
+  //
+  // Restating them as sixteen new rows would make the gate report the same
+  // measurement twice under two names, which is how a palette file starts
+  // disagreeing with itself. What is recorded instead is that the eyebrow is
+  // now a CONSUMER of those rows, so the next person to touch one of them
+  // knows the first line of every section on the site depends on it.
+  //
+  // The rule is measured at the 4.5 text bar rather than the 1.8 parity bar
+  // this file uses for hairlines, because the colour is doing both jobs — the
+  // same call the navbar's focus ring made — and the tighter bar is the honest
+  // one to hold it to.
+  //
+  // `#backdrops` IS THE NINTH AND TENTH GROUND, AND IT IS NEW HERE. The
+  // workbench sets the eyebrow inside `Plate`, which is `--overlay`, and that
+  // pair had only ever been measured at the ink-3 rung. Two rows added, one per
+  // theme, for each of the ink and the rule — it is a non-shipping surface, but
+  // it is a surface the eyebrow renders on and this file's whole claim is that
+  // it lists every one of them.
+  { note: 'L eyebrow   / overlay ', fg: '#14170f', bg: '#fdfcfa', min: 4.5 },
+  { note: 'D eyebrow   / overlay ', fg: '#f2f2ec', bg: '#191f1b', min: 4.5 },
+  { note: 'L eyebrow-r / overlay ', fg: '#1a5335', bg: '#fdfcfa', min: 4.5 },
+  { note: 'D eyebrow-r / overlay ', fg: '#9fb87e', bg: '#191f1b', min: 4.5 },
+  //
+  // THE ONE PLACE THE EYEBROW IS NOT MEASURABLE is backdrop 04 on that same
+  // workbench, which is the only variant that sets the claim straight onto one
+  // of Norrin's aerials with no plate under it. Type over a photograph has
+  // whatever ratio that pixel happens to be. It is noted rather than gated:
+  // `#backdrops` does not ship, it exists to choose between backdrops, the
+  // chosen one is the drawing (two flat fills already in this file), and the
+  // eyebrow was sitting there unpanelled before it was restyled — the restyle
+  // moved it two rungs UP the ramp, so whatever that ratio is, it is better
+  // than it was.
 ]
 
 const failed = check(pairs)
