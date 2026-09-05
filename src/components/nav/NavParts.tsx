@@ -21,44 +21,44 @@ function NavLink({ href, ...rest }: { href: string } & Omit<ComponentProps<'a'>,
 /**
  * Wordmark. Held at `production` — the mark must read at 26px in every state.
  *
- * It was `#top`, which was a scroll to the top of the one page there was. Home
- * is a route now, and a wordmark that scrolls instead of going home on four of
- * five pages would be the only broken thing in the bar.
+ * IT IS NOT A LINK, AND THAT IS DELIBERATE RATHER THAN AN OMISSION.
+ *
+ * It has been two things already: `#top`, a scroll to the top of the one page
+ * there was, and then `<Link to="/">` once home became a route. It is now plain
+ * text, because the bar carries an explicit Home item and a wordmark that goes
+ * home beside a link that goes home is one destination wearing two controls.
+ *
+ * The convention it declines is a real one — a clickable logo is what most
+ * readers reach for — so the replacement has to be visible rather than implied,
+ * which is exactly what a first nav item labelled Home is. What is NOT
+ * acceptable is the middle state: a mark that looks pressable and is not is the
+ * fabricated affordance §3 bans. So the anchor, the `text-accent`, the focus
+ * ring and the screen-reader "home" label all go with the link — nothing here
+ * offers an interaction any more, and a `<div>` cannot be tabbed to.
  */
 export function Wordmark() {
   return (
-    <Link to="/" className="flex w-fit shrink-0 items-center gap-2.5 text-accent">
+    <div className="flex w-fit shrink-0 items-center gap-2.5">
       <span className="wordmark text-ink">Norrin</span>
-      <span className="sr-only">Norrin — home</span>
-    </Link>
+    </div>
   )
 }
 
-export function ContactButton() {
-  return (
-    // A NAVIGATION NOW, NOT A SCROLL, and the change is forced rather than
-    // preferred. This was `href="#contact"` while the Contact strip was
-    // rendered in `SiteLayout` after every route — the target was on whatever
-    // page you were already on, so a fragment was the honest kind of link.
-    //
-    // Contact lives on `/` alone now, so a bare `#contact` would resolve to
-    // nothing from the other two routes: a control that scrolls somewhere on one
-    // page and does nothing on the rest. §3 has no patience for that, so it says
-    // what it does — it goes to the home page, at the ask.
-    <Link
-      to="/#contact"
-      // `.btn-solid` in both themes and at every scroll position. It used to
-      // swap to `.btn-signal` while the bar was inverted, which was the right
-      // call on a forest bar and is meaningless on a bar that is always the
-      // page's own ground. The hover swap it was really about — a colour swap
-      // rather than an opacity fade, so the page's most emphatic colour does not
-      // go muddy under the pointer — still lives in `.btn-solid` itself.
-      className="btn btn-sm btn-solid"
-    >
-      Contact
-    </Link>
-  )
-}
+/* THE CONTACT BUTTON LIVED HERE and is deleted rather than hidden.
+
+   It was the bar's one solid call to action, and it had just been rewritten
+   from `#contact` to `/#contact` because Contact stopped being in the layout
+   and became a section of `/` alone.
+
+   Removing it is a decision about the bar rather than about Contact: the ask is
+   still on the home page, still the last thing on it, and still linked from the
+   footer's Company column. What the bar no longer does is carry a standing
+   solicitation over every page — which is the same argument that took the
+   drawers out, applied to the loudest object in the chrome.
+
+   The mobile sheet's copy went with it, for the reason that matters more than
+   symmetry: a sheet that offers Contact while the bar it belongs to does not is
+   two different navigations on one site. */
 
 /**
  * The current item's length of the bar's bottom rule.
@@ -155,11 +155,7 @@ export function MobileSheet({ barHeight = 72 }: { barHeight?: number }) {
               </li>
             ))}
           </ul>
-          {/* `/#contact`, for the reason `ContactButton` above sets out at
-              length: Contact is a section of `/` now, not of every page. */}
-          <Link to="/#contact" className="btn btn-solid btn-block mt-8">
-            Contact
-          </Link>
+
           {/* ONE ROW, NOT TWO. A Language row sat above this one, added here
               because the desktop utilities row is `hidden` below lg and without
               it the entire phone audience was locked out of the locale menu.

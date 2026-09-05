@@ -47,22 +47,34 @@ export function isRoute(href: string) {
  * the shape that rule takes in a nav.
  *
  * ---------------------------------------------------------------------------
- * TWO ITEMS, AND THAT IS A REAL CONSEQUENCE RATHER THAN AN OVERSIGHT
+ * THREE ITEMS: THE ROUTE TABLE, COMPLETE
  * ---------------------------------------------------------------------------
- * There are three routes and the third is `/`, which the wordmark already owns —
- * a "Home" item beside a logo that goes home is the same destination twice. So
- * the list is What we do and Work.
+ * It was two for one commit, on the argument that `/` was already owned by the
+ * wordmark and a "Home" item beside a logo that goes home is one destination
+ * wearing two controls. That argument was answered by removing the other
+ * control rather than the item: the wordmark is plain text now and routes
+ * nowhere, so Home has to be here or `/` is unreachable from the bar.
+ *
+ * The list is therefore exactly the route table — every route, once, in reading
+ * order. That is the property worth keeping: a bar you can check against
+ * `routes.tsx` by counting.
  *
  * What the deleted items carried is still reachable and is not orphaned:
  * Careers and Contact are sections of `/` and are in the footer's Company
  * column; Track record is on `/work` and is in that same column; Thinking is on
  * `/work` too. Nothing lost a destination — two things lost a menu.
  *
+ * CONTACT IS NOT AN ITEM AND IS NOT A BUTTON ANY MORE. The bar carried a solid
+ * `/#contact` call to action in its utilities corner and no longer does. It is
+ * not promoted into this list to compensate: this list is routes, and Contact is
+ * a section. The footer links it.
+ *
  * Norrin's own live nav exposes roughly 25 primary destinations, Services alone
  * fanning out to eleven links across three subgroups. This is the opposite
  * position, arrived at by deleting rather than by collapsing.
  */
 export const NAV: NavItem[] = [
+  { label: 'Home', href: '/', owns: ['/'] },
   { label: 'What we do', href: '/what-we-do', owns: ['/what-we-do'] },
   { label: 'Work', href: '/work', owns: ['/work'] },
 ]

@@ -3,7 +3,7 @@ import { Container } from '@/components/primitives/Layout'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { cx } from '@/lib/cx'
 import { NAV } from './navData'
-import { ContactButton, Hamburger, MobileSheet, RuleSegment, Wordmark } from './NavParts'
+import { Hamburger, MobileSheet, RuleSegment, Wordmark } from './NavParts'
 import { useNavState } from './useNavState'
 
 /**
@@ -147,21 +147,22 @@ export function Nav() {
             </nav>
 
             <div data-nav-end className="hidden items-center gap-3 justify-self-end lg:flex">
-              {/* TWO OBJECTS, NOT THREE. A locale menu used to sit between
-                  these, and this note used to explain the gap in terms of the
-                  three of them. It is gone from the bar because it changed no
-                  locale: five languages listed, one set of strings behind them,
-                  which is a control that promises a thing the site cannot do —
-                  the same fabricated affordance §3 bans a made-up statistic
-                  for. `LocaleMenu.tsx` is still in the repo, untouched, for the
-                  day the translations are real.
+              {/* ONE OBJECT NOW. This corner held three — a locale menu, the
+                  theme toggle and a solid Contact button — and the note here
+                  used to argue about the gap between them.
 
-                  The gap stays at 3 rather than going back to 4. It was
-                  tightened so the quiet control and the action would read as one
-                  group with the action on the outside, and that is still what
-                  they are; the pair is just shorter now. */}
+                  The locale menu went first, because it listed five languages
+                  over one set of strings and a control that changes nothing is
+                  the fabricated affordance §3 bans a made-up statistic for.
+                  `LocaleMenu.tsx` is still in the repo for when translations are
+                  real. Contact went second, on the repo owner's call: the ask
+                  lives on the home page and in the footer, and the bar stops
+                  carrying a standing solicitation over every route.
+
+                  What is left is the one real preference on the site, and the
+                  `gap-3` is now moot with a single child — kept only so the row
+                  does not have to be rebuilt when something joins it. */}
               <ThemeToggle />
-              <ContactButton />
             </div>
             <Hamburger
               open={mobileOpen}
