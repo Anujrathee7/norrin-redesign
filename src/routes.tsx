@@ -1,11 +1,11 @@
-import { createBrowserRouter } from 'react-router'
+import { Navigate, createBrowserRouter } from 'react-router'
 import { SiteLayout } from '@/pages/SiteLayout'
 import { Home } from '@/pages/Home'
-import { WhatWeDo } from '@/pages/WhatWeDo'
 import { WorkPage } from '@/pages/WorkPage'
+import { CareersPage } from '@/pages/CareersPage'
 
 /**
- * Three routes, down from five, and the table is still the nav taxonomy.
+ * Three routes, and the table is still the nav taxonomy.
  *
  * The site was one document 13.6 viewport-heights tall — measured at 1512x860,
  * not estimated — with The Gap, Pillars and Proof carrying eight of those
@@ -14,18 +14,26 @@ import { WorkPage } from '@/pages/WorkPage'
  * the page; that requirement is exactly what makes the runs separable, and each
  * route below is one of them.
  *
- * IT WAS FIVE AND TWO OF THEM WERE TOO THIN TO BE PAGES. `/thinking` was one
- * 0.91-screen section and `/company` one 0.77-screen section; both were under
- * the shared footer's own height, so each was mostly chrome. Thinking joined
- * `/work` (evidence, outcome, argument) and Careers joined `/` — see the notes
- * in `WorkPage.tsx` and `Home.tsx`. Proof had already moved from Company to
- * Work, which is what left Company holding one section in the first place.
+ * THE TABLE HAS BEEN REDEALT TWICE AND THE CURRENT HAND IS: the argument on
+ * `/`, the evidence on `/work`, and the invitation on `/careers`.
  *
- * THE CONSEQUENCE IS STATED RATHER THAN DISCOVERED: the bar is two primary
- * items now. Everything the other two carried is still reachable — the Work
- * drawer lists what is on that page, and Careers and the offices are in the
- * footer's Company column — but a two-item bar is a real change to how the site
- * presents itself and is not a side effect of tidying routes.
+ * `/what-we-do` is gone because Pillars and Roles were the whole of it and the
+ * two have been split: Pillars sits under The Gap, continuing that section's
+ * argument instead of restating it a click away, and Roles sits under the
+ * customer cases on `/work`, where the commitment follows the evidence. They
+ * were adjacent because one nav item owned them both, not because they answered
+ * the same question. `/thinking` and `/company` went earlier, for being
+ * a single section each. Careers came back OUT of `/` in the same move that
+ * brought those two in — not because it is long enough to be a page, but because
+ * it addresses a different reader than every other page here.
+ *
+ * THE COST IS ON `/` AND IT IS NOT SMALL. Home is Hero, The Gap, Pillars and
+ * Contact — measurably the longest page on the site and past the "3-4 scrolls"
+ * this whole restructure started from, because The Gap alone is 3.12 screens and
+ * Pillars 2.46. That is a deliberate choice about narrative, taken with the
+ * number known rather than discovered.
+ *
+ * All three retired paths redirect rather than 404; see the routes below.
  *
  * BROWSER HISTORY, NOT HASH HISTORY, which is what puts a rewrite rule on the
  * host: a deep link to `/work` is a request a static server has no file for and
@@ -39,8 +47,22 @@ export const router = createBrowserRouter([
     element: <SiteLayout />,
     children: [
       { index: true, element: <Home /> },
-      { path: 'what-we-do', element: <WhatWeDo /> },
       { path: 'work', element: <WorkPage /> },
+      { path: 'careers', element: <CareersPage /> },
+
+      /* RETIRED PATHS, KEPT AS REDIRECTS RATHER THAN DELETED.
+         `/what-we-do`, `/thinking` and `/company` were all live on production
+         at some point during this restructure, so a link to any of them may
+         exist — in somebody's tab, a message, or an index. Without these, each
+         one renders react-router's default error page, which is the worst
+         possible answer: an unstyled framework screen on a site that is
+         otherwise finished.
+         Each points at wherever its content actually went, so the redirect is
+         a real answer rather than a dump to the homepage. `replace` so the dead
+         URL does not sit in history behind the live one. */
+      { path: 'what-we-do', element: <Navigate to="/" replace /> },
+      { path: 'thinking', element: <Navigate to="/work" replace /> },
+      { path: 'company', element: <Navigate to="/careers" replace /> },
     ],
   },
 ])

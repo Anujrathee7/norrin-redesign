@@ -57,7 +57,9 @@ export function isRoute(href: string) {
  *
  * The list is therefore exactly the route table — every route, once, in reading
  * order. That is the property worth keeping: a bar you can check against
- * `routes.tsx` by counting.
+ * `routes.tsx` by counting. The three redirects there are deliberately NOT in
+ * it: a redirect is a courtesy to an old link, not a destination, and listing
+ * one would advertise a page that no longer exists.
  *
  * What the deleted items carried is still reachable and is not orphaned:
  * Careers and Contact are sections of `/` and are in the footer's Company
@@ -75,6 +77,6 @@ export function isRoute(href: string) {
  */
 export const NAV: NavItem[] = [
   { label: 'Home', href: '/', owns: ['/'] },
-  { label: 'What we do', href: '/what-we-do', owns: ['/what-we-do'] },
   { label: 'Work', href: '/work', owns: ['/work'] },
+  { label: 'Careers', href: '/careers', owns: ['/careers'] },
 ]

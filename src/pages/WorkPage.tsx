@@ -1,5 +1,6 @@
 import { PageHead } from '@/pages/PageHead'
 import { Work } from '@/components/sections/Work'
+import { Roles } from '@/components/sections/Roles'
 import { Proof } from '@/components/sections/Proof'
 import { Thinking } from '@/components/sections/Thinking'
 
@@ -18,6 +19,25 @@ export function WorkPage() {
     <>
       <PageHead title="Work" />
       <Work />
+      {/* WHAT WE TAKE RESPONSIBILITY FOR, DIRECTLY UNDER THE CUSTOMERS.
+
+          It was half of `/what-we-do` and spent one commit on `/` beneath
+          Pillars. This is the better home for it and the reason is what the
+          section answers: "what we take responsibility for" is a reply to "who
+          did you do this for and how did it go", not to "what does this cost".
+          The cases make the claim and this is the shape of the commitment behind
+          them, so it reads as the same paragraph continuing.
+
+          The two halves of the old `/what-we-do` are now on different pages, and
+          that is the point rather than fallout: they were adjacent because one
+          nav item owned them both, not because they answered the same question.
+
+          §1.5 — Work is a full-bleed fixed night band with a card pile breaking
+          its right edge; Roles is page-ground, heading left, with a slider
+          running out past the container's gutter. Two silhouettes that were
+          never going to agree, but checked at 25% rather than assumed, because
+          this pairing has never been rendered before. */}
+      <Roles />
       <Proof />
       {/* THINKING CAME HERE FROM ITS OWN ROUTE, WHICH IS NOW DELETED.
           `/thinking` was one 0.91-screen section, and a route that thin is a

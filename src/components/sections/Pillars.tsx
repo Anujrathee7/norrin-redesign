@@ -53,14 +53,13 @@ export function Pillars() {
       // in a full-bleed band — a band running edge to edge IS the terminus and
       // does not also need setting away from the boundary — but the band is
       // gone and the section has to carry its own floor.
-      // TOP PADDING IS 112px AT EVERY WIDTH, NOT 80 BELOW `md`. This section
-      // opens `/what-we-do` — it was second on that route until the order was
-      // reversed — so what sits above it is not another section, it is a 72px
-      // OPAQUE fixed header. At `py-20` the eyebrow rendered at y=80 with the
-      // bar's edge at 73: seven pixels, measured, which reads as type resting on
-      // the chrome rather than as a page starting. Desktop was never affected
-      // (112 gives 39px) and is unchanged.
-      className="bg-surface pt-28 pb-20 md:py-28"
+      // BACK TO `py-20 md:py-28`, THE PAGE'S ORDINARY VALUE. This briefly ran
+      // `pt-28` below `md` because it opened `/what-we-do` and its eyebrow was
+      // rendering 7px under a 72px opaque fixed header. It sits under The Gap on
+      // `/` now, so what is above it is a section again and the extra clearance
+      // is buying nothing — it would just make one mid-page gap 32px taller than
+      // every other one.
+      className="bg-surface py-20 md:py-28"
     >
       <Container>
         <Grid>

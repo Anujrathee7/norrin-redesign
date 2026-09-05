@@ -1,6 +1,6 @@
 import { Hero } from '@/components/sections/Hero'
 import { TheGap } from '@/components/sections/TheGap'
-import { Careers } from '@/components/sections/Careers'
+import { Pillars } from '@/components/sections/Pillars'
 import { Contact } from '@/components/sections/Contact'
 
 /**
@@ -50,30 +50,26 @@ export function Home() {
         <div aria-hidden="true" data-deck-hold />
       </div>
       <TheGap />
-      {/* CAREERS CAME HERE FROM `/company`, AND IT TOOK THAT ROUTE WITH IT.
-          Careers was the only section on `/company`, so moving it did not
-          rebalance that page, it emptied it — the route and its nav item are
-          deleted rather than left pointing at nothing. `CompanyPage.tsx` is
-          gone for the same reason.
+      {/* WHAT YOU CAN BUY, DIRECTLY UNDER THE GAP.
 
-          It follows The Gap rather than opening the page: the argument runs
-          problem, then the people who answer it, then the ask. */}
-      <Careers />
-      {/* CONTACT IS HOME'S ALONE NOW, AND THAT REVERSES A DECISION MADE HERE
-          THREE COMMITS AGO. It was rendered in `SiteLayout` after every route's
-          outlet, on the argument that the ask belongs at the end of whatever was
-          just read and that `#contact` then resolved from anywhere.
+          It came here from `/what-we-do`, which is deleted. It sits under The
+          Gap because that is the argument continuing rather than a new one
+          starting: The Gap says pilots stall between demo and production, and
+          this is what you can buy to cross that. Problem, then offer.
 
-          The cost of that was five copies of one section and four pages ending
-          the same way — which is also what weakened §1.5 across pages: two of
-          the five were a single section followed by the same forest Contact and
-          the same paper footer. One page owns the ask now.
+          ROLES CAME WITH IT FOR ONE COMMIT AND HAS GONE TO `/work`. "What we
+          take responsibility for" is an answer to "who did you do this for and
+          how did it go", not to "what does this cost" — so it belongs under the
+          customer cases, which is where it now is. Splitting the two halves of
+          the old `/what-we-do` was the point rather than a side effect: they
+          were adjacent because a nav item owned them both, not because they
+          answered the same question.
 
-          What it costs in return is written down rather than hidden: the bar's
-          Contact button and the footer's Contact row are no longer scrolls. They
-          are `/#contact`, a navigation, and from any other route they move the
-          reader off the page they were on. That is the trade, and it is the
-          reason those two links had to change kind in the same commit. */}
+          CAREERS LEFT IN THE SAME MOVE. It was here for one commit and is
+          `/careers` now. A page for people deciding whether to work somewhere
+          should not be four sections deep in the page for people deciding
+          whether to hire them. */}
+      <Pillars />
       <Contact />
     </>
   )

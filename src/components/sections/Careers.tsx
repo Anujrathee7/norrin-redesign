@@ -54,7 +54,14 @@ export function Careers() {
       data-shot="careers"
       aria-labelledby="careers-heading"
       data-scene
-      className="py-20 md:py-28"
+      // TOP PADDING IS 112px AT EVERY WIDTH, NOT 80 BELOW `md`. This section is
+      // `/careers` — the whole of it — so what sits above it is not another
+      // section, it is a 72px OPAQUE fixed header. At `py-20` the eyebrow
+      // rendered at y=80 against a bar edge of 73: seven pixels, which reads as
+      // type resting on the chrome rather than as a page starting. This is the
+      // fourth section to need this after becoming a route opener; every opener
+      // is measured at 1512x950 and 390x844 before it ships.
+      className="pt-28 pb-20 md:py-28"
     >
       <Container>
         <Grid>

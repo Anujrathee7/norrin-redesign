@@ -66,7 +66,7 @@ const COMPANY_LINKS = [
   { label: 'Work', href: '/work' },
   { label: 'Track record', href: '/work#proof' },
   { label: 'Thinking', href: '/work#thinking' },
-  { label: 'Careers', href: '/#careers' },
+  { label: 'Careers', href: '/careers' },
   { label: 'Contact', href: '/#contact' },
 ]
 

@@ -173,25 +173,21 @@ export function Roles() {
       id="roles"
       data-shot="roles"
       aria-labelledby="roles-heading"
-      // THE ASYMMETRIC PADDING IS GONE, AND THE SPLIT IS WHAT RETIRED IT.
+      // THE PAGE'S ORDINARY `py-20 md:py-28`, AND IT STAYS THAT WAY THROUGH A
+      // SECOND MOVE.
       //
-      // It used to run `pt-8 md:pt-10` — about a third of the page's usual
-      // `py-20 md:py-28` — and the argument was sound at the time: this section
-      // followed The Gap, whose own `pb-28 md:pb-12` was already paying for the
-      // join, and an opening rule that needed air above it had been deleted, so
-      // keeping the old value would have left a hole exactly the size of the
-      // thing taken out of it.
+      // It used to run `pt-8 md:pt-10` — about a third of the usual top value —
+      // on an argument that assumed The Gap's own bottom padding was above it.
+      // That broke when Roles started opening `/what-we-do`: the section's top
+      // became the top of a document, what sat above it was a 72px OPAQUE fixed
+      // header, and at `md:pt-10` the "Scope" eyebrow rendered at y=40 and was
+      // covered outright.
       //
-      // Every clause of that argument assumed a section with another section
-      // above it. Roles now OPENS `/what-we-do`, so what is above it is not The
-      // Gap's bottom padding, it is a 72px opaque fixed header. At `md:pt-10`
-      // the "Scope" eyebrow rendered at y=40 and the bar covered it outright —
-      // measured, not inferred, and invisible in both themes.
-      //
-      // So it takes the page's usual value, which is also what every other
-      // route-opening section already clears the bar with: Work and Thinking
-      // open at 112px and were never affected. One number, one reason, no
-      // special case.
+      // Roles is mid-page again now, under Pillars on `/`, so the original
+      // asymmetric value would technically work again. It is NOT restored: the
+      // thing it was paying for — an opening rule that needed air above it — is
+      // still deleted, and a section that has now been first on a route once
+      // should not carry a padding that only holds while it is not.
       className="overflow-clip py-20 md:py-28"
     >
       <Container>
