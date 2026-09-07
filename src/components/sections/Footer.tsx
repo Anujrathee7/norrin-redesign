@@ -147,9 +147,7 @@ export function Footer() {
             this correctly the whole time. */}
         <Grid className="gap-y-10 border-t border-hairline pt-12">
           <div
-            data-scroll="enter"
             style={{
-              ['--enter-y' as string]: '20px',
               ['--scrub-from' as string]: 'entry 8%',
               ['--scrub-to' as string]: 'entry 68%',
             }}
@@ -196,9 +194,7 @@ export function Footer() {
               Every string is from `norrin.ts` and traceable to Norrin's own
               pages (§3). None of the seven is edited to fit the column. */}
           <div
-            data-scroll="enter"
             style={{
-              ['--enter-y' as string]: '20px',
               ['--scrub-from' as string]: 'entry 13%',
               ['--scrub-to' as string]: 'entry 73%',
             }}
@@ -219,9 +215,7 @@ export function Footer() {
 
           <nav
             aria-label="Company"
-            data-scroll="enter"
             style={{
-              ['--enter-y' as string]: '20px',
               ['--scrub-from' as string]: 'entry 18%',
               ['--scrub-to' as string]: 'entry 78%',
             }}
@@ -251,9 +245,7 @@ export function Footer() {
               leave the site, so they are the last ones that should lack a landmark. */}
           <nav
             aria-label="Elsewhere"
-            data-scroll="enter"
             style={{
-              ['--enter-y' as string]: '20px',
               ['--scrub-from' as string]: 'entry 28%',
               ['--scrub-to' as string]: 'entry 88%',
             }}

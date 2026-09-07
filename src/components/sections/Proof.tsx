@@ -63,7 +63,7 @@ export function Proof() {
       id="proof"
       data-shot="proof"
       aria-labelledby="proof-heading"
-      className="py-20 md:py-28"
+      className="pt-12 pb-20 md:pt-14 md:pb-28"
     >
       <Container>
         {/* Proof and Contact are the two sections that set their own eyebrow
@@ -91,6 +91,31 @@ export function Proof() {
             1140px of `contain` at a laptop — nearly double — and every station
             completes while the whole timeline is sitting still in front of you.
 
+            CONTINUOUS, NOT A BREAKPOINT, and it is expressed in height because
+            height is what the problem is measured in — width provably does not
+            matter here, 2560x1440 and 3440x1440 behave identically.
+            This replaces a `min-height: 900px` step that swapped 220svh for
+            170svh. The step worked and was still wrong: a 899px screen and a
+            901px screen jumped visibly for no reason a reader could name.
+            `clamp(1892px, 83.4svh + 1175px, 2376px)` is the same two endpoints
+            drawn as a line through them — 1892px at 860 (exactly today's
+            220svh) and 2376px at 1440 (about 165svh) — so every height in
+            between gets a proportionate hold and none of them get a cliff. The pin
+            releases when the runway's bottom edge reaches the pinned child's
+            bottom, so the scroll between the timeline finishing and the footer
+            appearing is set by the runway's height — and `svh` scales that with
+            the screen, so a taller viewport buys proportionally more hold than
+            it needs. At 1728x1150 the 220svh runway held for 2530px and the
+            footer arrived late enough to read as the section having stalled.
+            170svh is 1955px there: the footer comes up about 575px sooner.
+
+            It does not starve the sequence, and that is why the cut lands here
+            rather than everywhere. `contain` is `runway - viewport`, so 170svh
+            leaves 70svh of it — 805px at 1150, and 1046px at a 1440-tall screen,
+            which is still more absolute scroll than the 220svh rule gives a
+            860-tall laptop (1032px). Short viewports keep 220svh untouched,
+            because there the proportion was never the problem.
+
             THE HEADING IS INSIDE THE PIN, not above it. A 193px rail held alone
             leaves most of the screen empty for the whole hold; with the eyebrow
             and the claim held above it the composition is a page rather than a
@@ -98,27 +123,13 @@ export function Proof() {
             does not move, so its own `view()` timeline stops the moment the
             scene pins, and an entrance timed that way would freeze half-done.
             The hold IS their gesture. */}
-        <div data-scene data-scene-runway className="h-[220svh]">
-          {/* THE PIN FILLS THE VIEWPORT IT HOLDS, AND THAT IS THE FIX FOR THE
-              VOID UNDER THE TIMELINE. Held at `top: max(88px,12svh)` with the
-              block's own height and nothing else, the composition is 597px tall
-              in a 1150px viewport — so 415px of empty ground sat beneath it for
-              the ENTIRE hold, every frame of it, and read as the section having
-              failed to render. Measured, not estimated: `viewport - sticky top -
-              pin height`, which is why it grows with the screen rather than
-              shrinking.
-              `min-h` spans exactly the held region — top of the pin to the
-              bottom of the viewport — and `justify-center` puts the timeline in
-              the middle of it. The same slack still exists, because the block
-              genuinely is shorter than the screen; what changes is that it is
-              split evenly above and below instead of hanging off the bottom,
-              which is a centred composition rather than a hole. Content taller
-              than the region simply grows past `min-h`, so short viewports are
-              unaffected. */}
-          <div
-            data-scene-pin
-            className="sticky top-[max(88px,12svh)] flex min-h-[calc(100svh-max(88px,12svh))] flex-col justify-center"
-          >
+        <div
+          data-scene
+          data-scene-runway
+          data-scene-unpin-tall
+          className="h-[clamp(1892px,calc(83.4svh+1175px),2376px)]"
+        >
+          <div data-scene-pin className="sticky top-[max(88px,12svh)]">
             <Eyebrow label="Track record" className="mb-8" />
 
             <h2 id="proof-heading" className="display-2 max-w-[22ch]">

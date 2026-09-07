@@ -1468,6 +1468,47 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    resting state rather than staying at opacity 0.
    ========================================================================== */
 
+/* ==========================================================================
+   TALL SCREENS DO NOT PIN THE TRACK RECORD.
+   --------------------------------------------------------------------------
+   A pin holds a block still while the runway scrolls past it, so the viewport
+   below that block is empty for the whole hold. The block is ~597px at its
+   floor; the empty band is `viewport - sticky top - block`, which is 160px on
+   an 860px laptop and 479px at 1440 even after the arms were clamped to grow
+   with the screen. Growing the arms further was the alternative and it was
+   rejected for a stated reason: `.tl-fill-v` is `display: none` in the wide
+   branch, so nothing draws a line from a card to its node and proximity is the
+   only thing binding them — cards pushed far enough out to fill a 1440px screen
+   stop reading as belonging to their station.
+
+   So above 900px of viewport height the section stops pinning and simply
+   scrolls. The footer then follows the timeline immediately instead of waiting
+   out a hold, which is the whole point of the change.
+
+   THE CHOREOGRAPHY STILL RUNS. `contain` is the period a scene is fully inside
+   the viewport, and it stays well defined for a scene SHORTER than the
+   viewport — it is just measured over `viewport - scene` of scroll instead of
+   `runway - viewport`. What it must not do is need more scroll than the
+   document has left underneath it, and Proof is the last section before the
+   footer. That is checked, not assumed: the never-visible sweep in the audit
+   covers every station at every viewport, and it is the reason this rule is
+   scoped to one attribute rather than applied to `[data-scene-runway]`
+   generally — The Gap's runway sits mid-document with room beneath it and is
+   left alone.
+
+   The height query is deliberate. Width provably does not matter here: 2560x1440
+   and 3440x1440 measured identically at every step of this work.
+   ========================================================================== */
+@media (min-height: 900px) {
+  [data-scene-unpin-tall] {
+    height: auto;
+  }
+
+  [data-scene-unpin-tall] [data-scene-pin] {
+    position: static;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -2828,7 +2869,38 @@ html.js [data-reveal='lines']:not([data-revealed]) {
        finished, so "no animation" and "arrived" are the same declaration. */
     [data-scene-part][data-scene-arrived='true'],
     [data-scroll][data-scene-arrived='true'] {
-      animation-name: none;
+      /* A TIME-BASED ENTRANCE, NOT `animation-name: none`. Dropping the
+         animation outright was the first version of this and it was wrong in a
+         way that showed immediately: on `/company` BOTH sections sit in the
+         first viewport, so every part on the page qualified and the route
+         rendered dead — correct, legible, and completely still. The bug was
+         content that never arrives; the fix must not be content that never
+         moves.
+         `animation-timeline: auto` is what takes these off the scroll and onto
+         the clock. The scroll-linked ranges are the thing that cannot open at
+         zero scroll, so a part already on screen is timed against elapsed time
+         instead, runs once, and is done.
+         MOVEMENT ONLY, and that is §3's rule rather than a preference: this
+         starts at a 14px offset and lands at rest, so at EVERY frame including
+         the first the text is fully opaque and fully readable. An arrival that
+         fades from zero is one failed animation away from being the bug this
+         file just fixed. */
+      animation-name: scene-arrive;
+      animation-timeline: auto;
+      animation-range: normal;
+      animation-duration: 0.55s;
+      animation-delay: var(--arrive-delay, 0s);
+      animation-timing-function: var(--ease-entrance);
+      animation-fill-mode: both;
+    }
+
+    @keyframes scene-arrive {
+      from {
+        translate: 0 14px;
+      }
+      to {
+        translate: none;
+      }
     }
 
     /* A rule that completes itself, left to right. `transform-origin` is on the
@@ -3697,7 +3769,30 @@ html.js [data-reveal='lines']:not([data-revealed]) {
      between cards is paid by the card's own trailing margin instead. */
   .tl {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+    /* THE ARMS GROW WITH THE SCREEN; NOTHING ELSE DOES.
+       Rows 1 and 3 hold the alternating cards, row 2 is the rail. Left at
+       `minmax(0, 1fr)` they size to the card — a flat 123px — so the whole
+       pinned block was a constant 597px on every monitor. Measured: that is 69%
+       of a 860px laptop and 41% of a 1440px screen, which is where the section
+       reads as marooned rather than composed, and it is why the empty band
+       under the pin (`viewport - sticky top - pin height`) grew from 160px to
+       670px across that range.
+       Growing the ARM rather than the card or the type is the narrowest lever
+       that fixes it: the cards keep the geometry they were tuned with, the
+       heading keeps `display-2` — a token shared with the rest of the site —
+       and the extra height is spent on the space the rail already owned.
+       `20svh - 3rem` lands 124px at 860 (today's value, so the laptop does not
+       move) and reaches the cap by 1440.
+       THE CAP IS ABSOLUTE, NOT PROPORTIONAL, and that is the point of it: in
+       this branch `.tl-fill-v` is `display: none`, so NOTHING draws a line from
+       a card to its node and proximity is the only thing binding the two. A
+       proportional arm keeps widening on a 4K panel until the pairing stops
+       being readable. 15rem is far enough to fill a tall screen and near enough
+       to still read as attached. */
+    grid-template-rows:
+      minmax(clamp(7.6875rem, 20svh - 3rem, 15rem), 1fr)
+      auto
+      minmax(clamp(7.6875rem, 20svh - 3rem, 15rem), 1fr);
     row-gap: 1.5rem;
     column-gap: 0;
   }

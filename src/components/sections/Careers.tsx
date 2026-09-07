@@ -59,7 +59,7 @@ export function Careers() {
       // rendered 7px under the fixed header. Thinking opens `/company` now and
       // Careers follows it, so what is above it is a section again and the extra
       // clearance would only make one mid-page gap taller than every other.
-      className="py-20 md:py-28"
+      className="py-20 md:pt-28 md:pb-14"
     >
       <Container>
         <Grid>

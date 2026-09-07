@@ -50,35 +50,91 @@ export function useSceneArrival() {
     // Nothing to correct where the block never applies: without scroll-timeline
     // support the parts are never animated in the first place.
     if (typeof CSS === 'undefined' || !CSS.supports?.('animation-timeline: view()')) return
+    if (typeof IntersectionObserver === 'undefined') return
 
-    let raf = 0
-    const mark = () => {
-      const vh = window.innerHeight || document.documentElement.clientHeight
-      const onScreen = (r: DOMRect | undefined) => !!r && r.top < vh && r.bottom > 0
+    let marked = 0
+    let armed = true
 
-      for (const part of document.querySelectorAll<HTMLElement>('[data-scene-part], [data-scroll]')) {
-        if (part.dataset.sceneArrived === 'true') continue
-        if (part.closest('[data-scene-runway], [data-scene-pin]')) continue
+    const arrive = (part: HTMLElement) => {
+      if (!armed || part.dataset.sceneArrived === 'true') return
+      /* Staggered by position in the run, so the section arrives as a sequence
+         rather than as one block that all moves at once — the same reading
+         `Reveal`'s own `stagger` gives its children. Capped so a long run
+         cannot push its last part into a wait the reader notices. */
+      part.style.setProperty('--arrive-delay', `${Math.min(marked * 0.06, 0.36)}s`)
+      part.dataset.sceneArrived = 'true'
+      marked += 1
+    }
 
-        /* The part's OWN box is the transformed one — a masked line reports the
-           position it has been pushed to, not the position it occupies in
-           layout — so a line shoved far enough down can read as off-screen
-           while the mask holding it is plainly in view. Its parent is that
-           mask. Either box counts, because the failure this guards against is
-           content staying hidden, and every ambiguity here resolves toward
-           showing it. */
-        if (onScreen(part.getBoundingClientRect()) || onScreen(part.parentElement?.getBoundingClientRect())) {
-          part.dataset.sceneArrived = 'true'
-        }
+    /* ASK THE BROWSER WHETHER IT IS ON SCREEN; DO NOT GUESS WHEN TO MEASURE.
+       Three earlier versions of this read `getBoundingClientRect()` on a
+       schedule — two animation frames, then `load`, then `fonts.ready`, then a
+       ResizeObserver on the body. Every one of them missed the same case: at
+       768x1024 on `/company` the NorrInsights grid settles at top 1010,
+       fourteen pixels inside the viewport, and the reflow that lifts it there
+       lands after all four signals and does not change the body's height, so
+       the observer never fired either. The predicate was right the whole time —
+       measured `wouldMark: true` at rest — and it was never asked.
+       An IntersectionObserver is the thing that cannot be early: it reports the
+       current state when it starts AND again whenever layout changes that
+       state, which is exactly the question being asked. */
+    const owner = new WeakMap<Element, HTMLElement>()
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue
+        const part = owner.get(entry.target)
+        if (part) arrive(part)
+        io.unobserve(entry.target)
+      }
+    })
+
+    for (const part of document.querySelectorAll<HTMLElement>('[data-scene-part], [data-scroll]')) {
+      /* PINNED SCENES ARE EXCLUDED, and that exclusion is why this is a
+         per-part check rather than a per-scene one. A `[data-scene-runway]` is a
+         tall box whose sticky child advances THROUGH stages as it is scrolled;
+         its parts are a sequence, not an arrival, and dropping their scroll
+         animation would render every stage at once on top of itself. A pinned
+         scene also cannot exhibit the bug: its runway guarantees the scroll
+         distance its ranges are measured against. */
+      if (part.closest('[data-scene-runway], [data-scene-pin]')) continue
+
+      owner.set(part, part)
+      io.observe(part)
+
+      /* The part's OWN box is the transformed one — a masked line reports the
+         position it has been pushed to, not the one it occupies in layout — so
+         a line shoved far enough down reads as off-screen while the mask
+         holding it is plainly in view. Observing the mask as well covers that.
+         ONLY A REAL MASK MAY VOUCH. Letting any parent do it was too generous
+         by exactly the case it was meant to catch: on `/work` at 860px tall it
+         marked a Roles card 177px BELOW the fold, because its parent is the
+         section's full-height container. That part then spends its entrance
+         while nobody is looking. A mask is `overflow: hidden` AND close to the
+         child's own height; a tall container is neither. */
+      const host = part.parentElement
+      if (!host) continue
+      const hb = host.getBoundingClientRect()
+      const ownH = part.getBoundingClientRect().height
+      if (getComputedStyle(host).overflow === 'hidden' && hb.height <= ownH * 1.75 + 8) {
+        owner.set(host, part)
+        io.observe(host)
       }
     }
 
-    // Two frames: one for the route's own layout, one for the fonts and images
-    // that move it. Reading rects in the first frame after a route change
-    // measures a page that has not finished being placed.
-    raf = requestAnimationFrame(() => {
-      raf = requestAnimationFrame(mark)
-    })
-    return () => cancelAnimationFrame(raf)
+    /* THE SCROLL GATE. The defect is content sitting in the FIRST viewport;
+       everywhere else the scroll ranges work exactly as written. Without this,
+       the observer would keep firing as the reader scrolls and swap their
+       scroll choreography for a time-based entrance they never asked for —
+       which is the `/company` complaint in a new costume. */
+    const disarm = () => {
+      armed = false
+      io.disconnect()
+    }
+    window.addEventListener('scroll', disarm, { passive: true, once: true })
+
+    return () => {
+      io.disconnect()
+      window.removeEventListener('scroll', disarm)
+    }
   }, [pathname])
 }

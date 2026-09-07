@@ -59,7 +59,7 @@ export function Pillars() {
       // `/` now, so what is above it is a section again and the extra clearance
       // is buying nothing — it would just make one mid-page gap 32px taller than
       // every other one.
-      className="bg-surface py-20 md:py-28"
+      className="bg-surface py-20 md:pt-28 md:pb-20"
     >
       <Container>
         <Grid>

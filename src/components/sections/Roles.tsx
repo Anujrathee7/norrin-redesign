@@ -188,7 +188,7 @@ export function Roles() {
       // thing it was paying for — an opening rule that needed air above it — is
       // still deleted, and a section that has now been first on a route once
       // should not carry a padding that only holds while it is not.
-      className="overflow-clip py-20 md:py-28"
+      className="overflow-clip pt-20 pb-12 md:pt-14 md:pb-14"
     >
       <Container>
         <Grid>
