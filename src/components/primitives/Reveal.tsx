@@ -86,6 +86,18 @@ export function Reveal({
       el.style.setProperty('--reveal-delay', `${delay}s`)
     }
 
+    // Anything already visible at first paint must reveal even if the page
+    // never scrolls. On large viewports a section can sit inside the initial
+    // view (or in the -12% rootMargin dead-zone) and never cross the
+    // observer's threshold — leaving it stuck at its hidden state. Check the
+    // REAL viewport, not the observer's shrunk root.
+    const rect = el.getBoundingClientRect()
+    const vh = window.innerHeight || document.documentElement.clientHeight
+    if (rect.top < vh && rect.bottom > 0) {
+      show()
+      return
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
