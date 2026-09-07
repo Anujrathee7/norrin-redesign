@@ -1018,23 +1018,20 @@
     color: var(--ink);
   }
 
-  .eyebrow::before {
-    content: '';
-    /* `flex: none` because a flex item's default `min-width: auto` lets a
-       20px box shrink when the label wraps, and a lead-in rule that changes
-       length between sections is not a system. */
-    flex: none;
-    inline-size: 20px;
-    block-size: 1px;
-    background-color: var(--accent);
-  }
+  /* THE LEAD-IN RULE IS GONE, AT THE REPO OWNER'S CALL.
+     `.eyebrow::before` drew a 20px accent rule before every label — it arrived
+     in e5c6b5b with the section numbers being dropped, and it is removed here
+     for the same kind of reason they were: it is a decoration applied uniformly
+     to every section, which is the shape of a template rather than a decision.
+     Removed rather than set to `content: none`, because a pseudo-element kept
+     alive at zero is inventory, not a system — the same argument the deleted
+     `--stack-fan` and `--stack-shrink` tokens are held to.
+     The label keeps `display: flex` and its `gap`: the gap now has nothing to
+     space against a single child, and the flex row is what the mobile-nav rule
+     at the `column-gap` note downstream still reads. */
 
   .eyebrow-inverse {
     color: var(--inverse-ink);
-  }
-
-  .eyebrow-inverse::before {
-    background-color: var(--signal);
   }
 
   /* Sun is a fixed colour in both themes, so anything sitting on it must be
