@@ -2815,6 +2815,22 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       animation-range: var(--scene-from, contain 0%) var(--scene-to, contain 100%);
     }
 
+    /* ALREADY ON SCREEN AT FIRST PAINT — see `useSceneArrival`.
+       `animation-fill-mode: both` above is what pins a part at its FROM state
+       until its range opens, and every range here is measured in `cover` or
+       `contain`, which assumes the scene scrolled in from below. A scene
+       sitting in the FIRST viewport never had that runway, so its parts hold
+       their diminished state until something scrolls — and on `/work` at
+       1728x1150 that left the Roles heading translated clean out of its mask
+       and the eyebrow rendering as a slice of itself.
+       Dropping the animation returns the part to its resting state, which IS
+       the finished one: every part in this block animates FROM diminished TO
+       finished, so "no animation" and "arrived" are the same declaration. */
+    [data-scene-part][data-scene-arrived='true'],
+    [data-scroll][data-scene-arrived='true'] {
+      animation-name: none;
+    }
+
     /* A rule that completes itself, left to right. `transform-origin` is on the
        part rather than in the keyframes so a mirrored instance can flip it. */
     [data-scene-part='rule'] {
