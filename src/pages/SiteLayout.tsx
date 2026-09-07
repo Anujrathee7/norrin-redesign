@@ -1,6 +1,7 @@
 import { Outlet, ScrollRestoration } from 'react-router'
 import { Nav } from '@/components/nav/Nav'
 import { Footer } from '@/components/sections/Footer'
+import { useSceneArrival } from '@/hooks/useSceneArrival'
 
 /**
  * The shell every route is poured into: skip link, bar, `<main>`, footer.
@@ -55,6 +56,11 @@ import { Footer } from '@/components/sections/Footer'
  * per-PLACE, which is what "put me back where I was on the work page" means.
  */
 export function SiteLayout() {
+  /* Scenes already on screen at first paint arrive without a scroll. Here
+     rather than per-section because it is a property of the route, and every
+     route is poured through this shell. */
+  useSceneArrival()
+
   return (
     <>
       <a href="#main" className="skip-link">

@@ -99,7 +99,26 @@ export function Proof() {
             scene pins, and an entrance timed that way would freeze half-done.
             The hold IS their gesture. */}
         <div data-scene data-scene-runway className="h-[220svh]">
-          <div data-scene-pin className="sticky top-[max(88px,12svh)]">
+          {/* THE PIN FILLS THE VIEWPORT IT HOLDS, AND THAT IS THE FIX FOR THE
+              VOID UNDER THE TIMELINE. Held at `top: max(88px,12svh)` with the
+              block's own height and nothing else, the composition is 597px tall
+              in a 1150px viewport — so 415px of empty ground sat beneath it for
+              the ENTIRE hold, every frame of it, and read as the section having
+              failed to render. Measured, not estimated: `viewport - sticky top -
+              pin height`, which is why it grows with the screen rather than
+              shrinking.
+              `min-h` spans exactly the held region — top of the pin to the
+              bottom of the viewport — and `justify-center` puts the timeline in
+              the middle of it. The same slack still exists, because the block
+              genuinely is shorter than the screen; what changes is that it is
+              split evenly above and below instead of hanging off the bottom,
+              which is a centred composition rather than a hole. Content taller
+              than the region simply grows past `min-h`, so short viewports are
+              unaffected. */}
+          <div
+            data-scene-pin
+            className="sticky top-[max(88px,12svh)] flex min-h-[calc(100svh-max(88px,12svh))] flex-col justify-center"
+          >
             <Eyebrow label="Track record" className="mb-8" />
 
             <h2 id="proof-heading" className="display-2 max-w-[22ch]">
@@ -177,8 +196,36 @@ export function Proof() {
                        220svh runway is always more than a viewport tall by
                        construction, so `contain` is always about 120svh of
                        scroll: roughly 1140px on a laptop, and it cannot
-                       degenerate at any height. */
-                    const s = 4 + i * 18
+                       degenerate at any height.
+
+                       THE STRIDE SPENDS THE WHOLE RUNWAY, and at 18 it did not.
+                       Every part below is timed `s`, `s + 8`, `s + 21` — so
+                       with four stations the last one finished at `contain 79%`
+                       and the remaining 21% was runway with nothing left to
+                       play: measured at 1728x1150, all four cards were uncovered
+                       by scrollY 2535 and the next ~290px of scroll changed
+                       nothing on screen. That is the dead hold that reads as a
+                       void under the timeline.
+
+                       24 is the stride that lands the last station's finish on
+                       the end of `contain` rather than three-quarters of the way
+                       through it: `4 + 3*24 + 21 = 97`. It is derived from the
+                       count, not chosen — four stations at `s + 21` each, spread
+                       to fill 100%. Change the number of milestones and this
+                       needs recomputing, which is why the arithmetic is written
+                       out rather than left as a magic number.
+
+                       WHAT THIS DOES NOT FIX, because it cannot: about 415px of
+                       hold remains after `contain` ends. `contain 100%` is the
+                       runway's bottom reaching the viewport's bottom, but the
+                       sticky child does not release until that same edge reaches
+                       the CHILD's bottom, and the gap between those two is
+                       `viewport - (pin height + sticky top)` — 1150 - 735 here.
+                       It is a constant: it does not scale with the runway, so no
+                       height fixes it. The timeline is fully drawn and fully on
+                       screen throughout, which is the ordinary end of a pinned
+                       section rather than a defect. */
+                    const s = 4 + i * 24
 
                     return (
                       <li
