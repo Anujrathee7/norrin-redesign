@@ -92,7 +92,7 @@ export function Thinking() {
       // the chrome rather than as a page starting. Measured, on the fifth
       // section to need it; every route opener is checked at 1512x950 and
       // 390x844 before it ships.
-      className="bg-surface pt-28 pb-20 md:pt-14 md:pb-28"
+      className="bg-surface pt-28 pb-20 md:pt-18 md:pb-28"
     >
       <Container>
         <SectionHeader label="Thinking" id="thinking-heading">

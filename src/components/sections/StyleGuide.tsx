@@ -8,6 +8,7 @@ import { Card } from '@/components/primitives/Card'
 import { CardStack } from '@/components/primitives/CardStack'
 import { CardSlider } from '@/components/primitives/CardSlider'
 import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cases, photos, roles } from '@/data/norrin'
 
 /**
@@ -527,7 +528,7 @@ export function StyleGuide() {
           <Container>
             <h2 className="display-3 mb-3">Adopted components</h2>
             <p className="body-serif measure-serif mb-12 text-reading">
-              One shadcn component, rethemed. Not one stock value survives: every colour below is
+              Two shadcn components, rethemed. Not one stock value survives: every colour below is
               a bridge variable pointing at a token that was already here and already measured,
               which is what §2.2 asks for &mdash; the stock neutral-zinc look is on tens of
               thousands of sites and shipping it would worsen the exact problem this page exists to
@@ -536,6 +537,38 @@ export function StyleGuide() {
               outline along with the swap that keeps a ring visible on the forest band. A Badge was
               adopted here too and then removed with the element it was carrying &mdash; a
               component with no consumer is not adopted, it is inventory.
+            </p>
+
+            <h3 className="display-4 mb-5">Tabs</h3>
+            <div className="mb-4 max-w-[46rem]">
+              <Tabs defaultValue="a">
+                <TabsList>
+                  <TabsTrigger value="a">First panel</TabsTrigger>
+                  <TabsTrigger value="b">Second panel</TabsTrigger>
+                  <TabsTrigger value="c" disabled>
+                    Disabled
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="a" className="caption mt-6 max-w-[62ch] text-ink-2">
+                  The active trigger marks its own span of the list&rsquo;s hairline in accent. That
+                  is the bar&rsquo;s gesture for the current route, reused rather than reinvented,
+                  and it is what replaces shadcn&rsquo;s stock <code>bg-muted</code> track holding a
+                  <code> bg-background</code> pill &mdash; the single most recognisable tell the
+                  library has.
+                </TabsContent>
+                <TabsContent value="b" className="caption mt-6 max-w-[62ch] text-ink-2">
+                  Square, because a tab is not an object sitting on a plane: the rule it sits on is
+                  the plane, and planes have no corners. <code>--radius</code> stays unspent here.
+                </TabsContent>
+                <TabsContent value="c">Disabled panels are unreachable.</TabsContent>
+              </Tabs>
+            </div>
+            <p className="caption mb-12 max-w-[62ch] text-ink-3">
+              A disabled trigger is shown because it is the one state with a contrast question worth
+              answering on a review page, and it is the state a section never renders. Tab the row
+              in both themes: there is no <code>ring</code> utility on it, so the only focus
+              treatment is this page&rsquo;s global <code>:focus-visible</code> outline &mdash; the
+              same call the Progress adoption made, and for the same two bugs.
             </p>
 
             <h3 className="display-4 mb-5">Progress</h3>

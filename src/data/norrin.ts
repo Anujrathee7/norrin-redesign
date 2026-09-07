@@ -322,6 +322,15 @@ export const services = [
 /**
  * Values — source: /about-us "We believe in" + "Ways of working".
  *
+ * RENDERED AGAIN, ON `/company`, AND THE REVERSAL IS DELIBERATE. The note below
+ * is kept verbatim because the reasoning was sound for the page it was written
+ * about — and that page no longer exists. It described one long document whose
+ * middle carried no brand; `/company` is now its own route and was the thinnest
+ * on the site, two sections deep. The objection that cut this ("945px on a page
+ * that already had none of it") is the argument FOR it here.
+ *
+ * THE ORIGINAL NOTE, UNEDITED:
+ *
  * NOT CURRENTLY RENDERED. The values section was cut: four short statements
  * occupying ~945px of a page whose middle 70% already carried no brand, and the
  * objection it retired ("will they displace my team?") is answered by the
@@ -334,6 +343,56 @@ export const services = [
  * of repeating it four times. This is a typographic de-duplication, not a
  * rewrite — no wording is changed, added or softened.
  */
+/**
+ * Ways of working — source: /about-us, the "Ways of working" section.
+ *
+ * THE PROVENANCE HEADER ABOVE HAS NAMED THIS BLOCK SINCE IT WAS WRITTEN — it
+ * reads `"We believe in" + "Ways of working"` — but only the first half was
+ * ever extracted. This is the second half, and it is quoted verbatim from the
+ * same page as the beliefs beside it: three headings with their body copy, no
+ * wording changed, added or softened.
+ *
+ * There is no intro text on the source section; it opens straight onto the
+ * three items, so none is invented here (§3).
+ *
+ * UNLIKE `beliefs`, THESE HAVE NO SHARED OPENING TO LIFT OUT. The four beliefs
+ * all begin "We believe in", which is why they carry a `predicate`. These three
+ * begin differently from each other, so each `title` is the whole statement and
+ * there is nothing to de-duplicate.
+ */
+/**
+ * The heading of Norrin's `/about-us` page, quoted exactly.
+ *
+ * It is used as the heading of the values section because that is the page
+ * these values are printed on - the words and the material under them come from
+ * the same source, so nothing here is authored to introduce them (§3). An
+ * invented section heading would be a smaller lie than an invented statistic,
+ * but it would still be one.
+ */
+export const aboutHeadline = 'We forge new realities' as const
+
+export const waysOfWorking = [
+  {
+    title: 'We take responsibility by addressing issues head on',
+    body:
+      'We value clarity over complexity. We ask the essential questions, skip the sugarcoating, ' +
+      'and take ownership that actually moves projects forward.',
+  },
+  {
+    title: 'We stay close, involve & include',
+    body:
+      'We show up, build real understanding by listening, and bring our expertise to your ' +
+      'reality. True partnerships need presence, not just promises.',
+  },
+  {
+    title: 'We invite you to innovate together',
+    body:
+      'We listen first, then recommend. We favor bold solutions when they make sense, but rely ' +
+      'on time-tested engineering when solidity is called for. We bring technology that serves ' +
+      'your needs.',
+  },
+] as const
+
 export const beliefs = [
   {
     title: 'We believe in people and their experience',
