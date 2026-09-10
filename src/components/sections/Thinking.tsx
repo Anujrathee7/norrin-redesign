@@ -99,66 +99,17 @@ export function Thinking() {
           Start anywhere you like.
         </SectionHeader>
 
-        {/* Wiped rather than faded: the rungs are one framed object, and a wipe
-            crossing it reads as one gesture where four fades read as four
-            separate arrivals. */}
-        {/* THE `relative` HERE IS NOW UNCLAIMED. It existed for one reason —
-            Nori peeked over the frame's top border, and the border sits on the
-            <ul> two levels down inside an `overflow-hidden` frame, so anything
-            positioned in there would have been clipped. Nori has been deleted
-            from the codebase, so nothing is positioned against this wrapper any
-            more and the `relative` can probably go with it. Left in place rather
-            than removed blind, because this section is being redesigned by hand
-            and pulling a positioning context out from under a layout mid-edit is
-            how a subtle break gets introduced.
-
-            The drift stays on this shared wrapper rather than on the frame
-            below it. */}
-        <div data-scroll="drift-slow" className="relative">
-        {/* Uncovered left to right against its own scroll range, so it runs
-            backwards when you scroll back up instead of being spent on the
-            first pass. Still ONE gesture across the whole frame and not four
-            staggered cells: the rungs are hairline-separated parts of a single
-            object, and four arrivals would argue they are four competing
-            boxes — which is the exact reading the frame was built to prevent.
-
-            The clip lives on a wrapper rather than on the <ul>, because the
-            <ul> is `overflow-hidden` (that is what clips the cells' square
-            grounds to the rounded frame) and `overflow: hidden` is a scroll
-            container — an element's own view timeline inside one never
-            advances. Out here it is measured against the page. */}
-        {/* Its own window, later and wider than the shared default. This is
-            the tallest single object that animates on the page, and how far a
-            block must travel before it is properly on screen scales with its
-            height — a 40px list row is readable almost as soon as it appears, a
-            302px frame is not. Measured at 900px viewport: the wipe now runs
-            from the frame having ~200px on screen to it sitting complete near
-            the middle, instead of finishing while it was still a sliver at the
-            bottom edge. */}
-        <div
-          data-scroll="uncover"
-          style={{
-            ['--scrub-from' as string]: 'cover 16%',
-            ['--scrub-to' as string]: 'cover 46%',
-          }}
-        >
-          {/* One frame with four cells, not four cards.
-              The rungs are hairline-separated already, so the radius goes on the
-              OUTER edge and the interior stays ruled — sixteen rounded corners
-              become four, and the block still reads as one object you can choose
-              from rather than four competing boxes. `overflow-hidden` is what
-              lets the cells' own square backgrounds be clipped by the frame.
-
-              THE COLUMN COUNT HAS TO DIVIDE THE RUNGS. This was `md:grid-cols-3`
-              when there were three; adding the webinar left a fourth cell alone
-              on a second row beside two cells of bare frame — the one failure
-              mode a single framed object cannot survive, because the empty space
-              is inside the frame and reads as a rendering fault. Two-up from
-              `md`, four-up from `xl` where there is room for four measures of
-              this length. Never an odd column count while there are four. */}
-          <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-panel border border-hairline bg-hairline md:grid-cols-2 xl:grid-cols-4">
-            {RUNGS.map((r) => (
-              <li key={r.title} className="flex flex-col bg-surface p-7 md:p-9">
+        {/* A scroll-controlled spotlight, not an autoplaying carousel. The
+            runway supplies exactly three transitions for four cards. Each card
+            moves independently into or away from the centre; the row itself
+            never translates. Because the timeline is scroll progress, reversing
+            direction reverses the same frame immediately with no duration to
+            finish and no completed-state pause. */}
+        <div data-thinking-stage>
+          <div data-thinking-pin>
+            <ol data-thinking-cards className="m-0 list-none p-0">
+              {RUNGS.map((r, index) => (
+                <li key={r.title} data-thinking-card={index} className="flex flex-col rounded-panel border border-hairline bg-ground p-7 md:p-9">
                 <div className="mb-7 flex items-baseline justify-between gap-4 border-b border-hairline pb-4">
                   <span className="label text-ink-3">{r.step}</span>
                   <span className="label text-ink-3">{r.commitment}</span>
@@ -171,9 +122,12 @@ export function Thinking() {
 
                 <p className="mt-8 ui text-ink-3">{r.cta}</p>
               </li>
-            ))}
-          </ul>
-        </div>
+              ))}
+            </ol>
+            <div data-thinking-progress aria-hidden="true">
+              {RUNGS.map((r, index) => <span key={r.title} data-thinking-step={index} />)}
+            </div>
+          </div>
         </div>
 
         <p className="caption mt-8 text-ink-3">

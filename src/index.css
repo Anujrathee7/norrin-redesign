@@ -4736,6 +4736,140 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 }
 
 /* --------------------------------------------------------------------------
+   THINKING — A SCROLL-SCRUBBED CARD SPOTLIGHT
+
+   The runway is three viewport-heights because four cards make three handoffs.
+   The sticky stage stays still while each card independently changes position
+   and scale. There is no duration: the named timeline is the only clock, so a
+   wheel or trackpad reversal changes direction on the very next painted frame.
+
+   The base layout is a plain list. Browsers without scroll timelines and people
+   asking for reduced motion get every card at full size in reading order.
+   -------------------------------------------------------------------------- */
+
+[data-thinking-cards] {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+[data-thinking-card] {
+  min-block-size: 21rem;
+}
+
+[data-thinking-progress] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 48rem) {
+  @supports (animation-timeline: view()) {
+    [data-thinking-stage] {
+      height: 320svh;
+      margin-block-start: 2rem;
+      view-timeline-name: --thinking-stage;
+    }
+
+    [data-thinking-pin] {
+      position: sticky;
+      top: max(82px, 8svh);
+      display: grid;
+      min-block-size: min(44rem, calc(100svh - max(82px, 8svh) - 3rem));
+      place-items: center;
+      overflow: clip;
+    }
+
+    [data-thinking-cards] {
+      display: grid;
+      inline-size: 100%;
+      min-block-size: 32rem;
+      place-items: center;
+    }
+
+    [data-thinking-card] {
+      grid-area: 1 / 1;
+      inline-size: clamp(20rem, 39vw, 34rem);
+      min-block-size: 27rem;
+      transform-origin: center;
+      will-change: transform;
+      animation-duration: 1ms;
+      animation-timeline: --thinking-stage;
+      animation-range: contain 0% contain 100%;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+    }
+
+    [data-thinking-card='0'] { animation-name: thinking-card-0; }
+    [data-thinking-card='1'] { animation-name: thinking-card-1; }
+    [data-thinking-card='2'] { animation-name: thinking-card-2; }
+    [data-thinking-card='3'] { animation-name: thinking-card-3; }
+
+    @keyframes thinking-card-0 {
+      0%, 8% { transform: translateX(0) scale(1); z-index: 4; }
+      33% { transform: translateX(-82%) scale(0.74); z-index: 3; }
+      66% { transform: translateX(-132%) scale(0.62); z-index: 2; }
+      100% { transform: translateX(-166%) scale(0.56); z-index: 1; }
+    }
+
+    @keyframes thinking-card-1 {
+      0%, 8% { transform: translateX(82%) scale(0.74); z-index: 3; }
+      33%, 41% { transform: translateX(0) scale(1); z-index: 4; }
+      66% { transform: translateX(-82%) scale(0.74); z-index: 3; }
+      100% { transform: translateX(-132%) scale(0.62); z-index: 2; }
+    }
+
+    @keyframes thinking-card-2 {
+      0%, 8% { transform: translateX(132%) scale(0.62); z-index: 2; }
+      33% { transform: translateX(82%) scale(0.74); z-index: 3; }
+      66%, 74% { transform: translateX(0) scale(1); z-index: 4; }
+      100% { transform: translateX(-82%) scale(0.74); z-index: 3; }
+    }
+
+    @keyframes thinking-card-3 {
+      0%, 8% { transform: translateX(166%) scale(0.56); z-index: 1; }
+      33% { transform: translateX(132%) scale(0.62); z-index: 2; }
+      66% { transform: translateX(82%) scale(0.74); z-index: 3; }
+      92%, 100% { transform: translateX(0) scale(1); z-index: 4; }
+    }
+
+    [data-thinking-progress] {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    [data-thinking-progress]::before {
+      content: 'Scroll to shift focus';
+      margin-inline-end: 0.5rem;
+      color: var(--ink-3);
+      font: var(--label);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    [data-thinking-step] {
+      inline-size: 1.75rem;
+      block-size: 2px;
+      background: var(--hairline-strong);
+    }
+  }
+}
+
+@media (min-width: 40rem) {
+  [data-thinking-cards] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 48rem) {
+  @supports (animation-timeline: view()) {
+    [data-thinking-cards] {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
    THREE ACROSS, FROM 72rem.
 
    MEASURED, NOT PICKED. The row's width arithmetic is

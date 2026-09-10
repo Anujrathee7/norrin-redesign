@@ -1,6 +1,7 @@
 import { Container, Eyebrow } from '@/components/primitives/Layout'
 import { Reveal } from '@/components/primitives/Reveal'
 import { positioning } from '@/data/norrin'
+import { useForwardScene } from '@/hooks/useForwardScene'
 
 /**
  * The Gap — the section the site is built for.
@@ -531,8 +532,10 @@ function RoadNode({
 }
 
 export function TheGap() {
+  const sceneRef = useForwardScene()
   return (
     <section
+      ref={sceneRef}
       id="gap"
       data-shot="gap"
       data-deck-next
