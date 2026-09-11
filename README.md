@@ -79,8 +79,9 @@ Three rules hold it together:
 
 Typography is three self-hosted families: **Schibsted Grotesk** (display and UI),
 **Newsreader** (thesis, leads, case bodies), **IBM Plex Mono** (indices, unit labels,
-telemetry). Norrin's real faces are commercially licensed; their heading face is a script,
-which in an enterprise-AI context costs them authority.
+telemetry). Norrin's own faces are available to this demo — it is private and built only to
+show Norrin — but their heading face is a script, which in an enterprise-AI context costs
+them authority.
 
 ## Nori
 
@@ -227,7 +228,7 @@ deliberate positioning.
 
 A real build would still need testimonial quotes with attribution, licensed customer logo
 files, real destinations behind the nav and case links, case metrics beyond the four Norrin
-publishes, CRM wiring, and licences for Norrin's actual typefaces.
+publishes, and CRM wiring.
 
 Reasoning behind the decisions is in [docs/design-notes.md](docs/design-notes.md); the
 evidence the redesign argues from is in [docs/research-brief.md](docs/research-brief.md).

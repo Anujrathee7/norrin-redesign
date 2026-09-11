@@ -87,7 +87,7 @@ This is the single most valuable find. Norrin's design tokens are a **named Nord
 | `--color-gray` / `--color-light` / `--color-lighter` | `#9d9fa4` / `#e6e7ea` / `#f4f4f6` | neutrals |
 | `--color-error` | `#ff4f42` | coral red |
 
-**Typefaces (licensed, cannot be used):**
+**Typefaces (commercially licensed — usable here, since this repo is a private demo for Norrin):**
 - Body: `ABC Camera Plain` (Dinamo) — Regular/Medium + italics
 - Headings: `LFS Adelia` — a **script/handwritten** face
 

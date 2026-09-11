@@ -195,6 +195,12 @@ authored is flagged (`altIsOurs`, `placeholder`, `paraphrase`). **This governs f
 never design choices** — an authored palette is a stated point of view, not a false
 claim, and the README says so.
 
+**Norrin's own font and logo may be used.** Their typefaces (ABC Camera Plain, LFS
+Adelia) and their logo are available to this build directly.
+*Reason:* the repo is private and exists only to demo a redesign to Norrin; it is never
+used commercially, so licensing does not constrain it. This covers Norrin's own marks
+only — customer logos and client headshots stay as type or absent, as `norrin.ts` records.
+
 **Photography before illustration.** Where a real photograph exists, it outranks a
 drawing. A cute character on an enterprise consultancy page is the most recognisable
 generated signal available.
@@ -276,7 +282,8 @@ These are being decided with the user, on rendered options, not chosen unilatera
   Cards and the customer stack are adopted under this rule and needed no further
   amendment. The one step still unspent is `--radius-section`; it stays declared and
   flagged in `index.css` until a section actually floats.
-- **Display face.** Open-licence candidates to be rendered at real size in the real h1.
+- **Display face.** Candidates to be rendered at real size in the real h1 — Norrin's own
+  faces included (see §3).
 
 ---
 
