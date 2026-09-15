@@ -121,12 +121,11 @@ function splitTitle(title: string) {
  * done once, to the document's only `h1`.
  *
  * ---------------------------------------------------------------------------
- * NO CONTROLS, AND WHAT THAT COSTS
+ * ONE NEXT CONTROL, AND WHAT IS STILL MISSING
  * ---------------------------------------------------------------------------
- * There is no picker and no pause button, and the position indicator is a
- * Progress bar rather than a row of dots you could mistake for a control — a
- * dot that looks pressable and is not would be a fabricated affordance (§3),
- * and a bar cannot be mistaken for four buttons.
+ * The whole pile is a real next button, reachable by click, tap, Enter and
+ * Space. There is still no picker or pause button, and the position indicator
+ * is a Progress bar rather than a row of dots that look like controls.
  *
  * THE COST IS NOW TOTAL, AND IT IS WRITTEN DOWN RATHER THAN HIDDEN. WCAG 2.2.2
  * wants a mechanism to pause content that auto-updates for more than five
@@ -178,7 +177,7 @@ export function CardStack({
   /** `#styleguide` holds the pile still so it can be compared rather than watched. */
   paused?: boolean
 }) {
-  const { index, leaving } = useCardStack(items.length, { paused })
+  const { index, leaving, next } = useCardStack(items.length, { paused })
 
   return (
     // The count is written here rather than on the list because BOTH children
@@ -210,9 +209,17 @@ export function CardStack({
           paper it was not about. */}
       <Progress aria-hidden="true" className="stack-progress" value={((index + 1) / items.length) * 100} />
 
-      {/* NO POINTER HANDLERS AT ALL. `pileProps` carried a hover pause and is
-          deleted: crossing the cards must not stop the rotation. `useCardStack`
-          holds the history and the WCAG 2.2.2 cost. */}
+      {/* A transparent native button makes the entire pile respond to click,
+          tap, Enter and Space while leaving the complete case list available
+          to assistive technology underneath it. Manual turns restart the
+          automatic timer, so the requested card receives a full reading beat. */}
+      <button
+        type="button"
+        className="stack-next"
+        aria-label="Show next customer case"
+        onClick={next}
+      />
+
       <ol data-cardstack className="m-0 list-none p-0">
         {items.map((item, i) => {
           const d = (i - index + items.length) % items.length

@@ -1807,6 +1807,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    Every number the two children share is declared here, once. --stack-count is
    written onto this element from React, so it is in scope for both. */
 [data-cardstack-region] {
+  position: relative;
   /* THE STEP IS NO LONGER DERIVED FROM `--radius-panel`, AND THAT DERIVATION IS
      THE DEFECT THIS FIXES.
 
@@ -1898,6 +1899,23 @@ html.js [data-reveal='lines']:not([data-revealed]) {
      was checked first — at 1512 it is 547px wide, so 432px of card plus 78px of
      pile still lands 37px inside it. */
   max-inline-size: min(27rem, 100% - (var(--stack-count) - 1) * var(--stack-step));
+}
+
+/* The pile itself is the next control. This native button sits over the visual
+   stack without replacing the ordered list's semantics, and receives the
+   site's ordinary inverse focus ring when reached from the keyboard. */
+.stack-next {
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--stack-count) + 2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-stack);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
 }
 
 /* The full step, where the column can pay for it out of its own slack without
