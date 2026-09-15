@@ -35,11 +35,28 @@ function NavLink({ href, ...rest }: { href: string } & Omit<ComponentProps<'a'>,
  * fabricated affordance §3 bans. So the anchor, the `text-accent`, the focus
  * ring and the screen-reader "home" label all go with the link — nothing here
  * offers an interaction any more, and a `<div>` cannot be tabbed to.
+ *
+ * THE MARK IS NORRIN'S, NOT OURS. It is the path from their own favicon,
+ * norrin.com/hubfs/theme-2025/favicon/norrin-favicon.svg (the same file served
+ * as this site's tab icon, see `index.html`), with its white tile dropped and the
+ * viewBox cropped to the strokes. It fills with `currentColor` so it follows the
+ * theme like the word does, which keeps the colour in the token layer (§2.4).
+ * `aria-hidden` because the word beside it already says Norrin; a labelled
+ * picture there would announce the name twice.
  */
 export function Wordmark() {
   return (
-    <div className="flex w-fit shrink-0 items-center gap-2.5">
-      <span className="wordmark text-ink">Norrin</span>
+    <div className="flex w-fit shrink-0 items-center gap-2 text-ink">
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        viewBox="126 59 273 394"
+        className="h-[1.375rem] w-auto shrink-0"
+        fill="currentColor"
+      >
+        <path d="m130.19 337.68h67.3v-3.08c-3.08-10.28-5.14-34.42-5.14-57.02v-177.24h9.25c41.1 0 73.46 19 88.36 38.01h3.6v-61.65c-17.98-8.22-60.1-13.35-92.98-13.35h-70.38v3.08c3.08 10.28 5.14 34.42 5.14 57.02v154.11c0 22.6-2.05 46.75-5.14 57.02v3.08zm101.2 110.96h67.29v-3.08c-3.08-10.28-5.14-34.42-5.14-57.02v-177.23h9.25c41.1 0 73.46 19 88.36 38.01h3.59v-61.65c-17.98-8.22-60.1-13.35-92.98-13.35h-70.38v3.08c3.08 10.28 5.14 34.42 5.14 57.02v154.11c0 22.6-2.05 46.75-5.14 57.02v3.08z" />
+      </svg>
+      <span className="wordmark">Norrin</span>
     </div>
   )
 }

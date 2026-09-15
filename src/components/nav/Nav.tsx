@@ -26,21 +26,17 @@ import { useNavState } from './useNavState'
  * quiet and gets out of the way.
  */
 
-const BAR_HEIGHT = 72
+/* ONE HEIGHT, AT THE TOP AND EVERYWHERE ELSE. The bar used to stand 72px tall
+   at scroll zero and condense to 56px once the page moved — a height
+   transition the repo owner asked to have removed. It is the condensed height
+   now, unconditionally: the smaller bar is the one every page was already read
+   under, and a header that changes size as you start scrolling is motion in
+   the one element that should hold still. */
+const BAR_HEIGHT = 56
 
 export function Nav() {
-  const { mobileOpen, setMobileOpen, scrolled, edged, currentPath } = useNavState()
-
-  /* The condensed height, as a STATE rather than a scrub. See the long note in
-     index.css where `condense` used to be declared: driving this from an
-     animated custom property into `height: calc()` ran style, layout and paint
-     on the whole header subtree every frame of the first 220px of scroll, which
-     is the hero and nothing else.
-
-     `scrolled` and not `edged`. They differ, and the difference matters:
-     `edged` is also true when the mobile sheet is open, and opening the sheet
-     must not make the bar it is hanging from shrink underneath it. */
-  const rowHeight = scrolled ? BAR_HEIGHT - 16 : BAR_HEIGHT
+  const { mobileOpen, setMobileOpen, edged, currentPath } = useNavState()
+  const rowHeight = BAR_HEIGHT
 
   return (
     <header
@@ -71,9 +67,6 @@ export function Nav() {
       // both themes. It was NOT correct before, which is why the attribute was
       // put here in the first place.
       //
-      // The bar condenses once the page has moved, and deliberately does NOT
-      // touch its own bottom rule: that rule already encodes which section you
-      // are reading, and two meanings on one line is one too many.
       className="fixed inset-x-0 top-0 z-50"
     >
       <div
@@ -91,31 +84,20 @@ export function Nav() {
         )}
       >
         <Container>
-          {/* The row's height is the thing that actually condenses: 72px down
-              to 56px, once, on a transition rather than continuously on scroll.
-
-              The `ul` below carries the identical height rather than `h-full`,
+          {/* The `ul` below carries the identical height rather than `h-full`,
               because this row is `items-center` (each grid item aligned to the
-              row's midline) and not `items-stretch` — a `h-full` child would
-              stay 72px tall regardless of the row shrinking around it.
-
-              A height transition IS layout, and normally this file would refuse
-              one. It is allowed here because the header is `position: fixed`, so
-              the reflow is contained to its own subtree and never touches the
-              document, and because it runs twice per direction change instead of
-              on every frame of a 220px scroll band. Under
-              `prefers-reduced-motion` the global rule crushes the duration and
-              it simply snaps, which is correct. */}
+              row's midline) and not `items-stretch` — the rule segment under the
+              current item has to sit on the bar's bottom edge. */}
           <div
             style={{ height: rowHeight }}
-            className="grid grid-cols-[auto_1fr_auto] items-center gap-6 transition-[height] duration-300 ease-(--ease-ui) lg:grid-cols-[1fr_auto_1fr]"
+            className="grid grid-cols-[auto_1fr_auto] items-center gap-6 lg:grid-cols-[1fr_auto_1fr]"
           >
             <Wordmark />
 
             <nav aria-label="Primary" className="hidden justify-self-center lg:block">
               <ul
                 style={{ height: rowHeight }}
-                className="flex items-center gap-1 transition-[height] duration-300 ease-(--ease-ui)"
+                className="flex items-center gap-1"
               >
                 {/* EVERY ITEM IS A LINK, AND THERE IS NO SECOND KIND.
                     Three of the four used to be `<button aria-haspopup>` with a
@@ -173,7 +155,10 @@ export function Nav() {
         </Container>
       </div>
 
-      {mobileOpen ? <MobileSheet /> : null}
+      {/* The bar's height is passed rather than left to the sheet's default,
+          which was 72 and would have left the sheet 16px short of the viewport
+          floor under a 56px bar. */}
+      {mobileOpen ? <MobileSheet barHeight={BAR_HEIGHT} /> : null}
     </header>
   )
 }
