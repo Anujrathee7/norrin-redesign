@@ -166,8 +166,8 @@
      it takes that room from the forest band, whose lift off the page falls to
      1.65:1, and a page of large display type on near-black is the effect this
      build is actually after. Reverted. The hairlines can work harder. */
-  --ground: light-dark(#f8f7f3, #0e120f); /* warm paper, 0.005 chroma */
-  --surface: light-dark(#f1f0ea, #161b17);
+  --ground: light-dark(#fbfbfd, #0b0b0d);
+  --surface: light-dark(#f5f5f7, #171719);
 
   /* The forest band.
      In light this is the darkest plane on the page: you cross into it and the
@@ -193,7 +193,7 @@
      than a colour that was chosen. Forest full strength is the brand's, and it
      looks like it means it. Measurements can say a plane is better separated;
      they cannot say it is the right plane. */
-  --inverse: light-dark(#123e28, #16452c);
+  --inverse: light-dark(#18324f, #1b3150);
 
   /* THE NIGHT BAND — Work's ground, and the first plane on this page that does
      not flip with the theme.
@@ -218,12 +218,12 @@
      That is not a defect in the band or in the tones — a dark plane on a dark
      plane is not a thing tone can separate — and it is the decision the tone lab
      now has to be looked at for. */
-  --band-night: #0e120f;
+  --band-night: #0b0b0d;
 
   /* Ink ------------------------------------------------------------------ */
-  --ink: light-dark(#14170f, #f2f2ec);
-  --ink-2: light-dark(#4a4d42, #b4b8ac);
-  --ink-3: light-dark(#696d5f, #868a7c); /* 4.96:1 on light ground — AA at 11px */
+  --ink: light-dark(#1d1d1f, #f5f5f7);
+  --ink-2: light-dark(#424245, #d2d2d7);
+  --ink-3: light-dark(#6e6e73, #a1a1a6);
 
   /* The forest bands used to be built from eight hand-picked alphas of
      --inverse-ink — /15 /20 /25 for rules and /60 /65 /70 /75 /80 /85 for type —
@@ -236,7 +236,7 @@
      22% it measured 1.79:1 there — and came back with the band. That round trip
      is what these solved alphas are for: the number moved, it was caught, and
      it moved back. `node tools/palette.mjs` prints all of it. */
-  --inverse-ink: #eef0e6;
+  --inverse-ink: #f5f5f7;
   --inverse-ink-2: color-mix(in srgb, var(--inverse-ink) 78%, transparent);
   --inverse-ink-3: color-mix(in srgb, var(--inverse-ink) 62%, transparent);
   --inverse-hairline: color-mix(in srgb, var(--inverse-ink) 10%, transparent);
@@ -271,7 +271,7 @@
   /* Sun's stand-in for the accent, and it is the LIGHT accent in BOTH themes.
      Moss on sun measures 7.67:1; the dark theme's lichen accent on sun measures
      1.86:1, which is the same trap `.on-signal` was written to close. */
-  --on-signal-accent: #1a5335;
+  --on-signal-accent: #004f9e;
 
   /* Structure ------------------------------------------------------------ */
   /* Solved against --surface, not just --ground. The gate measured both of
@@ -284,8 +284,8 @@
      of solving these rather than picking them. Found while retiring the
      platforms band: off the forest, that block's rules became its only
      structure, and they were the ones sitting on surface. */
-  --hairline: light-dark(#d8d7cc, #292f2a);
-  --hairline-strong: light-dark(#b3b3a5, #404841);
+  --hairline: light-dark(#dedee3, #2c2c2f);
+  --hairline-strong: light-dark(#b8b8bf, #48484d);
 
   /* THE ONLY SHADOW IN THE SYSTEM, and §2.7 is the reason it is stated here
      rather than written at the one call site that uses it: a shadow is a
@@ -306,8 +306,8 @@
      near-black ground does almost nothing at .06 — same shadow, different
      exposure, which is the argument `--inverse` already makes about the
      forest band. */
-  --stack-shadow-contact: light-dark(rgb(20 23 15 / 0.06), rgb(0 0 0 / 0.34));
-  --stack-shadow-cast: light-dark(rgb(20 23 15 / 0.14), rgb(0 0 0 / 0.55));
+  --stack-shadow-contact: light-dark(rgb(29 29 31 / 0.06), rgb(0 0 0 / 0.34));
+  --stack-shadow-cast: light-dark(rgb(29 29 31 / 0.14), rgb(0 0 0 / 0.55));
 
   /* THE CONTOUR FIELD'S OWN PAIR, and it is separate from the hairlines above
      for a reason that is easy to lose.
@@ -332,8 +332,8 @@
      Decoration only: `aria-hidden`, no text on them, so they are outside the
      contrast gate by policy rather than by omission. Nothing readable is ever
      drawn in these. */
-  --contour: light-dark(#cfcec2, color-mix(in srgb, var(--inverse-ink) 10%, transparent));
-  --contour-strong: light-dark(#a8a89a, color-mix(in srgb, var(--inverse-ink) 22%, transparent));
+  --contour: light-dark(#d4d4d9, color-mix(in srgb, var(--inverse-ink) 10%, transparent));
+  --contour-strong: light-dark(#aaaab2, color-mix(in srgb, var(--inverse-ink) 22%, transparent));
 
   /* READING INK — long-form serif passages, and the one place on this page where
      the ink is allowed to carry a hue.
@@ -359,7 +359,7 @@
      IT IS NOT USED FOR EMPHASIS. The Gap's station quotes are `--ink` on
      purpose — they are the loudest copy in the section — and they stay there.
      This token is for passages you read, not passages you are meant to notice. */
-  --reading: light-dark(#4d5744, #a8b09b);
+  --reading: light-dark(#424245, #c7c7cc);
 
 
   /* The plane a floating control opens onto — the locale list, and anything
@@ -367,7 +367,7 @@
      to be said tonally: the overlay is lifted away from --ground in both themes
      and closed with --hairline-strong. Dark stops at #191f1b precisely because
      --ink-3 measures 4.74:1 there and 4.47:1 one step lighter. */
-  --overlay: light-dark(#fdfcfa, #191f1b);
+  --overlay: light-dark(#ffffff, #1c1c1e);
 
   /* The same plane inside a forest band. Without it the locale list opened as a
      near-white card floating on the band — the one construction the drawer
@@ -404,7 +404,7 @@
      same hue (58 vs 57) and separated by LUMINANCE alone; light's #1a5335 is
      hue 152 and dark's sage is 86, so both now separate by hue as well and
      nothing relies on brightness alone to say "this is not the signal". */
-  --accent: light-dark(#1a5335, #9fb87e);
+  --accent: light-dark(#0066cc, #64a8ff);
 
   /* Sun — fill only, never type.
      Identical in both themes on purpose: a light does not change colour when
@@ -418,9 +418,9 @@
 
   /* Lichen — the "not yet in production" state. Strokes and dashed rules
      only: at label sizes it does not clear AA, so text uses the ink ramp. */
-  --inactive: light-dark(#88967e, #5d6a55);
+  --inactive: light-dark(#7f74a8, #a99bd4);
 
-  --selection: light-dark(#e8e6a8, #2f3a1f);
+  --selection: light-dark(#dbeaff, #293b58);
 
   /* State ---------------------------------------------------------------- */
   /* Hover and pressed were previously hand-written at the call site, twice as
@@ -435,8 +435,8 @@
      lifted one step, so pressing it puts it back — the control returns to the
      colour the page's own dark plane is made of, rather than to a fourth green
      mixed for the occasion. 11.22:1 under --ground. */
-  --accent-hover: light-dark(#2a6b47, #b3c795);
-  --accent-press: light-dark(#123e28, #8aa36a);
+  --accent-hover: light-dark(#0077ed, #82b8ff);
+  --accent-press: light-dark(#004f9e, #4090e8);
   --signal-hover: #ebe565;
   --signal-press: #ddd74d;
 
