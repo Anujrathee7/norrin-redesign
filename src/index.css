@@ -1,6 +1,37 @@
 @import 'tailwindcss';
 
-/* ==========================================================================
+/* Dark mode expands from the theme control as one circular field. Browsers
+   without View Transitions ignore these pseudo-elements, and reduced-motion
+   users retain the immediate theme switch. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.68s;
+    animation-timing-function: var(--ease-entrance);
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-old(root) {
+    animation-name: none;
+    z-index: 1;
+  }
+
+  :root[data-theme='dark']::view-transition-new(root) {
+    animation-name: theme-reveal-dark;
+    z-index: 2;
+  }
+
+  @keyframes theme-reveal-dark {
+    from {
+      clip-path: circle(0 at var(--theme-reveal-x) var(--theme-reveal-y));
+    }
+    to {
+      clip-path: circle(var(--theme-reveal-radius) at var(--theme-reveal-x) var(--theme-reveal-y));
+    }
+  }
+}
+
+/* ===========================================================================
    Fonts — self-hosted, latin subset only, woff2 only.
    Three families, three files. The mono is used at a single weight (500) and
    the two text faces are variable, so one file each covers the whole range.
