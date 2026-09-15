@@ -1,6 +1,8 @@
 import { Container, Eyebrow } from '@/components/primitives/Layout'
 import { story, timeline } from '@/data/norrin'
 
+const WORK_TONES = ['slate', 'clay', 'sage', 'plum'] as const
+
 /**
  * Proof — how it got here.
  *
@@ -328,6 +330,7 @@ export function Proof() {
                             there. */}
                         <div
                           className="tl-card"
+                          data-tone={WORK_TONES[i % WORK_TONES.length]}
                           data-scene-part="uncover"
                           style={{
                             ['--scene-from' as string]: `contain ${s + 3}%`,

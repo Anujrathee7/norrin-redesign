@@ -85,7 +85,7 @@ export type StackItem = {
  * the fourth, and it is `--ink-2` used as a surface rather than a colour anybody
  * had to invent.
  */
-const TONES = ['paper', 'signal', 'paper', 'dark'] as const
+const TONES = ['slate', 'clay', 'sage', 'plum'] as const
 
 const FILLER = new Set(['a', 'an', 'the', 'to', 'for', 'in', 'of', 'and', 'on', 'at', 'with'])
 

@@ -4575,6 +4575,8 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     grid-area: stage;
     cursor: grab;
     touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   [data-slider][data-dragging] [data-slidestage] {
@@ -4994,33 +4996,54 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    with the card through the circular stack. The surfaces stay muted; ink and
    outlines follow one consistent rule per page theme.
    -------------------------------------------------------------------------- */
-:root[data-theme='light'] [data-rolecards] > li {
+:root[data-theme='light'] [data-rolecards] > li,
+:root[data-theme='light'] [data-cardstack] > li,
+:root[data-theme='light'] .tl-card[data-tone] {
   --tone-hairline: #14170f;
   --tone-ink: #14170f;
   --tone-reading: #14170f;
   --tone-ink-3: #14170f;
+  --tone-accent: #14170f;
 }
 
-:root[data-theme='light'] [data-rolecards] > li[data-tone='slate'] { --tone-surface: #aebbd2; }
-:root[data-theme='light'] [data-rolecards] > li[data-tone='clay'] { --tone-surface: #d7a08f; }
-:root[data-theme='light'] [data-rolecards] > li[data-tone='sage'] { --tone-surface: #b8c5a6; }
-:root[data-theme='light'] [data-rolecards] > li[data-tone='plum'] { --tone-surface: #beb0d0; }
+:root[data-theme='light'] [data-tone='slate'] { --tone-surface: #aebbd2; }
+:root[data-theme='light'] [data-tone='clay'] { --tone-surface: #d7a08f; }
+:root[data-theme='light'] [data-tone='sage'] { --tone-surface: #b8c5a6; }
+:root[data-theme='light'] [data-tone='plum'] { --tone-surface: #beb0d0; }
 
-:root[data-theme='dark'] [data-rolecards] > li {
+:root[data-theme='dark'] [data-rolecards] > li,
+:root[data-theme='dark'] [data-cardstack] > li,
+:root[data-theme='dark'] .tl-card[data-tone] {
   --tone-hairline: #f8f7f3;
   --tone-ink: #f8f7f3;
   --tone-reading: #f8f7f3;
   --tone-ink-3: #f8f7f3;
+  --tone-accent: #f8f7f3;
 }
 
-:root[data-theme='dark'] [data-rolecards] > li[data-tone='slate'] { --tone-surface: #35425c; }
-:root[data-theme='dark'] [data-rolecards] > li[data-tone='clay'] { --tone-surface: #5a3f38; }
-:root[data-theme='dark'] [data-rolecards] > li[data-tone='sage'] { --tone-surface: #3e4c39; }
-:root[data-theme='dark'] [data-rolecards] > li[data-tone='plum'] { --tone-surface: #493c59; }
+:root[data-theme='dark'] [data-tone='slate'] { --tone-surface: #35425c; }
+:root[data-theme='dark'] [data-tone='clay'] { --tone-surface: #5a3f38; }
+:root[data-theme='dark'] [data-tone='sage'] { --tone-surface: #3e4c39; }
+:root[data-theme='dark'] [data-tone='plum'] { --tone-surface: #493c59; }
 
 [data-rolecards] > li > .card {
   border-width: 2px;
   justify-content: center;
+}
+
+[data-cardstack] > li[data-tone] > .card,
+.tl-card[data-tone] {
+  border-width: 2px;
+  border-color: var(--tone-hairline);
+  background-color: var(--tone-surface);
+}
+
+.tl-card[data-tone] .tl-title {
+  color: var(--tone-ink);
+}
+
+.tl-card[data-tone] .tl-body {
+  color: var(--tone-reading);
 }
 
 [data-rolecards] > li > .card > .body-serif {
