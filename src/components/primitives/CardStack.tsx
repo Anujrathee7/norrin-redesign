@@ -80,15 +80,8 @@ const TONES = ['slate', 'clay', 'sage', 'plum'] as const
  * of the hover pause that was removed on the repo owner's instruction. If a
  * pause is wanted back, it should be a real button, not a pointer heuristic.
  */
-export function CardStack({
-  items,
-  paused = false,
-}: {
-  items: readonly StackItem[]
-  /** `#styleguide` holds the pile still so it can be compared rather than watched. */
-  paused?: boolean
-}) {
-  const { index, leaving, next } = useCardStack(items.length, { paused })
+export function CardStack({ items }: { items: readonly StackItem[] }) {
+  const { index, leaving, next } = useCardStack(items.length)
   const [dragX, setDragX] = useState(0)
   const [dragging, setDragging] = useState(false)
   const [manualLeaving, setManualLeaving] = useState<number | null>(null)

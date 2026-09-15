@@ -19,9 +19,7 @@ const pairs = [
   // --- light: ink ramp on every paper ground ---------------------------------
   { note: 'L ink       / ground ', fg: '#14170f', bg: '#f8f7f3', min: 4.5 },
   // The card puts the full ink ramp on --surface in two sections at once, so
-  // the top of that ramp is now load-bearing there and not just on paper. It
-  // was measured on #styleguide and never enforced here, which is the gap this
-  // closes: the guide reports, the gate refuses.
+  // the top of that ramp is now load-bearing there and not just on paper.
   { note: 'L ink       / surface', fg: '#14170f', bg: '#f1f0ea', min: 4.5 },
   { note: 'L ink-2     / ground ', fg: '#4a4d42', bg: '#f8f7f3', min: 4.5 },
   // The customer card sets its quote in --ink-2 on --surface, which demotes the
@@ -130,8 +128,8 @@ const pairs = [
   // the third does not.
   //
   // THE BACKGROUND HERE IS A PLACEHOLDER AND THESE FOUR LINES ARE WHAT MOVES
-  // WHEN THE PICK LANDS. `--role-dark` is candidate A (ink) of the four rendered
-  // on #styleguide; espresso #2a221c, slate #1c2733 and aubergine #2d1f33 all
+  // WHEN THE PICK LANDS. `--role-dark` is candidate A (ink) of four dark tones
+  // that were compared; espresso #2a221c, slate #1c2733 and aubergine #2d1f33 all
   // clear the same four bars, the tightest being inv-ink-3 at 5.97:1 on slate.
   // The pale and sun tones need nothing new: their inks are the light ramp on
   // #f1f0ea and the on-signal ladder on #f6f279, both already measured above.
@@ -286,7 +284,7 @@ const pairs = [
   { note: 'D case-body   / surface  ', fg: '#ffffff', bg: '#171719', min: 1.25 },
   // TYPE ON THE ART — EVERY CARD ON THE SITE. A gradient has no single
   // background, so each row is the LIGHTEST pixel found under any heading set on
-  // that art, across the customer deck, Scope, Thinking and #styleguide, at
+  // that art, across the customer deck, Scope and Thinking, at
   // 1512, 834, 390 and 320, read off the rendered page with the ink made
   // transparent (WCAG F83) by `.shots/probe/art-contrast.mjs`. The arts are
   // mesh gradients under contour lines now; the worst case is wherever the lines'

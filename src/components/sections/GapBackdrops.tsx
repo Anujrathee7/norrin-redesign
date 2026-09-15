@@ -9,8 +9,8 @@ import { photos, positioning } from '@/data/norrin'
  *
  * A WORKBENCH, NOT A PROPOSAL. Nothing here is adopted. It exists so the choice
  * between these is made by looking at seven rendered options in both themes,
- * rather than by describing them, which is the same reason `#styleguide` and
- * `#compare` exist rather than living in `docs/`.
+ * rather than by describing them, which is the same reason `#compare` exists
+ * rather than living in `docs/`.
  *
  * ---------------------------------------------------------------------------
  * WHERE THE PICTURES CAME FROM, because this is the part worth being straight

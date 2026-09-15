@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { RouterProvider } from 'react-router'
 import { Compare } from '@/components/sections/Compare'
-import { StyleGuide } from '@/components/sections/StyleGuide'
 import { GapBackdrops } from '@/components/sections/GapBackdrops'
 import { FontLab } from '@/components/sections/FontLab'
 import { router } from '@/routes'
@@ -58,16 +57,12 @@ import { router } from '@/routes'
  *
  * `#backdrops` is a workbench for one open question: whether The Gap carries
  * a picture behind it, and if so which one and where the type goes. Seven
- * rendered options rather than a description of seven options, for the same
- * reason the style guide is a page — a backdrop is not a thing you can judge by
- * reading about it.
+ * rendered options rather than a description of seven options — a backdrop is
+ * not a thing you can judge by reading about it.
  *
- * `#styleguide` is the system itself, rendered rather than written. It exists
- * because a spec for type, colour and spacing is the one thing you cannot judge
- * by reading it, and because a guide that restates values copied out of the
- * stylesheet starts lying the first time a token moves. Every number on it is
- * measured off the live DOM. It is a review gate, which is why it is here and
- * not in `docs/`.
+ * `#styleguide` used to be one of these: the design system rendered in both
+ * themes. The repo owner removed it as no longer needed, and the tone lab and
+ * quote-card CSS that only it drew went with it.
  *
  * STILL GATED ON THE HASH, AND STILL AHEAD OF THE ROUTER, though the sentence
  * that used to justify it — "the project has no router and needs none" — is no
@@ -91,7 +86,6 @@ import { router } from '@/routes'
  */
 const SURFACES: Record<string, string> = {
   '#compare': 'compare',
-  '#styleguide': 'styleguide',
   '#backdrops': 'backdrops',
   '#fonts': 'fonts',
 }
@@ -134,7 +128,6 @@ function useHashSurface() {
 export default function App() {
   const surface = useHashSurface()
   if (surface === 'compare') return <Compare />
-  if (surface === 'styleguide') return <StyleGuide />
   if (surface === 'backdrops') return <GapBackdrops />
   if (surface === 'fonts') return <FontLab />
 

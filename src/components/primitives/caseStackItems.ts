@@ -2,8 +2,7 @@ import type { StackItem } from '@/components/primitives/CardStack'
 import { cases } from '@/data/norrin'
 
 /**
- * The cases, as cards. ONE MAPPING, shared by `/work` and `#styleguide`, so the
- * specimen §2.8 requires is the real card rather than a copy of it that drifts.
+ * The cases, as cards, for the customer pile on `/work`.
  *
  * Its own file because `CardStack.tsx` exports a component, and a component file
  * that also exports a value loses fast refresh.
