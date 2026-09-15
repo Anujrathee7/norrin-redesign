@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useRef, useState } from 'react'
+import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 import { Card } from '@/components/primitives/Card'
 import { useCardSlider } from '@/hooks/useCardSlider'
 
@@ -170,16 +171,65 @@ export function CardSlider({
 }) {
   const { index, go, next, prev, regionProps, holdProps } = useCardSlider(items.length, { paused })
   const n = items.length
+  const [dragX, setDragX] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const gesture = useRef<{ pointerId: number; startX: number } | null>(null)
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return
+    gesture.current = { pointerId: event.pointerId, startX: event.clientX }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    setDragging(true)
+    setDragX(0)
+    holdProps.onPointerDown()
+  }
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const active = gesture.current
+    if (!active || active.pointerId !== event.pointerId) return
+    setDragX(event.clientX - active.startX)
+  }
+
+  const finishDrag = (event: ReactPointerEvent<HTMLDivElement>, cancelled = false) => {
+    const active = gesture.current
+    if (!active || active.pointerId !== event.pointerId) return
+    const distance = event.clientX - active.startX
+    const threshold = Math.min(88, event.currentTarget.clientWidth * 0.16)
+    gesture.current = null
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+    setDragging(false)
+    setDragX(0)
+    holdProps.onPointerUp()
+
+    if (!cancelled && distance <= -threshold) next()
+    if (!cancelled && distance >= threshold) prev()
+  }
 
   return (
     // The region wraps the cards AND the controls, so focus moving between the
     // arrows and the dots never leaves it and never restarts the rotation.
-    <div {...regionProps} data-slider style={{ ['--slide-count' as string]: String(n) }}>
+    <div
+      {...regionProps}
+      data-slider
+      data-dragging={dragging ? '' : undefined}
+      style={{
+        ['--slide-count' as string]: String(n),
+        ['--slide-drag-x' as string]: `${dragX}px`,
+      }}
+    >
       {/* THE HOLD GOES ON THE STAGE, NOT ON THE REGION. The region wraps the
           controls too, and a press on the next arrow that also registered as a
           hold would pause the rotation with the very gesture asking it to move.
           Here it covers exactly the cards and nothing else. */}
-      <div {...holdProps} data-slidestage>
+      <div
+        data-slidestage
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={finishDrag}
+        onPointerCancel={(event) => finishDrag(event, true)}
+      >
         {/* `data-rolecards` is kept and is load-bearing: the section's tone
             system is bound behind `[data-rolecards] > li` at the end of
             index.css, and the flat layout uses it exactly as it was authored.

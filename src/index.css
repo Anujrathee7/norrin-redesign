@@ -4573,6 +4573,12 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 
   [data-slidestage] {
     grid-area: stage;
+    cursor: grab;
+    touch-action: pan-y;
+  }
+
+  [data-slider][data-dragging] [data-slidestage] {
+    cursor: grabbing;
   }
 
   /* ONE CARD, CENTRED, until there is room for three. 30rem is the measure the
@@ -4618,6 +4624,14 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 
     z-index: calc(var(--slide-count) - var(--slide-depth));
     transition: transform 0.5s var(--ease-ui);
+  }
+
+  /* The active card follows the pointer while the rest of the circular stack
+     holds its positions. Releasing removes this override and the existing
+     transition carries every card to its next or previous slot. */
+  [data-slider][data-dragging] [data-slidetrack] > li[data-depth='0'] {
+    transform: translateX(var(--slide-drag-x)) scale(1.02);
+    transition: none;
   }
 
   /* THE FRONT CARD. Sun, the only saturated surface in the section. */
@@ -4971,4 +4985,63 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     inline-size: calc((100% - 2 * var(--slide-gap)) / var(--slide-span));
     max-inline-size: none;
   }
+}
+
+/* --------------------------------------------------------------------------
+   SCOPE CARD COLOUR SET
+
+   These tones belong to the four responsibilities, so their colour travels
+   with the card through the circular stack. The surfaces stay muted; ink and
+   outlines follow one consistent rule per page theme.
+   -------------------------------------------------------------------------- */
+:root[data-theme='light'] [data-rolecards] > li {
+  --tone-hairline: #14170f;
+  --tone-ink: #14170f;
+  --tone-reading: #14170f;
+  --tone-ink-3: #14170f;
+}
+
+:root[data-theme='light'] [data-rolecards] > li[data-tone='slate'] { --tone-surface: #aebbd2; }
+:root[data-theme='light'] [data-rolecards] > li[data-tone='clay'] { --tone-surface: #d7a08f; }
+:root[data-theme='light'] [data-rolecards] > li[data-tone='sage'] { --tone-surface: #b8c5a6; }
+:root[data-theme='light'] [data-rolecards] > li[data-tone='plum'] { --tone-surface: #beb0d0; }
+
+:root[data-theme='dark'] [data-rolecards] > li {
+  --tone-hairline: #f8f7f3;
+  --tone-ink: #f8f7f3;
+  --tone-reading: #f8f7f3;
+  --tone-ink-3: #f8f7f3;
+}
+
+:root[data-theme='dark'] [data-rolecards] > li[data-tone='slate'] { --tone-surface: #35425c; }
+:root[data-theme='dark'] [data-rolecards] > li[data-tone='clay'] { --tone-surface: #5a3f38; }
+:root[data-theme='dark'] [data-rolecards] > li[data-tone='sage'] { --tone-surface: #3e4c39; }
+:root[data-theme='dark'] [data-rolecards] > li[data-tone='plum'] { --tone-surface: #493c59; }
+
+[data-rolecards] > li > .card {
+  border-width: 2px;
+  justify-content: center;
+}
+
+[data-rolecards] > li > .card > .body-serif {
+  max-inline-size: 30ch;
+  margin-inline: auto;
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 0.94rem + 0.25vw, 1.125rem);
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+
+[data-rolecards] > li > .card > .card-floor {
+  align-self: center;
+  margin-block-start: 1.75rem;
+  padding-block-start: 0;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.07em;
+  text-align: center;
+  text-transform: uppercase;
 }
