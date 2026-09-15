@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Container, Eyebrow, Grid, SectionHeader } from '@/components/primitives/Layout'
-import { Photo } from '@/components/primitives/Photo'
 import { cx } from '@/lib/cx'
-import { partnership, photos, pillars, productionSince, services, technologies } from '@/data/norrin'
+import { partnership, pillars, productionSince, services, technologies } from '@/data/norrin'
 
 /**
  * The three pillars.
@@ -170,44 +169,11 @@ export function Pillars() {
                     </li>
                   ))}
                 </ol>
-                {/* The portrait belongs to the index rather than to one
-                    pillar. Because it lives inside the same sticky wrapper,
-                    it stays on stage while all three service articles pass. */}
-                <div
-                  data-scene-part="uncover"
-                  style={{
-                    ['--scene-from' as string]: 'cover 5%',
-                    ['--scene-to' as string]: 'cover 16%',
-                  }}
-                  className="mt-8 ml-4 w-[calc(100%_-_1rem)]"
-                >
-                  <Photo
-                    file={photos.portrait.file}
-                    alt={photos.portrait.alt}
-                    width={photos.portrait.w}
-                    height={photos.portrait.h}
-                    sizes="(min-width: 1024px) 22vw, 32vw"
-                    className="aspect-[3/4]"
-                  />
-                </div>
               </div>
             </div>
           </nav>
 
           <div className="col-span-4 md:col-span-7 md:col-start-6 lg:col-span-8 lg:col-start-5">
-            {/* The sticky index is hidden below `md`, so its photograph gets a
-                compact in-flow home here at the same point in the reading
-                order. Only one copy is displayed at any breakpoint. */}
-            <div data-scroll="uncover" className="mb-12 w-[min(62vw,220px)] md:hidden">
-              <Photo
-                file={photos.portrait.file}
-                alt={photos.portrait.alt}
-                width={photos.portrait.w}
-                height={photos.portrait.h}
-                sizes="62vw"
-                className="aspect-[3/4]"
-              />
-            </div>
             {pillars.map((p, i) => (
               // Each article is its own scene, so the beats below are staged
               // against ITS arrival rather than against the column's. The column

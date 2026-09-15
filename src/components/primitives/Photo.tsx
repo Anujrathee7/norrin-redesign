@@ -104,7 +104,7 @@ export function Photo({
     // cosmetic. `hidden` creates a scroll container; a `view()` timeline on
     // anything INSIDE a scroll container that never scrolls resolves against a
     // box that never moves and sits frozen at 0% forever. `clip` clips
-    // identically and creates no scrollport. That is what lets the careers
+    // identically and creates no scrollport. That is what lets a
     // photograph animate inside its own frame (`data-scroll="photo-pan"`), and
     // it is the same trap the hero and the contact band already avoid — see the
     // note above the continuous-motion block in index.css.
