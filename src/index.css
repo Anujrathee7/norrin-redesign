@@ -1915,7 +1915,19 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   background: transparent;
   color: inherit;
   cursor: pointer;
-  touch-action: manipulation;
+  touch-action: pan-y;
+}
+
+[data-cardstack-region][data-dragging] .stack-next {
+  cursor: grabbing;
+}
+
+/* During a drag, only the front sheet follows the pointer and its ordinary
+   depth transition is disabled. If released early, removing `data-dragging`
+   restores that transition and the sheet settles back into place. */
+[data-cardstack-region][data-dragging] [data-cardstack] > li[data-front] {
+  transform: translate(var(--drag-x), 0);
+  transition: none;
 }
 
 /* The full step, where the column can pay for it out of its own slack without
@@ -2523,6 +2535,44 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    reading it, and it is gone entirely by the time the card is back on screen. */
 [data-cardstack] > li[data-leaving] {
   animation: cardstack-deal 0.62s var(--ease-ui) both;
+}
+
+/* A completed drag has already supplied the anticipation beat. Continue from
+   the pointer's release position instead of snapping the sheet back to zero
+   before the normal deal begins. */
+[data-cardstack-region][data-manual-deal] [data-cardstack] > li[data-leaving] {
+  animation-name: cardstack-deal-from-drag;
+}
+
+@keyframes cardstack-deal-from-drag {
+  0% {
+    z-index: calc(var(--stack-count) + 1);
+    transform: translate(var(--drag-x), 0) rotate(2deg);
+    filter: blur(0);
+  }
+
+  52% {
+    z-index: calc(var(--stack-count) + 1);
+    transform: translate(128%, calc(var(--stack-step) * 1.2)) scale(0.94) rotate(9deg);
+    filter: blur(7px);
+  }
+
+  53% {
+    z-index: 0;
+    transform: translate(-18%, calc((var(--stack-count) - 1) * var(--stack-step))) scale(0.94)
+      rotate(-3deg);
+    filter: blur(7px);
+  }
+
+  100% {
+    z-index: 0;
+    transform: translate(
+        calc((var(--stack-count) - 1) * var(--stack-drift)),
+        calc((var(--stack-count) - 1) * var(--stack-step))
+      )
+      rotate(0deg);
+    filter: blur(0);
+  }
 }
 
 @keyframes cardstack-deal {

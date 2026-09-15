@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 import { Progress } from '@/components/ui/progress'
 import { useCardStack } from '@/hooks/useCardStack'
 
@@ -178,6 +179,67 @@ export function CardStack({
   paused?: boolean
 }) {
   const { index, leaving, next } = useCardStack(items.length, { paused })
+  const [dragX, setDragX] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const [manualDeal, setManualDeal] = useState(false)
+  const gesture = useRef<{ pointerId: number; startX: number } | null>(null)
+  const suppressClick = useRef(false)
+
+  useEffect(() => {
+    if (!manualDeal) return
+    const id = window.setTimeout(() => {
+      setManualDeal(false)
+      setDragX(0)
+    }, 700)
+    return () => window.clearTimeout(id)
+  }, [manualDeal])
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (event.button !== 0) return
+    gesture.current = { pointerId: event.pointerId, startX: event.clientX }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    suppressClick.current = false
+    setDragging(true)
+    setDragX(0)
+  }
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const active = gesture.current
+    if (!active || active.pointerId !== event.pointerId) return
+    const distance = event.clientX - active.startX
+    // The pile deals to the right. A small resistance to the left makes that
+    // direction discoverable without locking vertical page scrolling.
+    setDragX(distance < 0 ? Math.max(-28, distance * 0.18) : distance)
+  }
+
+  const finishDrag = (event: ReactPointerEvent<HTMLButtonElement>, cancelled = false) => {
+    const active = gesture.current
+    if (!active || active.pointerId !== event.pointerId) return
+    const distance = event.clientX - active.startX
+    const threshold = Math.min(96, event.currentTarget.clientWidth * 0.22)
+    suppressClick.current = Math.abs(distance) > 6
+    gesture.current = null
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+    setDragging(false)
+
+    if (!cancelled && distance >= threshold) {
+      setDragX(distance)
+      setManualDeal(true)
+      next()
+    } else {
+      setDragX(0)
+    }
+  }
+
+  const onClick = () => {
+    if (suppressClick.current) {
+      suppressClick.current = false
+      return
+    }
+    next()
+  }
 
   return (
     // The count is written here rather than on the list because BOTH children
@@ -185,7 +247,15 @@ export function CardStack({
     // 1.25rem below the front card by subtracting the pile's full travel. On the
     // list it was out of scope for the dots, which is why they were centred on
     // the column instead of on the card.
-    <div data-cardstack-region style={{ ['--stack-count' as string]: String(items.length) }}>
+    <div
+      data-cardstack-region
+      data-dragging={dragging ? '' : undefined}
+      data-manual-deal={manualDeal ? '' : undefined}
+      style={{
+        ['--stack-count' as string]: String(items.length),
+        ['--drag-x' as string]: `${dragX}px`,
+      }}
+    >
       {/* POSITION, NOT NAVIGATION — AND IT STAYS OUT OF THE ACCESSIBILITY TREE.
 
           `aria-hidden` is a decision, not an omission, and it is the same one
@@ -217,7 +287,11 @@ export function CardStack({
         type="button"
         className="stack-next"
         aria-label="Show next customer case"
-        onClick={next}
+        onClick={onClick}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={finishDrag}
+        onPointerCancel={(event) => finishDrag(event, true)}
       />
 
       <ol data-cardstack className="m-0 list-none p-0">
@@ -227,6 +301,7 @@ export function CardStack({
             <li
               key={item.id}
               style={{ ['--d' as string]: String(d) }}
+              data-front={d === 0 ? '' : undefined}
               data-tone={TONES[i % TONES.length]}
               // Only the card that has actually just left the front is dealt
               // out. Keying this off depth would fire it on first paint, and the
