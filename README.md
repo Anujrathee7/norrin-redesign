@@ -2,12 +2,6 @@
 
 An unsolicited redesign of a real company's website, built only from what they publish.
 
-hei I'm Anuj. This started as a design exercise and turned into an argument. Norrin's whole
-pitch is one sentence — *"we believe enterprise AI is won in production"* — and on their own
-homepage that sentence is an `h3` at 19.5px, two sections down, under a webinar promo. Their
-`h1` is the company name, set at the same size as the paragraph beneath it. I wanted to see
-what the site looks like when that sentence is the point. That's why this exists.
-
 It's a speculative piece and it stays one. I have no brief, no analytics, no access to anyone
 at Norrin, and none of this is endorsed by them.
 
