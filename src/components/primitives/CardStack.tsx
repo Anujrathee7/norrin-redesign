@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 import { Progress } from '@/components/ui/progress'
 import { useCardStack } from '@/hooks/useCardStack'
@@ -181,18 +181,9 @@ export function CardStack({
   const { index, leaving, next } = useCardStack(items.length, { paused })
   const [dragX, setDragX] = useState(0)
   const [dragging, setDragging] = useState(false)
-  const [manualDeal, setManualDeal] = useState(false)
+  const [manualLeaving, setManualLeaving] = useState<number | null>(null)
   const gesture = useRef<{ pointerId: number; startX: number } | null>(null)
   const suppressClick = useRef(false)
-
-  useEffect(() => {
-    if (!manualDeal) return
-    const id = window.setTimeout(() => {
-      setManualDeal(false)
-      setDragX(0)
-    }, 700)
-    return () => window.clearTimeout(id)
-  }, [manualDeal])
 
   const onPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
     if (event.button !== 0) return
@@ -226,7 +217,7 @@ export function CardStack({
 
     if (!cancelled && distance >= threshold) {
       setDragX(distance)
-      setManualDeal(true)
+      setManualLeaving(index)
       next()
     } else {
       setDragX(0)
@@ -250,7 +241,6 @@ export function CardStack({
     <div
       data-cardstack-region
       data-dragging={dragging ? '' : undefined}
-      data-manual-deal={manualDeal ? '' : undefined}
       style={{
         ['--stack-count' as string]: String(items.length),
         ['--drag-x' as string]: `${dragX}px`,
@@ -302,6 +292,7 @@ export function CardStack({
               key={item.id}
               style={{ ['--d' as string]: String(d) }}
               data-front={d === 0 ? '' : undefined}
+              data-manual-leaving={i === manualLeaving ? '' : undefined}
               data-tone={TONES[i % TONES.length]}
               // Only the card that has actually just left the front is dealt
               // out. Keying this off depth would fire it on first paint, and the

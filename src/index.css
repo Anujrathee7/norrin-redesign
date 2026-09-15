@@ -2540,7 +2540,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 /* A completed drag has already supplied the anticipation beat. Continue from
    the pointer's release position instead of snapping the sheet back to zero
    before the normal deal begins. */
-[data-cardstack-region][data-manual-deal] [data-cardstack] > li[data-leaving] {
+[data-cardstack] > li[data-leaving][data-manual-leaving] {
   animation-name: cardstack-deal-from-drag;
 }
 
