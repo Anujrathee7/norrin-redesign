@@ -1,5 +1,8 @@
+import { useId, type FormEvent, type InputHTMLAttributes } from 'react'
 import { Container, Eyebrow, Grid } from '@/components/primitives/Layout'
-import { contactEmail, contacts } from '@/data/norrin'
+import { Photo } from '@/components/primitives/Photo'
+import { contactEmail, contacts, photos } from '@/data/norrin'
+import { cx } from '@/lib/cx'
 import { Link } from 'react-router'
 
 /**
@@ -8,6 +11,19 @@ import { Link } from 'react-router'
  * The production line, which has been dashed and then solid across the whole
  * page, finally runs edge to edge and terminates in a filled sun square. The
  * line is drawn on scroll, so the gesture completes as the reader arrives.
+ *
+ * THE BAND STANDS ON THE CAUSEWAY. `photos.vision` — a road crossing a lake to
+ * the far shore — used to sit above Pillars as a strip with no heading and no
+ * job (`PhotoInterlude`, deleted). Under the ask to reach production it has
+ * one: it is the crossing the whole page has been describing. Chosen by the
+ * repo owner from four rendered options (a blurred Gap backdrop, a reveal at
+ * the end of the Gap, this, and a frame that opened in place).
+ *
+ * It sits under a flat `--scrim`, which is a treatment of a Norrin photograph
+ * and so an explicit exception to CLAUDE.md §1.8, recorded there. The scrim is
+ * 76% for a measured reason: type has to pass against the LIGHTEST pixel it
+ * can land on (WCAG F83), and the pairs are gated in `tools/palette.mjs`.
+ * `bg-inverse` stays on the section as the ground a still-loading image leaves.
  *
  * The CTA stays sun. Moving it to moss to "spend less sun" was considered and
  * rejected on measurement: moss on forest is 1.40:1, so the button's shape would
@@ -20,9 +36,20 @@ import { Link } from 'react-router'
  * beside the only call to action on the page competes with it for the eye at
  * the exact moment you want nothing else in the way.
  *
- * Named humans rather than a faceless form — Norrin publishes these people and
- * their titles, and a named contact is a materially lower-anxiety ask for an
- * enterprise buyer than "submit".
+ * FORM LEFT, PEOPLE RIGHT. Picked by the repo owner from four rendered layouts
+ * (people stacked beside the form, a wide form under the people, a row of three
+ * portraits, and this). The previous version put the ask on one row and three
+ * portrait cards under it, which left the right half of the band empty. Now the
+ * ask and a form hold the left, and the people — named humans rather than a
+ * faceless form alone, since a name is a lower-anxiety ask for an enterprise
+ * buyer than "submit" — hold the right, stepped in two columns.
+ *
+ * NO LINES, ANYWHERE IN THE BAND. Not over the group, not under a title, not
+ * under a link, not under a field. The repo owner's verdict on separator rules
+ * here was that they made it look generated, and the contact sections studied
+ * (Siili, Bekk, Futurice, NoA Ignite, Clearleft) part the same content with a
+ * real heading, space and type contrast instead. Fields are filled
+ * (`--inverse-field`), not underlined — a bottom-border input is the same rule.
  */
 export function Contact() {
   return (
@@ -31,8 +58,23 @@ export function Contact() {
       data-shot="contact"
       aria-labelledby="contact-heading"
       data-tone="inverse"
-      className="relative overflow-clip bg-inverse py-20 text-inverse-ink md:pt-20 md:pb-28"
+      className="relative isolate overflow-clip bg-inverse py-20 text-inverse-ink md:pt-20 md:pb-28"
     >
+      {/* `isolate` so the two negative layers stay inside the band — without a
+          stacking context of its own they would drop behind the page. */}
+      <div className="absolute inset-0 -z-20">
+        <Photo
+          file={photos.vision.file}
+          alt={photos.vision.alt}
+          width={photos.vision.w}
+          height={photos.vision.h}
+          sizes="100vw"
+          frame={false}
+          className="h-full w-full"
+        />
+      </div>
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-scrim" />
+
       {/* The line completes. */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-4" aria-hidden="true">
         <svg className="h-4 w-full" viewBox="0 0 1000 16" preserveAspectRatio="none">
@@ -107,8 +149,8 @@ export function Contact() {
       </div>
 
       <Container>
-        <Grid>
-          <div className="col-span-4 md:col-span-7">
+        <Grid className="gap-y-20">
+          <div className="col-span-4 md:col-span-12 lg:col-span-6">
             {/* This column had no entrance at all — it was the one band on the
                 page that simply appeared. Each line now runs off its own scroll
                 range with an index offset, so the ask assembles as you arrive at
@@ -151,56 +193,37 @@ export function Contact() {
                 ['--scrub-from' as string]: 'cover 22%',
                 ['--scrub-to' as string]: 'cover 46%',
               }}
-              className="mt-10 flex flex-wrap items-center gap-x-2 gap-y-2"
+              className="mt-12"
             >
-              <a
-                href={`mailto:${contactEmail.address}`}
-                className="btn btn-signal"
-              >
-                Contact us
-              </a>
-              {/* A ROUTE, NOT A FRAGMENT, AND THAT IS A BUG FIX RATHER THAN A
-                  TIDY-UP. This read `href="#thinking"` back when Contact was
-                  the last section of a single page and Thinking was five
-                  sections above it. Contact is now the closing strip on every
-                  route, and `#thinking` exists on exactly one of them — so on
-                  every route but one this button pointed at nothing and threw
-                  the reader to scrollY 0. Measured on two
-                  of those routes.
-
-                  §3 calls that a fabricated affordance in as many words: a link
-                  whose destination is not what it says it is belongs in the same
-                  class as a fabricated statistic. A `Link` to the page that
-                  actually holds the paper is the honest version, and it is the
-                  only control in this section that leaves the current route. */}
-              <Link
-                to="/company#thinking"
-                className="btn btn-ghost"
-              >
-                Or start with the Vision Paper
-              </Link>
+              <ContactForm />
             </div>
           </div>
 
-          {/* Named humans. No headshots — we hold no rights to their images.
+          {/* The people, stepped in two columns.
 
-              CENTRED AGAINST THE COPY, not pinned to its foot. This was
-              `self-end`, which bottom-aligned the roster with the CTA row and
-              left roughly 230px of empty band above it — the column reading as
-              though it had slipped down rather than been placed. The left
-              column runs headline, lede, then buttons; this list is about half
-              its height, so centring is what makes the two read as a pair.
+              The second card spans both rows of the first column and centres on
+              them, so it sits exactly midway between the two cards beside it —
+              a fixed offset only ever looked right at one card height, and it
+              read as out of place. Placed by the grid rather than nudged by a
+              translate, because `data-scroll="enter"` animates the card's
+              transform. The wide column gap is what keeps the stagger from
+              reading as a cramped 2x2 with a hole in it.
 
-              `md:` only. Below that the column has stacked underneath and there
-              is nothing left to centre against. */}
-          <div className="col-span-4 mt-16 md:col-span-4 md:col-start-9 md:mt-0 md:self-center">
-            {/* One label at every width. Nori used to point at it from the row
-                above, which meant this column carried two copies of the same
-                three words plus a `md:` branch to choose between them. The
-                drawing is gone — see the note at the top of this file — and the
-                branch went with it. */}
-            <p className="label mb-6 text-inverse-ink-3">Who you&rsquo;ll reach</p>
-            <ul className="border-t border-inverse-hairline-strong">
+              THE TRACKS ARE CAPPED SO THE COLUMN ENDS WHERE THE FORM DOES. The
+              repo owner asked for the portraits a little smaller so the two
+              halves of the band finish on one line; the cap is measured against
+              the form's last row at 1512, not picked.
+
+              4:5 FROM A SQUARE SOURCE. Norrin's headshots are square studio
+              crops; `object-cover` takes a little off each side, and 4:5 reads
+              as a person where a square reads as an avatar.
+
+              A ROW ON A PHONE, NOT A STACK. Below `sm` each card turns sideways
+              — a 96px portrait with the details beside it — so a phone does not
+              get three full-width portraits before the first phone number. */}
+          <div className="col-span-4 md:col-span-12 lg:col-span-5 lg:col-start-8">
+            <h3 className="display-3 text-inverse-ink">Who you&rsquo;ll reach</h3>
+            <ul className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[repeat(2,minmax(0,var(--contact-card)))] sm:gap-x-20 [--contact-card:200px]">
               {contacts.map((c, i) => (
                 <li
                   key={c.name}
@@ -210,10 +233,42 @@ export function Contact() {
                     ['--scrub-from' as string]: `cover ${10 + i * 4}%`,
                     ['--scrub-to' as string]: `cover ${10 + i * 4 + 26}%`,
                   }}
-                  className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-inverse-hairline-strong py-4"
+                  className={cx(
+                    'flex items-start gap-5 sm:block',
+                    i === 1 ? 'sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:self-center' : 'sm:col-start-1',
+                  )}
                 >
-                  <span>{c.name}</span>
-                  <span className="label text-inverse-ink-3">{c.title}</span>
+                  <Photo
+                    file={c.photo.file}
+                    alt={c.photo.alt}
+                    width={c.photo.w}
+                    height={c.photo.h}
+                    sizes="(min-width: 640px) 200px, 96px"
+                    tone="inverse"
+                    className="size-24 shrink-0 sm:aspect-[4/5] sm:size-auto sm:w-full"
+                  />
+                  <div className="min-w-0 sm:mt-5">
+                    <p className="display-4 text-inverse-ink">{c.name}</p>
+                    <p className="label mt-1.5 text-inverse-ink-3">{c.title}</p>
+                    {/* The visible text IS the address and the number, so each
+                        link names itself — no "Email" label for a screen
+                        reader to hear with nothing after it. Plain text, no
+                        underline: the underline read as one more rule. */}
+                    <div className="mt-4 flex flex-col items-start gap-1">
+                      <a
+                        href={`mailto:${c.email}`}
+                        className="ui break-all text-inverse-ink-2 transition-colors hover:text-inverse-ink"
+                      >
+                        {c.email}
+                      </a>
+                      <a
+                        href={`tel:${c.tel}`}
+                        className="ui text-inverse-ink-2 transition-colors hover:text-inverse-ink"
+                      >
+                        {c.phone}
+                      </a>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -221,5 +276,73 @@ export function Contact() {
         </Grid>
       </Container>
     </section>
+  )
+}
+
+const fieldClass =
+  'ui mt-2 block w-full rounded-(--radius-control) bg-inverse-field px-4 py-3 text-inverse-ink'
+
+/**
+ * THE FORM DOES NOT PRETEND TO SUBMIT ANYWHERE. There is no backend and no CRM
+ * (the README lists CRM wiring among what a real build still needs), and a form
+ * that swallows a message is a fabricated affordance under CLAUDE.md §3. So it
+ * composes a `mailto:` from what was typed, and the line under the button says
+ * that is what will happen. It replaces the old "Contact us" mailto button,
+ * which went to the same address.
+ *
+ * Native inputs with real `<label>`s — nothing here is a Radix primitive, so
+ * §2.1 has nothing to reach for, and no ARIA is hand-written.
+ */
+function ContactForm() {
+  const id = useId()
+
+  function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const data = new FormData(e.currentTarget)
+    const read = (key: string) => String(data.get(key) ?? '').trim()
+    const subject = `Enquiry from ${read('name')}${read('company') ? `, ${read('company')}` : ''}`
+    const body = `${read('message')}\n\n${read('name')}\n${read('email')}`
+    window.location.href = `mailto:${contactEmail.address}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="grid gap-6">
+      <Field id={`${id}-name`} name="name" label="Name" autoComplete="name" required />
+      <Field id={`${id}-email`} name="email" label="Work email" type="email" autoComplete="email" required />
+      <Field id={`${id}-company`} name="company" label="Company" autoComplete="organization" />
+      <div>
+        <label htmlFor={`${id}-message`} className="ui text-inverse-ink-2">
+          What are you trying to get into production?
+        </label>
+        <textarea id={`${id}-message`} name="message" required rows={5} className={cx(fieldClass, 'resize-y')} />
+      </div>
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="submit" className="btn btn-signal">
+            Send enquiry
+          </button>
+          {/* A ROUTE, NOT A FRAGMENT. This read `href="#thinking"` back when
+              Thinking sat on the same page; on every route without that section
+              it pointed at nothing and threw the reader to scrollY 0 — a
+              fabricated affordance in §3's own words. The paper lives on
+              /company, so the link goes there. */}
+          <Link to="/company#thinking" className="btn btn-ghost">
+            Or start with the Vision Paper
+          </Link>
+        </div>
+        <p className="caption mt-3 text-inverse-ink-3">Sending opens your email app with this filled in.</p>
+      </div>
+    </form>
+  )
+}
+
+function Field({ id, label, ...rest }: { id: string; label: string } & InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <div>
+      <label htmlFor={id} className="ui text-inverse-ink-2">
+        {label}
+      </label>
+      <input id={id} className={fieldClass} {...rest} />
+    </div>
   )
 }
