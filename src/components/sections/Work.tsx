@@ -42,24 +42,14 @@ export function Work() {
       id="work"
       data-shot="work"
       aria-labelledby="work-heading"
-      // THE NIGHT BAND. Full-bleed, edge to edge — the background is on the
-      // SECTION, which already spans the viewport, so there is no inset panel
-      // and `--radius-section` stays unspent and still flagged in §4.
-      //
-      // FIXED IN BOTH THEMES. `--band-night` is `--ground`'s dark branch pinned,
-      // and index.css carries the argument: the pile on it is four sheets
-      // separated by tone, and a ground that flips takes that separation with it.
-      //
-      // `data-tone="inverse"` is the page's existing switch for "this plane is
-      // dark". It is what repaints the focus ring in sun, which is the one thing
-      // in this section that axe cannot check and that this repo has shipped two
-      // real bugs in.
+      // Full-bleed and theme-aware. The section uses the ordinary surface and
+      // ink tokens so light mode is actually light while dark mode keeps the
+      // same deep band. The cards retain their own shared colour palette.
       //
       // `overflow-clip` STAYS, and not as a formality: the deal keyframe throws
       // the leaving card to `translate(128%)` and something has to take it, and
       // `hidden` would create a scroll container that freezes the roster's
       // `view()` timeline at 0% forever. The comment above says so at length.
-      data-tone="inverse"
       // THE SECTION MOVES DOWN. THE PILE DOES NOT MOVE INSIDE IT.
       //
       // The position row — the 3px bar above the front card — was invisible, and
@@ -84,7 +74,7 @@ export function Work() {
       // Mobile takes 112 rather than 80 for the same reason Pillars does: at
       // `py-20` the eyebrow rendered 7px under the bar's edge. `-mt-18` is `md:`
       // only, so the pile is not involved down there.
-      className="overflow-clip bg-band-night pt-28 pb-20 text-inverse-ink md:pt-42 md:pb-14"
+      className="overflow-clip bg-surface pt-28 pb-20 text-ink md:pt-42 md:pb-14"
     >
       <Container>
         {/* READING MATTER LEFT, THE PILE RIGHT.
@@ -124,10 +114,10 @@ export function Work() {
             that changed is what gives. */}
         <Grid className="items-start">
           <div className="col-span-4 md:col-span-5">
-            <SectionHeader label="Customers" id="work-heading" gap="tight" tone="inverse">
+            <SectionHeader label="Customers" id="work-heading" gap="tight">
               Forerunners, mostly Nordic.
             </SectionHeader>
-            <p className="body-serif measure-serif mt-6 text-inverse-ink-2">{customersIntro}</p>
+            <p className="body-serif measure-serif mt-6 text-ink-2">{customersIntro}</p>
             {/* THE ROSTER, UNDER THE INTRO IT BELONGS TO.
 
                 It used to be a full-width row of ten names set large, panning
@@ -159,7 +149,7 @@ export function Work() {
                 the sentence above it says "most of our customers", not "all".
                 The moment anything here does claim completeness, this filter has
                 to go. */}
-            <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-2.5 border-t border-inverse-hairline pt-8 sm:grid-cols-3">
+            <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-2.5 border-t border-hairline pt-8 sm:grid-cols-3">
               {customers
                 .filter((name) => name !== 'Plan International Finland')
                 .map((name, i) => (
@@ -175,7 +165,7 @@ export function Work() {
                     ['--scrub-from' as string]: `cover ${12 + (i % 3) * 4}%`,
                     ['--scrub-to' as string]: `cover ${12 + (i % 3) * 4 + 26}%`,
                   }}
-                  className="ui text-inverse-ink-2"
+                  className="ui text-ink-2"
                   >
                     {name}
                   </li>
