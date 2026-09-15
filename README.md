@@ -23,10 +23,9 @@ Three pages:
 
 ![Thinking on /company](docs/images/thinking.png)
 
-There are also four review pages. They aren't in the nav; you open them by adding a hash to
+There are also three review pages. They aren't in the nav; you open them by adding a hash to
 the URL:
 
-- `#styleguide`: the design system, rendered in both themes
 - `#compare`: each norrin.com section beside its rebuilt version
 - `#backdrops`: options for the picture behind The Gap
 - `#fonts`: display-face candidates at real size
@@ -87,10 +86,11 @@ exist publicly, it's left out.
 - Two photographs sit under a dark overlay so text stays readable: the causeway behind
   Contact and the team photo behind Careers. Both are recorded exceptions in `CLAUDE.md` §1.8.
 
+The fonts are Norrin's own too, the same files norrin.com loads: ABC Camera Plain for all
+text, and LFS Adelia for the one large uppercase headline, just as their site uses it.
+
 Known gaps:
 
-- The type follows Norrin's own font roles (ABC Camera Plain and LFS Adelia), but those font
-  files aren't included, so the site falls back to Helvetica and Trebuchet.
 - A real build would still need attributed testimonials, licensed customer logos, real links
   behind the Thinking items and case studies, and a CRM behind the contact form.
 

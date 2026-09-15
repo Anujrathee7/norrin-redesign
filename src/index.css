@@ -32,19 +32,63 @@
 }
 
 /* ===========================================================================
-   Fonts — self-hosted, latin subset only, woff2 only.
-   Three families, three files. The mono is used at a single weight (500) and
-   the two text faces are variable, so one file each covers the whole range.
+   Fonts — NORRIN'S OWN, THE SAME FILES norrin.com SERVES.
+   ---------------------------------------------------------------------------
+   The repo owner's call: the site uses the fonts of Norrin's original website.
+   These five files and their declarations are copied from norrin.com's
+   `template_main.min.css` (theme-2025/fonts), and self-hosted under CLAUDE.md §3,
+   which allows Norrin's own typefaces in this private demo.
 
-   NEWSREADER IS GONE. It held the serif slot — thesis, lead, body copy — until
-   Fraunces was chosen for display. Two serifs with different axes of contrast
-   doing adjacent jobs reads as an accident, so Fraunces took the whole serif
-   voice rather than sitting beside it. The face and its file are deleted rather
-   than left declared: an unused `@font-face` costs a reader nothing (nothing
-   requests it) but costs the next person reading this file, and a font that is
-   present but unreferenced is exactly the kind of thing that gets re-adopted by
-   accident later.
+   THE WEIGHT MAPPING IS NORRIN'S, NOT A MISTAKE. Their Medium file is declared as
+   700, so anything asking for bold gets Medium, exactly as on their site. With
+   `font-synthesis-weight: none` on body, 500 resolves to Regular and 600 to Medium.
+
+   LFS Adelia has one weight and no italic. Norrin uses it for one thing, the
+   large uppercase statement (`.heading--style-1`), and so does this site: see
+   `.display-1`.
+
+   Schibsted Grotesk stays declared only for the `#fonts` lab.
    ========================================================================== */
+
+@font-face {
+  font-family: 'ABC Camera Plain';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/ABCCameraPlain-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'ABC Camera Plain';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/ABCCameraPlain-RegularItalic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'ABC Camera Plain';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('/fonts/ABCCameraPlain-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'ABC Camera Plain';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 700;
+  src: url('/fonts/ABCCameraPlain-MediumItalic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'LFS Adelia';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/LFSAdelia-Regular.woff2') format('woff2');
+}
 
 @font-face {
   font-family: 'Schibsted Grotesk Variable';
@@ -52,16 +96,6 @@
   font-display: swap;
   font-weight: 400 700;
   src: url('/fonts/schibsted-grotesk-latin-wght-normal.woff2') format('woff2-variations');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
-    U+2122, U+2191, U+2193, U+2212, U+2215;
-}
-
-@font-face {
-  font-family: 'IBM Plex Mono';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 500;
-  src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC,
     U+2122, U+2191, U+2193, U+2212, U+2215;
 }
@@ -638,9 +672,7 @@
 
   /* THE CARD PILE’S OWN CORNER. Bigger than --radius-panel and NOT part of the
      object scale above: --radius-panel is Scope’s radius too, and moving it to
-     suit the pile would move a section this has no business touching. It lives
-     here rather than on the pile because #styleguide’s tone lab draws the same
-     shell and needs the same corner. */
+     suit the pile would move a section this has no business touching. */
   --radius-stack: 22px;
 
   /* THE CUSTOMER CARD. Fixed in both themes — see `[data-cardstack] .card`.
@@ -718,12 +750,11 @@
      the padding the title is set in. */
   --case-art-rim: inset 0 0 0 1px rgb(255 255 255 / 16%), inset 0 0 1rem rgb(255 255 255 / 14%);
 
-  /* Norrin's primary and decorative type roles. The proprietary faces are
-     named first so licensed webfont files can be added without changing any
-     component; the supplied fallbacks keep both roles usable until then. */
+  /* Norrin's two type roles, with norrin.com's own fallback stacks: `--body-font`
+     sets everything, `--heading-font` only the big uppercase statement. There is
+     no serif or mono role any more, because Norrin's site has neither. */
   --font-sans: 'ABC Camera Plain', Helvetica, Arial, sans-serif;
-  --font-serif: 'LFS Adelia', 'Trebuchet MS', Helvetica, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-display: 'LFS Adelia', 'Trebuchet MS', Helvetica, sans-serif;
 
   /* Motion. Three easings, on purpose. */
   --ease-entrance: cubic-bezier(0.33, 1, 0.68, 1);
@@ -979,17 +1010,20 @@
    ========================================================================== */
 
 @layer components {
+  /* NORRIN'S `.heading--style-1`, ON OUR SIZE. Their big statement is LFS Adelia,
+     uppercase, weight 400, tracking 0, leading 1; only the size is ours. */
   .display-1 {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
     font-size: clamp(2.5rem, 2.07rem + 4.23vw, 5.875rem);
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    line-height: 0.94;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1;
+    text-transform: uppercase;
     text-wrap: balance;
   }
 
   .display-2 {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: clamp(2rem, 1.86rem + 1.51vw, 3.125rem);
     font-weight: 500;
     letter-spacing: -0.018em;
@@ -998,7 +1032,7 @@
   }
 
   .display-3 {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: clamp(1.5rem, 1.49rem + 0.82vw, 2.1875rem);
     font-weight: 500;
     letter-spacing: -0.014em;
@@ -1011,7 +1045,7 @@
      `.display-3` and then overrode its font-size, keeping only the tracking —
      which silently coupled those files to a role they were not using. */
   .display-4 {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: clamp(1.25rem, 1.31rem + 0.27vw, 1.5625rem);
     font-weight: 500;
     letter-spacing: -0.012em;
@@ -1049,7 +1083,7 @@
      INVERTED on phones, so the two display voices swapped rank at the width
      most people use. The floor now clears display-3 at every width. */
   .thesis {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: clamp(1.75rem, 1.68rem + 0.8vw, 2.375rem);
     font-weight: 300;
     letter-spacing: -0.012em;
@@ -1061,7 +1095,7 @@
      desktop to 1.10 at 390 — the deck and the body it introduces converged to
      nearly the same size exactly where the hierarchy is needed most. */
   .lead {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: clamp(1.25rem, 1.235rem + 0.22vw, 1.375rem);
     font-weight: 400;
     letter-spacing: -0.006em;
@@ -1070,7 +1104,7 @@
   }
 
   .body-serif {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: 1.0625rem;
     line-height: 1.62;
     text-wrap: pretty;
@@ -1086,7 +1120,7 @@
 
   /* The "production" voice: indices, units, addresses, telemetry. */
   .label {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.65625rem;
     font-weight: 500;
     text-transform: uppercase;
@@ -1138,7 +1172,7 @@
     display: flex;
     align-items: center;
     gap: 0.625rem;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.75rem;
     font-weight: 500;
     text-transform: uppercase;
@@ -1988,10 +2022,8 @@ html.js [data-reveal='lines']:not([data-revealed]) {
      scale, because `--radius-panel` is Scope's radius too and moving it would
      move a section this change has no business touching. The pile is the one
      object on the page seen as a physical stack, and a stack of paper with a
-     14px corner on a 368px card reads as cardboard. */
-  /* Declared on :root beside the rest of the radius scale, because the tone
-     lab on #styleguide draws the same shell and a token scoped to the region was
-     invisible there — which is why those specimens rendered square. */
+     14px corner on a 368px card reads as cardboard. Declared on :root as
+     `--radius-stack`, beside the rest of the radius scale. */
 
   /* DEPTH WAS DRAWN BY SINKING ONE SURFACE TOWARD THE PAGE GROUND — 26% closer
      per step. Three real tones do it now, so `--stack-sink` is deleted rather
@@ -2347,7 +2379,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 /* The display face, per §1.2 and the user's pick: remove it and the card
    would be one grotesk doing two jobs. */
 .case-title {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: clamp(1.25rem, 1rem + 0.7vw, 1.625rem);
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -2388,7 +2420,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 
 .case-points-label {
   margin: 0 0 0.625rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 0.6875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2493,157 +2525,6 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   }
 }
 
-/* ---------------------------------------------------------------------------
-   THE QUOTE CARD — NOW ONLY THE TONE LAB'S SPECIMEN
-   ---------------------------------------------------------------------------
-   The customer pile no longer draws this composition; it moved to the case
-   card above. `#styleguide`'s tone lab still renders these classes, so they are
-   kept for that one consumer, and the notes below describe the retired pile.
-
-   A different composition from Scope's card, on the same `.card` shell. They
-   share the box — radius, hairline, surface, padding — and nothing else, which
-   is the honest arrangement: forcing one slot API to produce both a claim/name
-   card and a quote card would have made a component that is two
-   components wearing a trench coat.
-
-   CENTRED, AND THE MARK RIDES THE TOP EDGE. Every part of it shares one centre
-   line: the mark, the case title, the quote, the client and its sector. The
-   mark is pulled up out of the padding box so it straddles the card's top
-   border rather than sitting inside the corner — it reads as a seal on the card
-   rather than as the first character of the text, which is what stops a
-   decorative glyph from being mistaken for content.
-
-   This was briefly left-aligned with the mark tucked inside the top-left
-   corner. That was a misreading of a cropped reference and it is reverted here;
-   the note is kept so the same crop does not produce the same edit twice.
-
-   HOW THE VERTICAL WORKS, because it is the whole point of this block. All four
-   cards sit in one grid cell, so the longest case sets the height and the three
-   shorter ones are stretched to match it. That slack has to go somewhere, and
-   where it used to go was between the quote and the client's name: the
-   attribution was pinned to the card's floor with `margin-block-start: auto`,
-   which opened a dead band above the company name on every case shorter than
-   the longest one.
-
-   So the slack is now spent outside the text rather than inside it. The mark
-   holds the top-left corner and never moves — it is the card's ornament, and a
-   glyph that bobbed as the pile rotated would draw the eye to the wrong thing.
-   Everything else is one block, `.quote-set`, with `margin-block: auto`, which
-   splits the leftover space evenly above and below it. The quote therefore sits
-   where its own length puts it, and the gap between its last line and the
-   client's name is a fixed 1.5rem on all four cases.
-
-   THERE IS NO AVATAR, and that is not an omission to be filled in later. We
-   hold no licence to client headshots — `norrin.ts` records it — and three of
-   the four cases name no individual at all. What sits in that slot is the
-   client and the sector, which is what this card is actually about: a company
-   and a piece of work, not a person and a job title.
-   --------------------------------------------------------------------------- */
-
-/* The block that floats. `auto` on both sides splits the card's slack evenly
-   above and below it. The padding is the floor for the longest case, where the
-   autos resolve to zero and there is no slack left to split.
-
-   `align-self: stretch` because the card is now `align-items: center`, which
-   would otherwise shrink this to its own max-content width — a paragraph's
-   max-content width is the whole quote on one line, so the measure would be
-   decided by which case happened to be longest rather than by the card. */
-.quote-set {
-  align-self: stretch;
-  margin-block: auto;
-  padding-block-start: 1.5rem;
-}
-
-/* THE CASE TITLE IS THE CARD'S DISPLAY LINE.
-
-   IT WAS THE SMALLEST THING ON THE CARD AND IT IS NOW THE LARGEST, and that is
-   the whole change. Four elements in one sans face between 13px and 17px is not
-   a hierarchy, it is a list, and §1.2's check is explicit: remove the display
-   face and see whether the page still looks the same. On this card the display
-   face was not present at all, so the check could not even be run.
-
-   The quote used to lead and now supports. That is the honest order for what
-   these actually are: the title is Norrin's own line about the piece of work,
-   the quote is a summary of it. A summary set larger than the thing it
-   summarises reads as a testimonial, which is a claim this card is careful not
-   to make.
-
-   FRAUNCES, AT ITS OWN SIZE RATHER THAN AT `.display-4`'S. The rung is right —
-   `.display-4` tops out at 25px and this tops out at 28px — but its 1.15 leading
-   is set for one or two lines of heading, and a title this long runs to three on
-   a 432px card. Multi-line copy at 1.15 sets solid. 1.2 is the smallest leading
-   that still opens.
-
-   THE CLAMP IS TUNED AGAINST THE NARROW CARD, not the wide one. The pile's step
-   is paid for out of the card's width, so a 306px tablet column leaves a 258px
-   card and a 194px measure; at 28px this title would break into six lines
-   there. The floor is 21px for that reason and not because 21px is a size
-   anybody chose. */
-.quote-title {
-  font-family: var(--font-serif);
-  font-size: clamp(1.3125rem, 1.05rem + 0.85vw, 1.75rem);
-  font-weight: 500;
-  letter-spacing: -0.012em;
-  line-height: 1.2;
-  color: inherit;
-  text-wrap: balance;
-}
-
-/* THE LAST WORDS, IN THE ACCENT. Which words is decided in CardStack.tsx, from
-   position rather than from authored data — the note there carries the argument
-   and the filler-word guard.
-
-   `--accent` on `--surface` measures 7.88:1 on paper and 8.00:1 in dark, both
-   already in `tools/palette.mjs`, so this is a colour the gate was watching
-   before it was used here. It is the same green the rest of the page uses for
-   the one thing colour is allowed to do to type. */
-.quote-title-tail {
-  color: var(--tone-accent);
-}
-
-/* THE QUOTE, DEMOTED TO SUPPORTING COPY. Smaller than the title and a rung down
-   the ink ladder, which is the second half of the same decision: a hierarchy
-   needs something to be lower as well as something to be higher.
-
-   `--ink-2`, AND IT IS A COLOUR RATHER THAN AN OPACITY. §3 is unambiguous that
-   text is never faded for effect — ancestor opacity folds into the contrast
-   maths, so faded copy genuinely fails it rather than merely looking quieter.
-   `--ink-2` on `--surface` measures 7.56:1 on paper and 8.64:1 in dark, and the
-   pair is now declared in `tools/palette.mjs`; it had never been, despite the
-   card already putting the full ink ramp on that surface in two sections. */
-.quote-body {
-  font-size: 1rem;
-  line-height: 1.55;
-  color: var(--tone-reading);
-  margin-block-start: 1rem;
-  /* `pretty` and not `balance`, unlike the title above: this runs to six lines
-     on the longest case, and balancing a paragraph that long only trims the
-     measure. `pretty` still takes the orphan off the last line. */
-  text-wrap: pretty;
-}
-
-/* A plain gap after the last line of the quote — not `margin-block-start: auto`
-   and a 2.5rem floor pad, which is what pinned this to the bottom of the card
-   and opened the dead band described above. Fixed, so the distance from the
-   quote to the client's name is the same on all four cases; the slack that
-   differs between them is spent by the autos on `.quote-set`, outside the
-   text. */
-.quote-who {
-  margin-block-start: 2.25rem;
-}
-
-.quote-who-name {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: inherit;
-}
-
-.quote-who-role {
-  font-size: 0.8125rem;
-  color: var(--tone-ink-3);
-  margin-block-start: 0.125rem;
-}
-
 /* THE POSITION INDICATOR, ON THE ADOPTED PROGRESS.
 
    IT WAS FOUR DOTS AND IT IS NOW ONE BAR. The dots were hand-drawn spans that
@@ -2730,147 +2611,6 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   transition:
     background-color 0.34s var(--ease-ui),
     transform 0.34s var(--ease-ui);
-}
-
-/* ==========================================================================
-   THE TONE LAB — four directions for the card pile, rendered rather than
-   described
-   --------------------------------------------------------------------------
-   §4 says the palette is under revision, that three directions are to be
-   rendered on `#styleguide` and picked from, and that no rule may hardcode a hue
-   until then. This is that, with four.
-
-   IT EXISTS BECAUSE A TONE WAS COMMITTED TO THE PILE AND REJECTED ON SIGHT. The
-   forest green went onto the real cards, was looked at, and came off. That round
-   trip is the argument for this block: a tone that is going to be judged by
-   looking at it should be looked at HERE, where withdrawing it costs a deleted
-   specimen rather than a reverted section.
-
-   WHAT VARIES AND WHAT DOES NOT. Every direction is three card surfaces — a dark
-   one, paper, sun. Paper and sun are constant across all four; only the dark
-   tone changes. So the choice being put is exactly one colour wide.
-
-   THE SURFACES ARE FIXED IN BOTH THEMES, and that is the answer to "what are the
-   dark-theme counterparts". Sun already is — `--signal` is one value in both
-   themes and this file explains why. Making the other two fixed as well is what
-   makes a direction a DIRECTION: three cards that are the same three cards
-   whatever the page around them is doing, the way a printed card does not change
-   colour when the room does. The consequence is stated rather than hidden — in
-   light the paper card nearly matches the page ground, and in dark the dark card
-   nearly matches it (1.04:1 for direction A) — so in either theme one of the
-   three is carried by its hairline alone.
-
-   THE ACCENT PHRASE ON A DARK CARD IS SUN, NOT MOSS. Moss measures 1.68–2.01:1
-   on these four and fails on every one of them, which is the same failure this
-   file already records for moss on forest. Sun measures 12.90–15.44:1.
-
-   NOTHING HERE IS A TOKEN IN THE SYSTEM. The four candidates are declared on
-   this block and nowhere else, so no section can reach one by accident, and
-   `tools/palette.mjs` is deliberately not taught them: gating a colour is what
-   you do when a colour has been chosen.
-   ========================================================================== */
-
-[data-tonelab] {
-  /* The two constants. */
-  --lab-paper: #f1f0ea;
-  --lab-sun: var(--signal);
-}
-
-[data-tonelab='a'] {
-  --lab-dark: #14170f;
-}
-[data-tonelab='b'] {
-  --lab-dark: #2a221c;
-}
-[data-tonelab='c'] {
-  --lab-dark: #1c2733;
-}
-[data-tonelab='d'] {
-  --lab-dark: #2d1f33;
-}
-
-[data-tonelab] .card {
-  border-radius: var(--radius-stack);
-  box-shadow:
-    0 1px 1px var(--stack-shadow-contact),
-    0 10px 18px -10px var(--stack-shadow-cast);
-}
-
-/* The dark card. It takes the inverse ink ladder, which is the ladder this
-   system already owns for reading on a dark plane, and sun for the accent. */
-/* The dark card, twice: as a plane, and outlined. The pair is the whole
-   question this lab now asks — on the night band a dark plane is 1.04-1.25:1
-   away from its ground, which is at best exactly one hairline's worth of
-   separation, so the ruled version is the one that has an edge to see. */
-[data-tonelab] .card[data-lab='dark'],
-[data-tonelab] .card[data-lab='dark-ruled'] {
-  background-color: var(--lab-dark);
-  border-color: transparent;
-}
-
-[data-tonelab] .card[data-lab='dark-ruled'] {
-  border-color: var(--inverse-hairline-strong);
-}
-[data-tonelab] :is(.card[data-lab='dark'], .card[data-lab='dark-ruled']) .quote-title,
-[data-tonelab] :is(.card[data-lab='dark'], .card[data-lab='dark-ruled']) .quote-who-name {
-  color: var(--inverse-ink);
-}
-[data-tonelab] :is(.card[data-lab='dark'], .card[data-lab='dark-ruled']) .quote-body {
-  color: var(--inverse-ink-2);
-}
-[data-tonelab] :is(.card[data-lab='dark'], .card[data-lab='dark-ruled']) .quote-who-role {
-  color: var(--inverse-ink-3);
-}
-[data-tonelab] :is(.card[data-lab='dark'], .card[data-lab='dark-ruled']) .quote-title-tail {
-  color: var(--signal);
-}
-
-/* The paper card. Fixed light values, so its ink is the light ramp in both
-   themes — every pair here is already in the gate against #f1f0ea. */
-[data-tonelab] .card[data-lab='paper'] {
-  background-color: var(--lab-paper);
-  border-color: #d8d7cc;
-}
-[data-tonelab] .card[data-lab='paper'] .quote-title,
-[data-tonelab] .card[data-lab='paper'] .quote-who-name {
-  color: #14170f;
-}
-[data-tonelab] .card[data-lab='paper'] .quote-body {
-  color: #4a4d42;
-}
-[data-tonelab] .card[data-lab='paper'] .quote-who-role {
-  color: #696d5f;
-}
-[data-tonelab] .card[data-lab='paper'] .quote-title-tail {
-  color: #1a5335;
-}
-
-/* The sun card, on the solved fixed ladder. */
-[data-tonelab] .card[data-lab='sun'] {
-  background-color: var(--lab-sun);
-  border-color: var(--on-signal-hairline);
-}
-[data-tonelab] .card[data-lab='sun'] .quote-title,
-[data-tonelab] .card[data-lab='sun'] .quote-who-name {
-  color: var(--on-signal-ink);
-}
-[data-tonelab] .card[data-lab='sun'] .quote-body {
-  color: var(--on-signal-ink-2);
-}
-[data-tonelab] .card[data-lab='sun'] .quote-who-role {
-  color: var(--on-signal-ink-3);
-}
-[data-tonelab] .card[data-lab='sun'] .quote-title-tail {
-  color: var(--on-signal-accent);
-}
-
-/* The specimen's own type, one rung down from the section's, because three of
-   these sit side by side in a column the real card has to itself. */
-[data-tonelab] .quote-title {
-  font-size: 1.25rem;
-}
-[data-tonelab] .quote-body {
-  font-size: 0.9375rem;
 }
 
 /* SCOPE TAKES THE SAME COMPOSITION. Centred copy, name on the floor at the
@@ -4539,7 +4279,8 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    THE DARK TONE IS A PLACEHOLDER, AND THIS IS THE FLAG (§4)
    --------------------------------------------------------------------------
    The palette is under revision and the dark tone is the value being chosen.
-   Four candidates are rendered on `#styleguide` as `[data-tonelab]` a-d:
+   Four candidates were compared (the `#styleguide` tone lab that drew them is
+   deleted):
 
      a  ink        #14170f   — the light theme's own `--ink`, a near-black green
      b  espresso   #2a221c
@@ -4584,8 +4325,8 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    ON "SUN IS A SIGNAL, NEVER A SURFACE", stated at the head of this file. That
    line was already superseded before this block: `--on-signal-ink-2/-3` and
    `--on-signal-hairline` were added with a note saying they exist because "the
-   customer pile now sets a whole CARD on sun", and `#styleguide`'s tone lab
-   renders a sun card in every one of its four directions. This is the third
+   customer pile now sets a whole CARD on sun", and the since-deleted tone lab
+   rendered a sun card in every one of its four directions. This is the third
    consumer of a rule that has been false for a while. It is flagged rather than
    edited here because this block is append-only by agreement; the header line at
    the top of the file is the thing that needs the amendment.

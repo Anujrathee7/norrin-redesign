@@ -192,8 +192,10 @@ dialog, sheet). Everything in the page separates on hairlines.
 Solita has a real 4-step elevation scale and uses it at `.04`–`.06` alpha, almost
 nowhere.
 
-**2.8 Every adopted component is rendered on `#styleguide`, in both themes, or it is
-not adopted.** A component that exists only inside a section cannot be reviewed.
+**2.8 Retired: the `#styleguide` specimen rule.** Every adopted component used to have
+to be rendered on `#styleguide` in both themes. The repo owner removed that page as no
+longer needed, so components are reviewed where they are used: screenshot the section
+in both themes (§5).
 
 ---
 
@@ -268,9 +270,9 @@ faded copy genuinely fails. Movement alone carries text arrivals.
 
 These are being decided with the user, on rendered options, not chosen unilaterally.
 
-- **Palette.** Departing from Norrin's extracted moss/sun/forest tokens. Three
-  directions to be rendered on `#styleguide` and picked from. Until then, no rule here
-  hardcodes a hue, and `tools/palette.mjs` still gates the *current* tokens.
+- **Palette.** Departing from Norrin's extracted moss/sun/forest tokens. Directions are
+  rendered in place and picked from. Until then, no rule here hardcodes a hue, and
+  `tools/palette.mjs` still gates the *current* tokens.
 - **Radius. SETTLED — moved out of this section.** The rule was amended in the open, in
   `src/index.css`, and now reads: **"radius means it is an object, not a plane."** A plane
   is the page itself — a full-bleed band, the ground, a rule, a timeline — and planes have
@@ -291,13 +293,16 @@ These are being decided with the user, on rendered options, not chosen unilatera
   `--radius-panel` cards under the new rule. The old phrasing was a lossy summary of its
   own scale even when it was current — `--radius-panel` was always documented as
   "anything that opens **or frames**", and the Thinking frame neither opens nor is
-  pressable. `#styleguide` carried the same stale headline and has been corrected too.
+  pressable.
 
   Cards and the customer stack are adopted under this rule and needed no further
   amendment. The one step still unspent is `--radius-section`; it stays declared and
   flagged in `index.css` until a section actually floats.
-- **Display face.** Candidates to be rendered at real size in the real h1 — Norrin's own
-  faces included (see §3).
+- **Type. SETTLED — the repo owner's call: the same fonts as norrin.com.** ABC Camera
+  Plain sets everything, headings included, as it does on their site (regular 400, and
+  their Medium file served as 700). LFS Adelia is used only where Norrin uses it: the one
+  large uppercase statement, which here is the hero headline. There is no mono face,
+  because Norrin has none. The files are self-hosted in `public/fonts` under §3.
 
 ---
 
@@ -339,7 +344,6 @@ where nothing has arrived yet; use `.shots/probe/gap-pin.mjs`.
 
 - `src/index.css` — the whole design system, tokens and rationale, ~1900 lines
 - `src/data/norrin.ts` — all content, with per-block provenance
-- `src/lib/contrast.ts` — runtime contrast, same maths as `tools/contrast.mjs`
 - `docs/research-brief.md` — evidence on Norrin itself
 - `docs/style-research.md` — Reaktor, Futurice, Vincit, Solita, from their real CSS
-- `#styleguide`, `#compare`, `#mascots` — hash surfaces, not nav items
+- `#compare`, `#backdrops`, `#fonts` — hash surfaces, not nav items
