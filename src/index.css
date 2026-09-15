@@ -369,6 +369,28 @@
      --ink-3 measures 4.74:1 there and 4.47:1 one step lighter. */
   --overlay: light-dark(#ffffff, #1c1c1e);
 
+  /* A flat darkening laid over a photograph so inverse type can sit on it —
+     the causeway under the Contact band, and nothing else.
+
+     THE ONE TREATED PHOTOGRAPH ON THE SITE, AND AN EXCEPTION RATHER THAN A
+     LOOPHOLE. CLAUDE.md §1.8 bans treating Norrin's photographs; the repo
+     owner lifted it for this photograph in this band, picked from four
+     rendered options. A second scrimmed photograph needs that conversation
+     again, not a second use of this token.
+
+     76% AND NOT LESS, because the check is WCAG F83: type must pass against the
+     LIGHTEST pixel it can land on, not the average. A pure white pixel (the
+     causeway itself, the glint on the water) under 76% black composites to
+     #3d3d3d, and --inverse-ink-3 — the roster's titles — clears 4.5:1 there
+     only from about 75% up. Same value in both themes: the band it builds is
+     dark whichever theme the page is in. */
+  --scrim: color-mix(in srgb, #000 76%, transparent);
+  /* The Careers band's scrim. Deeper than Contact's because its photograph is
+     people at close range — faces and a lit window compete with running text
+     where an aerial landscape does not — and the repo owner found the copy hard
+     to focus on at 76%. Still flat, still the one sanctioned treatment. */
+  --scrim-deep: color-mix(in srgb, #000 88%, transparent);
+
   /* The same plane inside a forest band. Without it the locale list opened as a
      near-white card floating on the band — the one construction the drawer
      above it exists to avoid. Built as the hover wash made opaque rather than
@@ -454,6 +476,11 @@
     color-mix(in srgb, var(--accent) 8%, transparent)
   );
   --inverse-tint: color-mix(in srgb, var(--inverse-ink) 8%, transparent);
+  /* A text field on an inverse band. Filled, not ruled: the repo owner's call
+     was that separator lines read as generated, and a bottom-border input is
+     that same line wearing a form's clothes. 8% (`--inverse-tint`) is a hover
+     wash and vanished over the photograph, so a field gets its own step. */
+  --inverse-field: color-mix(in srgb, var(--inverse-ink) 14%, transparent);
 }
 
 /* ==========================================================================
@@ -575,6 +602,8 @@
   --color-inverse-inactive: var(--inverse-inactive);
   --color-overlay: var(--overlay);
   --color-inverse-overlay: var(--inverse-overlay);
+  --color-scrim: var(--scrim);
+  --color-scrim-deep: var(--scrim-deep);
 
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
@@ -589,6 +618,7 @@
   --color-inactive: var(--inactive);
   --color-tint: var(--tint);
   --color-inverse-tint: var(--inverse-tint);
+  --color-inverse-field: var(--inverse-field);
 
   /* Exposed as utilities (rounded-control, rounded-panel, rounded-action,
      rounded-section) so a radius cannot be typed as an arbitrary value at a
@@ -612,6 +642,81 @@
      here rather than on the pile because #styleguide’s tone lab draws the same
      shell and needs the same corner. */
   --radius-stack: 22px;
+
+  /* THE CUSTOMER CARD. Fixed in both themes — see `[data-cardstack] .card`.
+     Every pair is gated in `tools/palette.mjs`. */
+  --case-body: #ffffff;
+  --case-ink: #1d1d1f;
+  --case-reading: #424245;
+  --case-ink-3: #6e6e73;
+  --case-edge: rgb(29 29 31 / 12%);
+  --case-cta-bg: #1d1d1f;
+  --case-cta-ink: #ffffff;
+  --case-art-ink: #ffffff;
+
+  /* THE FOUR ARTS. Our own graphic layer, never a photograph (§1.8), and
+     assigned by array position rather than by client (CardStack.tsx).
+
+     MESH GRADIENTS, FROM THE USER'S THIRD REFERENCE. A saturated ground with
+     two or three soft blobs of a second and third hue bleeding into it — pink
+     into red, mint and emerald around a deep forest, lilac out of a navy — so
+     a card reads as colour moving rather than as a ramp. Each art is: a light
+     bloom at a TOP corner, a mid-tone body, a deep pool anchored at the
+     BOTTOM-LEFT, over a diagonal ground.
+
+     THE TITLE SITS IN THE BOTTOM-LEFT, which is where every art keeps its deep
+     pool, and the blooms live at the top edge, away from the type. Blob sizes
+     are percentages so each blob scales with its card — cards are now sized to
+     their content, from a one-line timeline card to a three-line case title.
+     Whether that keeps the type safe is measured, not assumed: the lightest
+     pixel under every title, on every page, at four viewports, is what
+     `tools/palette.mjs` records (`.shots/probe/art-contrast.mjs`).
+
+     IT REPLACED A VERTICAL LIGHT-TO-DARK FALL, which replaced a conic light-ray,
+     both at the user's request. The contour lines over it replaced a second
+     ray, the same way. */
+  --case-art-ocean:
+    radial-gradient(60% 80% at 100% 0%, #cf98e4 0%, rgb(186 132 222 / 55%) 38%, rgb(120 96 190 / 0) 78%),
+    radial-gradient(70% 85% at 58% 30%, rgb(38 116 150 / 85%) 0%, rgb(38 116 150 / 0) 72%),
+    radial-gradient(90% 95% at 8% 100%, #0b1d40 0%, rgb(11 29 64 / 0) 72%),
+    linear-gradient(100deg, #13295a 0%, #1a4470 55%, #35508c 100%);
+  --case-art-ember:
+    radial-gradient(70% 65% at 0% 0%, #ee9bd8 0%, rgb(232 122 190 / 60%) 34%, rgb(220 60 96 / 0) 72%),
+    radial-gradient(30% 40% at 100% 100%, rgb(250 170 176 / 38%) 0%, rgb(250 170 176 / 0) 70%),
+    radial-gradient(90% 95% at 30% 100%, #9c1018 0%, rgb(156 16 24 / 0) 70%),
+    linear-gradient(160deg, #cc2f55 0%, #c21f1f 45%, #b3181a 100%);
+  --case-art-forest:
+    radial-gradient(55% 65% at 0% 0%, #b4e6b8 0%, rgb(140 205 150 / 55%) 36%, rgb(60 130 90 / 0) 74%),
+    radial-gradient(60% 85% at 100% 15%, #3fb872 0%, rgb(47 163 95 / 50%) 40%, rgb(47 163 95 / 0) 76%),
+    radial-gradient(90% 95% at 15% 100%, #0f3a24 0%, rgb(15 58 36 / 0) 72%),
+    linear-gradient(135deg, #2a764c 0%, #1b5636 55%, #1e6841 100%);
+  --case-art-violet:
+    radial-gradient(60% 75% at 100% 0%, #f0a3d9 0%, rgb(220 120 200 / 55%) 36%, rgb(160 70 180 / 0) 76%),
+    radial-gradient(70% 85% at 60% 45%, rgb(122 60 190 / 80%) 0%, rgb(122 60 190 / 0) 72%),
+    radial-gradient(90% 95% at 8% 100%, #1f1450 0%, rgb(31 20 80 / 0) 72%),
+    linear-gradient(120deg, #3a2585 0%, #472a90 55%, #6538a4 100%);
+
+  /* THE LINE HUE. One highlight per art, near the art's own lightest bloom,
+     that the contour lines over each mesh are drawn in. Still named `ray`
+     after the conic light-ray it first coloured. The lines are masked out
+     above the title — see `.case-art::before` — so they never carry type. */
+  --case-ray-ocean: #c4e8ff;
+  --case-ray-ember: #ffd6b0;
+  --case-ray-forest: #d8f56e;
+  --case-ray-violet: #f4ccff;
+
+  /* The pill a label sits in on the art (Thinking's step and commitment). */
+  --case-pill-bg: rgb(255 255 255 / 86%);
+  --case-pill-ink: #1d1d1f;
+
+  /* The light veil that turns an art into the lighter band on a Track record
+     card — same hue, lifted. */
+  --case-band-veil: rgb(255 255 255 / 28%);
+
+  /* The soft light rim every reference card has on its art's inner edge. Our
+     graphic layer, inside the art's own box, and thin enough to stay inside
+     the padding the title is set in. */
+  --case-art-rim: inset 0 0 0 1px rgb(255 255 255 / 16%), inset 0 0 1rem rgb(255 255 255 / 14%);
 
   /* Norrin's primary and decorative type roles. The proprietary faces are
      named first so licensed webfont files can be added without changing any
@@ -1521,8 +1626,22 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    and 3440x1440 measured identically at every step of this work.
    ========================================================================== */
 @media (min-height: 900px) {
+  /* THE LEAD. Unpinned, `contain 0%` is the moment the scene's bottom edge
+     reaches the viewport's — and the scene's bottom edge IS the lowest card, so
+     the first card started uncovering while the row under it was still resting
+     on the bottom of the screen. Measured at `contain 0%`: that card 15px from
+     the edge at 1512x950, 27px at 2400x1006, 41px at 1920x1080. The repo owner
+     asked for it to start a little later.
+
+     A fixed distance added to BOTH ends of every range in `Proof.tsx`, so the
+     whole sequence moves later and keeps its pacing, rather than compressing a
+     308px window further. Pixels, not `svh`, because the end has to stay
+     reachable: Proof is the last section, and at 2560x1440 the document has
+     only 112px of scroll past `contain 100%`. 96px fits under that; 12svh would
+     be 173px and would strand the last card half-uncovered. */
   [data-scene-unpin-tall] {
     height: auto;
+    --tl-lead: 96px;
   }
 
   [data-scene-unpin-tall] [data-scene-pin] {
@@ -1823,10 +1942,14 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    and three real customer cases become unreadable. Only the travel between
    positions is motion, and the global reduced-motion reset flattens that.
 
-   THE DECK IS SQUARE AGAIN. It was fanned and tilted for a while; the rotation
-   is gone, and every card now sits parallel and steps down and to the right.
-   `--stack-fan` and `--stack-tilt` are deleted rather than set to zero, because
-   a token at zero is a mechanism waiting to be switched back on by accident.
+   THE DECK IS A HAND, AND IT PIVOTS ON ONE CORNER. It was fanned and tilted
+   once, then squared into a pile stepping down and to the right — which the
+   user read as "a misaligned copy" of one card. The fan is back on their
+   instruction, but not as the old fan-plus-tilt: every card rotates about the
+   SAME bottom-left corner, which is the one geometry a held hand of cards
+   actually has. `--stack-step` and `--stack-drift` are deleted rather than set
+   to zero, because a token at zero is a mechanism waiting to be switched back
+   on by accident.
    ========================================================================== */
 
 /* THE REGION IS THE PILE PLUS ITS POSITION ROW, and it exists because the dots
@@ -1839,44 +1962,27 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    written onto this element from React, so it is in scope for both. */
 [data-cardstack-region] {
   position: relative;
-  /* THE STEP IS NO LONGER DERIVED FROM `--radius-panel`, AND THAT DERIVATION IS
-     THE DEFECT THIS FIXES.
+  /* THE FAN, PER CARD OF DEPTH. The deepest card turns `(count - 1)` times
+     this about the shared bottom-left corner — 9° narrow, 12° wide.
 
-     It used to read `--stack-step: var(--radius-panel)`, on the argument that a
-     step of exactly one corner radius means what shows of the card behind is
-     precisely its rounded corner and never a straight sliver. That argument is
-     sound about the CORNER and says nothing about the PILE, and the pile is the
-     thing being drawn: at 14px down and 2.4% (9px) right, four cards read as one
-     card with a slightly thick edge. The reviewer's words were that the stack
-     "barely reads".
+     A rotation still has to be paid for, and the bill has two lines, which is
+     why there are two lengths beside the angle:
 
-     The two numbers were never the same measurement. A radius is the size of a
-     corner on one card; a step is how far apart two cards are. Tying them meant
-     the only way to make the pile legible was to round every panel on the page
-     harder, which is why the number sat wrong for so long. They are separate
-     now, and the radius below is set for this card rather than taken from the
-     scale for the same reason.
+     `--stack-reach` — a card of height H and width W turned θ about its bottom-
+     left corner reaches H·sin θ − W·(1 − cos θ) further right. It is paid out of
+     the card's width (see `max-inline-size` below), so the pile rather than the
+     front card is the thing that fits the column.
 
-     26px is ~7% of the card's 368px, which is the proportion the reference
-     holds. It is a length and not a percentage because the same token also sets
-     the horizontal drift, and a percentage means the element's own width in a
-     `translate()` and its CONTAINING BLOCK's width in `max-inline-size` — two
-     different measurements under one name, which is how the vertical and
-     horizontal steps came apart in the first place.
+     `--stack-dip` — the same turn drops the bottom-right corner by W·sin θ. It
+     is out of flow, so it is reserved as padding under the list, or the
+     section's `overflow-clip` shears the corners off.
 
-     THE SMALL VALUE IS THE DEFAULT AND THE LARGE ONE IS THE OPT-IN, because the
-     step is paid for out of the card's own width (see `max-inline-size` below)
-     and only a wide column can afford it. Written the other way round — 26px
-     everywhere, narrowed by a `max-width` query — the tablet column silently
-     bought a 78px pile with a 306px budget and rendered a 179px card, which is
-     two words a line. Measured, not guessed: 64rem is the first width at which
-     the column clears 23rem plus the travel. */
-  --stack-step: 16px;
-
-  /* Down and right by the same amount. This was a percentage of the card's own
-     width while the vertical step was a length, so the two axes drifted apart
-     at every viewport; a deck of paper steps evenly. */
-  --stack-drift: var(--stack-step);
+     THE SMALL VALUES ARE THE DEFAULT AND THE LARGE ONES THE OPT-IN, for the
+     reason the old step carried: only a wide column can afford the travel, and
+     the tablet column once silently bought a 179px card the other way round. */
+  --stack-fan: 3deg;
+  --stack-reach: 4rem;
+  --stack-dip: 3.25rem;
 
   /* The corner. Bigger than `--radius-panel` and set here rather than in the
      scale, because `--radius-panel` is Scope's radius too and moving it would
@@ -1929,7 +2035,14 @@ html.js [data-reveal='lines']:not([data-revealed]) {
      leaves is five lines. 27rem leaves 368px and takes it to three. The column
      was checked first — at 1512 it is 547px wide, so 432px of card plus 78px of
      pile still lands 37px inside it. */
-  max-inline-size: min(27rem, 100% - (var(--stack-count) - 1) * var(--stack-step));
+  /* 22.5rem, down from 27rem and then 24.5rem, both at the user's request for
+     a narrower card. */
+  max-inline-size: min(22.5rem, 100% - var(--stack-reach));
+
+  /* TALLER, at the same request: more colour field above the title. The
+     contours' fade reads `--art-room` too, so the lines grow with it and still
+     clear the title. */
+  --art-room: 9rem;
 }
 
 /* The pile itself is the next control. This native button sits over the visual
@@ -1957,89 +2070,40 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    depth transition is disabled. If released early, removing `data-dragging`
    restores that transition and the sheet settles back into place. */
 [data-cardstack-region][data-dragging] [data-cardstack] > li[data-front] {
-  transform: translate(var(--drag-x), 0);
+  transform: translate(var(--drag-x), 0) rotate(var(--drag-turn));
   transition: none;
 }
 
-/* The full step, where the column can pay for it out of its own slack without
+/* The full fan, where the column can pay for it out of its own slack without
    taking the width off the card. */
 @media (min-width: 64rem) {
   [data-cardstack-region] {
-    --stack-step: 26px;
+    --stack-fan: 4deg;
+    --stack-reach: 5.5rem;
+    --stack-dip: 5.75rem;
   }
 }
 
 [data-cardstack] {
   display: grid;
 
-  /* Transforms are out of flow, so the pile's back edges would fall outside the
-     section's `overflow-clip` box and be cut. This reserves the travel the
-     deepest card takes, so the caption below clears the pile and not just the
-     front card. */
-  padding-block-end: calc(var(--stack-step) * (var(--stack-count) - 1));
-}
-
-[data-cardstack] > li,
-[data-cardstack] > li[data-tone='paper'] {
-  --tone-surface: var(--role-paper);
-  --tone-hairline: var(--role-paper-hairline);
-  --tone-ink: var(--role-paper-ink);
-  --tone-reading: var(--role-paper-reading);
-  --tone-ink-3: var(--role-paper-ink-3);
-  --tone-accent: #1a5335;
-}
-
-/* THE STRONG HAIRLINE, NOT THE PLAIN ONE, and it is the whole answer to "can a
-   dark card sit on a dark band". As a FIELD it cannot: #14170f on #0e120f is
-   1.04:1, and no band value fixes that — pushing the band to #0a0d0b drops the
-   inverse hairline to 1.25:1 and #060807 fails both hairlines, so the page's one
-   separating device would stop reading to buy a tenth of a ratio. As an OUTLINED
-   OBJECT it reads fine: --inverse-hairline-strong measures 1.87:1 on the band,
-   the same weight of rule this page draws everything with. The dark card is a
-   drawn edge with a filled interior, which is a thing this system already knows
-   how to make. */
-[data-cardstack] > li[data-tone='dark'] {
-  --tone-surface: var(--role-dark);
-  --tone-hairline: var(--inverse-hairline-strong);
-  --tone-ink: var(--inverse-ink);
-  --tone-reading: var(--inverse-ink-2);
-  --tone-ink-3: var(--inverse-ink-3);
-  --tone-accent: var(--signal);
-}
-
-/* Stone. Sun for the accent, not moss: moss on stone measures 1.04:1, which is
-   the same failure moss has on every dark plane in this system. */
-[data-cardstack] > li[data-tone='stone'] {
-  --tone-surface: var(--role-stone);
-  --tone-hairline: var(--role-stone-hairline);
-  --tone-ink: var(--inverse-ink);
-  --tone-reading: var(--inverse-ink-2);
-  --tone-ink-3: var(--role-stone-ink-3);
-  --tone-accent: var(--signal);
-}
-
-[data-cardstack] > li[data-tone='signal'] {
-  --tone-surface: var(--signal);
-  --tone-hairline: var(--on-signal-hairline);
-  --tone-ink: var(--on-signal-ink);
-  --tone-reading: var(--on-signal-ink-2);
-  --tone-ink-3: var(--on-signal-ink-3);
-  --tone-accent: var(--on-signal-accent);
+  /* Transforms are out of flow, so the fan's dipped corners would fall outside
+     the section's `overflow-clip` box and be cut. This reserves the drop the
+     deepest card takes — see `--stack-dip`. */
+  padding-block-end: var(--stack-dip);
 }
 
 [data-cardstack] > li {
-  /* One cell, four occupants. Grid items in the same area still contribute to
-     the row's intrinsic height, unlike absolute positioning, so the row is as
-     tall as the tallest card and all four stretch to it — which is what keeps
-     the pile's edges parallel instead of ragged. */
-  grid-area: 1 / 1;
+  /* One cell, four occupants, spanning the two rows every art card in a
+     section shares — see ONE SIZE PER SECTION. */
+  grid-area: 1 / 1 / span 2;
 
-  /* TOP-LEFT ORIGIN. The pile grows down and right, so pinning the corner it
-     grows away from keeps the step exactly `--stack-step` per depth: scaling
-     from the centre would eat half of it back and leave a 3px peek, which is a
-     rendering artefact rather than a deck. */
-  transform-origin: 0% 0%;
-  transform: translate(calc(var(--d) * var(--stack-drift)), calc(var(--d) * var(--stack-step)));
+  /* THE SHARED CORNER. Every card turns about the same bottom-left point, so
+     the cards behind fan clockwise and each one's art shows as a coloured
+     wedge along the top and right of the card in front. No translate and no
+     scale: a hand of cards is the same cards at different angles, nothing more. */
+  transform-origin: 0% 100%;
+  transform: rotate(calc(var(--d) * var(--stack-fan)));
 
   z-index: calc(var(--stack-count) - var(--d));
   transition: transform 0.34s var(--ease-ui);
@@ -2087,19 +2151,355 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    and moss on sun is 7.67:1; on the dark tone moss is 2.01:1 and fails, so the
    dark card takes sun — the same substitution this file already makes for the
    focus ring on a dark plane. */
-[data-cardstack] .card {
-  background-color: var(--tone-surface);
-  border-color: var(--tone-hairline);
-  color: var(--tone-ink);
+/* THE CASE CARD. Art on top, reading below — the anatomy and the two things
+   deliberately left out of it are written up in CardStack.tsx.
+
+   FIXED IN BOTH THEMES. The body is light on the dark page as well as the light
+   one, decided with the user from the reference: a card is a printed object
+   and does not change colour when the room does. So every token below is one
+   value, declared once beside `--radius-stack`, and measured once each in
+   `tools/palette.mjs`.
+
+   `overflow: clip` IS NOW ALLOWED ON THIS CARD. The old note forbade it
+   because a quotation mark hung over the card's top edge; the mark is gone, and
+   the art has to follow the corner radius. `clip` rather than `hidden`, so no
+   scroll container is created. The shadow is outside the border box and is not
+   clipped by it. */
+/* THE ART CARD — ONE SHELL FOR EVERY CARD ON THE SITE.
+
+   The customer card's anatomy became the whole site's at the user's request:
+   Scope's roles, Thinking's rungs and the Track record's milestones all take
+   the same gradient header with the heading inside it, over the same white
+   body. One radius, one edge, one body, fixed in both themes.
+
+   Unlayered, and `padding: 0` is load-bearing: the layered `.card` the customer
+   pile still carries sets padding, and an unlayered declaration is the only one
+   guaranteed to beat it. */
+.art-card {
+  display: flex;
+  flex-direction: column;
+  /* Content-sized — see THE ART. Beats the layered `.card`'s `height: 100%`. */
+  block-size: auto;
+  gap: 0;
+  padding: 0;
+  overflow: clip;
+  border: 1px solid var(--case-edge);
   border-radius: var(--radius-stack);
+  background: var(--case-body);
+  color: var(--case-ink);
+}
+
+/* ONE SIZE PER SECTION, SET BY THE SECTION'S CONTENT (user decision).
+
+   Every card in a collection is the same size, and that size is whatever the
+   collection's longest content needs — never a fixed height. It is done with
+   subgrid rather than a measured number: each collection's grid gives its cards
+   two shared rows, the art and the body, and every card (and the article in
+   it) takes those rows as its own. So the art row is as tall as the tallest
+   title in the section and the body row as tall as the longest copy, every
+   header ends on the same line, and editing one string resizes the whole set
+   together.
+
+   Where a browser drops subgrid, each card falls back to its own content
+   height — still legible, just no longer matched. */
+:is([data-cardstack], [data-slidetrack]) > li {
+  display: grid;
+  grid-template-rows: subgrid;
+}
+
+:is([data-cardstack], [data-slidetrack]) > li > .art-card {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+}
+
+/* The pile's shadow stays the pile's — see the §2.7 note above. */
+[data-cardstack] .card {
   box-shadow:
     0 1px 1px var(--stack-shadow-contact),
     0 10px 18px -10px var(--stack-shadow-cast);
 }
 
+/* ONE TONE NAME PER ART, site-wide. Every collection names a tone by position
+   (never by what the card is about — CardStack.tsx carries that argument) and
+   the name resolves to the same art wherever it appears. */
+[data-tone='slate'] {
+  --case-art: var(--case-art-ocean);
+  --case-ray: var(--case-ray-ocean);
+}
+[data-tone='clay'] {
+  --case-art: var(--case-art-ember);
+  --case-ray: var(--case-ray-ember);
+}
+[data-tone='sage'] {
+  --case-art: var(--case-art-forest);
+  --case-ray: var(--case-ray-forest);
+}
+[data-tone='plum'] {
+  --case-art: var(--case-art-violet);
+  --case-ray: var(--case-ray-violet);
+}
+
+/* LABELS IN THE ART — Thinking's step and commitment, as two pills in the art's
+   top corners (user pick). A near-opaque light capsule with dark ink, so the
+   label's contrast never depends on where a bloom or a contour line falls; the
+   pair is gated against the darkest art it can sit on in `tools/palette.mjs`.
+   Above the contours' `z-index: -1` inside the art's own stacking context. */
+.art-top {
+  position: absolute;
+  inset: 1rem 1rem auto;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.art-pill {
+  border-radius: var(--radius-action);
+  background-color: var(--case-pill-bg);
+  color: var(--case-pill-ink);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* The one concrete fact a Thinking rung's own page adds — a host, a question,
+   the speakers. In the card's quieter reading ink under the summary; the rule
+   that used to set it off went with the label row, so the body reads straight
+   down. */
+.art-detail {
+  margin-block-start: 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--case-ink-3);
+  text-wrap: pretty;
+}
+
+/* A floor line that is text, not a control — Thinking's rungs are shown rather
+   than linked, so their call to action is a statement and never a button. */
+.art-floor-note {
+  margin-block-start: auto;
+  padding-block-start: 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--case-ink);
+}
+
+/* THE ART. The title alone, settled to the bottom-left, which is where every
+   art keeps its deep pool — the blooms are at the top, away from the type (see
+   the tokens).
+
+   SIZED BY CONTENT, NOT BY A NUMBER. There is no fixed art height: the art is
+   a field of colour above the title (`--art-room`, set per collection) plus
+   the title. In a collection the art row is shared, so it is the room plus the
+   section's tallest title — see ONE SIZE PER SECTION. */
+.case-art {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: var(--art-room, 6.5rem) 1.25rem 1.25rem;
+  background: var(--case-art);
+  box-shadow: var(--case-art-rim);
+
+  /* The contours' positioning context, and its own stacking context so their
+     `z-index: -1` lands above this background and below the title. */
+  position: relative;
+  isolation: isolate;
+}
+
+/* THE CONTOURS, over the mesh. Concentric rings pushed through turbulence so
+   they wander like height lines — the aerial landscapes Norrin photographs,
+   drawn. The SVG is the MASK and the fill is `--case-ray`, the art's own
+   highlight hue, so every art draws its lines in its own light.
+
+   IT REPLACED A CONIC LIGHT-RAY, picked by the repo owner from six rendered
+   directions (grain, halftone, contours, stepped light, a blueprint grid, a
+   sun disc). The ray read as a hard point with wedges fanning out of it.
+
+   WHERE THE TYPE STAYS SAFE. Intersected with a fade by length from the top:
+   full strength through the colour field above the title, gone by the title's
+   first line. `--art-room` is the field, so the handover moves with every
+   collection's own sizing. The fade used to leave an 8% trace there, which was
+   enough to put the webinar's forest title at 4.31:1 once Thinking's art got
+   shorter. Gated in `tools/palette.mjs` from the measured worst pixel. */
+.case-art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--case-ray) 62%, transparent);
+  mask-image:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 300' preserveAspectRatio='xMaxYMin slice'><filter id='d' x='-20%' y='-20%' width='140%' height='140%'><feTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='2' seed='11'/><feDisplacementMap in='SourceGraphic' scale='46'/></filter><g fill='none' stroke='white' stroke-width='1.3' filter='url(%23d)'><circle cx='430' cy='24' r='22'/><circle cx='430' cy='24' r='44'/><circle cx='430' cy='24' r='66'/><circle cx='430' cy='24' r='88'/><circle cx='430' cy='24' r='110'/><circle cx='430' cy='24' r='132'/><circle cx='430' cy='24' r='154'/><circle cx='430' cy='24' r='176'/><circle cx='430' cy='24' r='198'/><circle cx='430' cy='24' r='220'/><circle cx='430' cy='24' r='242'/><circle cx='430' cy='24' r='264'/><circle cx='430' cy='24' r='286'/><circle cx='430' cy='24' r='308'/><circle cx='430' cy='24' r='330'/><circle cx='430' cy='24' r='352'/><circle cx='430' cy='24' r='374'/><circle cx='430' cy='24' r='396'/><circle cx='430' cy='24' r='418'/><circle cx='430' cy='24' r='440'/></g></svg>"),
+    linear-gradient(
+      to bottom,
+      rgb(0 0 0) calc(var(--art-room, 6.5rem) * 0.45),
+      rgb(0 0 0 / 0) var(--art-room, 6.5rem)
+    );
+  mask-size: cover, auto;
+  mask-position: right top, 0 0;
+  mask-repeat: no-repeat;
+  mask-composite: intersect;
+}
+
+/* The display face, per §1.2 and the user's pick: remove it and the card
+   would be one grotesk doing two jobs. */
+.case-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 1rem + 0.7vw, 1.625rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--case-art-ink);
+  text-wrap: balance;
+}
+
+.case-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1.125rem 1.25rem 1.25rem;
+}
+
+.case-summary {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--case-reading);
+  text-wrap: pretty;
+}
+
+/* WHAT A CLAIM COVERS — Scope's items under each role.
+
+   The first pass was three bare lines under the claim, and it read as a second,
+   ragged paragraph: nothing said the lines were a different layer from the
+   sentence above them. Two things say it now. A mono label names the layer
+   (§1.2 — mono for metadata, which a label over a list is), and every item
+   hangs off a small dot painted with the card's own art, so the list is tied
+   to the colour at the top of the card rather than floating under it. The
+   indent is a hanging one, so a wrapped item lines up with its own first word.
+
+   Same reading colour as the customer card's summary (user request), and no
+   rule above it — the gap does that job. */
+.case-points {
+  margin-block-start: 1.25rem;
+}
+
+.case-points-label {
+  margin: 0 0 0.625rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--case-ink-3);
+}
+
+.case-points ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.case-points li {
+  display: grid;
+  grid-template-columns: 0.4375rem minmax(0, 1fr);
+  column-gap: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--case-reading);
+  text-wrap: pretty;
+}
+
+/* Decorative, so it carries no contrast obligation; centred on the first line
+   by half the leftover line height rather than by `baseline`, which an empty
+   box resolves to its bottom edge. */
+.case-points li::before {
+  content: '';
+  inline-size: 0.4375rem;
+  block-size: 0.4375rem;
+  margin-block-start: calc((1.45em - 0.4375rem) / 2);
+  border-radius: 50%;
+  background: var(--case-art);
+}
+
+/* Under the summary. Cards hug their content now, so this sits where the copy
+   ends; `margin-block-start: auto` only matters where a card is stretched. */
+.case-floor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block-start: auto;
+  padding-block-start: 1.25rem;
+}
+
+.case-client {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--case-ink);
+}
+
+.case-meta {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--case-ink-3);
+}
+
+.case-next {
+  flex: none;
+  border-radius: var(--radius-action);
+  background-color: var(--case-cta-bg);
+  color: var(--case-cta-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.7rem 1.1rem;
+  white-space: nowrap;
+}
+
+.case-next-arrow {
+  display: inline-block;
+  margin-inline-start: 0.2em;
+}
+
+/* ONLY THE FRONT CARD SHOWS ITS PILL. The fan drops every card behind below
+   the front one's floor, and each dropped floor showed its own black capsule —
+   a row of dark slivers under the hand, read off the screenshot. `visibility`
+   and not opacity: nothing fades (§3), it is simply not drawn.
+
+   The card being dealt keeps its pill through the swing and loses it at the
+   51% tuck, discretely, so a card flicked out of the hand does not drop its
+   button mid-air. `both` holds it hidden until the attribute moves on. */
+[data-cardstack] > li:not([data-front]) .case-next {
+  visibility: hidden;
+}
+
+[data-cardstack] > li[data-leaving] .case-next {
+  animation: case-next-tuck 0.62s step-end both;
+}
+
+@keyframes case-next-tuck {
+  0%,
+  50% {
+    visibility: visible;
+  }
+  51%,
+  100% {
+    visibility: hidden;
+  }
+}
+
 /* ---------------------------------------------------------------------------
-   THE QUOTE CARD
+   THE QUOTE CARD — NOW ONLY THE TONE LAB'S SPECIMEN
    ---------------------------------------------------------------------------
+   The customer pile no longer draws this composition; it moved to the case
+   card above. `#styleguide`'s tone lab still renders these classes, so they are
+   kept for that one consumer, and the notes below describe the retired pile.
+
    A different composition from Scope's card, on the same `.card` shell. They
    share the box — radius, hairline, surface, padding — and nothing else, which
    is the honest arrangement: forcing one slot API to produce both a claim/name
@@ -2139,60 +2539,6 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    client and the sector, which is what this card is actually about: a company
    and a piece of work, not a person and a job title.
    --------------------------------------------------------------------------- */
-
-/* The mark straddles the card's top edge, centred. It is `aria-hidden` on the
-   element: it is punctuation, and the source of the text is stated under the
-   pile.
-
-   THE TWO NUMBERS BELOW ARE ONE MOVE, NOT TWO. `“` hangs from the top of its em
-   box, so a normal line box leaves a tall void under the glyph and none above
-   it; `line-height: 0.5` collapses the box onto the glyph so the negative
-   margin is measured against the ink rather than against the leading. The
-   margin then lifts it clear of the card's top padding and over the border.
-
-   It is not clipped, because `.card` has a radius and no `overflow` — the one
-   place on this page where that combination is load-bearing rather than
-   incidental. Nothing else may add `overflow: hidden` to `.card`. */
-.quote-mark {
-  font-family: var(--font-serif);
-  font-size: clamp(2.75rem, 2.4rem + 1.4vw, 3.5rem);
-  line-height: 0.5;
-  margin-block-start: -3.4rem;
-  /* It hangs entirely above the card, so it is drawn on the night band and takes
-     the band's muted rung rather than the card's. */
-  color: var(--inverse-ink-3);
-
-  /* ONLY THE FRONT CARD KEEPS ITS MARK, and this is the price of hanging the
-     glyph over the top edge rather than a preference.
-
-     The ink of `“` sits about 27px above the element's own line box, so a card
-     one step back paints its mark 27px minus one step above the FRONT card's
-     top edge. At the desktop step of 26px that is 1px and invisible; at the
-     16px step the narrow columns use it is 11px, and the tablet rendered a
-     second quotation mark floating over the ground beside the first. Nothing
-     else of a card behind shows except its paper edge, and the mark was the one
-     exception.
-
-     `--d` is a plain number, so the front card can be picked out in arithmetic
-     rather than by matching on an inline style — 0 for the front, 1 for
-     everything behind it.
-
-     NO TRANSITION, deliberately. Every card carries the mark at the same place
-     in the same cell, so when the pile rotates the outgoing card's mark
-     disappears in the same frame the incoming card's appears, in the same
-     pixels — the composite does not change. Fading it would put the front
-     card's own mark at partial opacity for a third of a second, which is the
-     only version of this a reader would notice. */
-  opacity: calc(1 - min(var(--d), 1));
-}
-
-/* The extra top padding is room for the mark to hang into. Everything else is
-   the centre line. */
-[data-cardstack] .card {
-  align-items: center;
-  text-align: center;
-  padding-block-start: 2.5rem;
-}
 
 /* The block that floats. `auto` on both sides splits the card's slack evenly
    above and below it. The padding is the floor for the longest case, where the
@@ -2369,10 +2715,9 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   inline-size: 5rem;
   margin-inline: auto;
 
-  /* CLEAR OF THE QUOTATION MARK, which is the number this had wrong first time.
-     The mark's ink rises about 27px above the card's top edge, so a 24px gap put
-     the bar through the middle of it. 3rem leaves 21px of air between the two. */
-  margin-block-end: 3rem;
+  /* 3rem while a quotation mark hung 27px above the card; the mark is gone, so
+     the bar sits at an ordinary gap above the front card's art. */
+  margin-block-end: 1.75rem;
 
   /* Both ends of the bar cross-fade over the same 0.34s the pile's transforms
      take, so a tone change arrives with the card that caused it rather than a
@@ -2539,22 +2884,16 @@ html.js [data-reveal='lines']:not([data-revealed]) {
    Scoped to an attribute on the list rather than to `.card`, because Scope and
    the stack are the only two consumers and a third would want to opt in
    deliberately. */
-[data-rolecards] .card {
-  align-items: center;
-  text-align: center;
-}
-
-[data-rolecards] .card-floor {
-  align-self: stretch;
-  text-align: start;
-}
+/* Scope's centred claim-and-floor composition is retired: its cards are art
+   cards now (see THE ART CARD), left-aligned like every other card. */
 
 /* THE CARD LEAVING THE FRONT IS DEALT OUT, NOT COLLAPSED.
 
    Sliding it back into the pile is the honest default and it is what this did
-   first, but it hides the one moment the section has. So it travels — right,
-   past the container edge, out of the frame — and the section's `overflow-clip`
-   takes it. That is the page's second frame-break (§1.6).
+   first, but it hides the one moment the section has. So it swings — about the
+   same bottom-left corner the hand fans from, out past the container edge — and
+   then tucks in behind at the deepest angle. That is the page's second
+   frame-break (§1.6).
 
    AN ANIMATION, NOT A TRANSITION, because the path has a waypoint: out, then
    back to the deepest position. A transition can only interpolate between two
@@ -2575,33 +2914,31 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   animation-name: cardstack-deal-from-drag;
 }
 
+/* Every keyframe below is a turn about the li's `transform-origin` — the shared
+   bottom-left corner — so the translate in the middle is the only thing that
+   lifts the card off that pivot, and it is back on it by 51%. */
 @keyframes cardstack-deal-from-drag {
   0% {
     z-index: calc(var(--stack-count) + 1);
-    transform: translate(var(--drag-x), 0) rotate(2deg);
+    transform: translate(var(--drag-x), 0) rotate(var(--drag-turn));
     filter: blur(0);
   }
 
-  52% {
+  50% {
     z-index: calc(var(--stack-count) + 1);
-    transform: translate(128%, calc(var(--stack-step) * 1.2)) scale(0.94) rotate(9deg);
+    transform: translate(70%, -3%) rotate(24deg);
     filter: blur(7px);
   }
 
-  53% {
+  51% {
     z-index: 0;
-    transform: translate(-18%, calc((var(--stack-count) - 1) * var(--stack-step))) scale(0.94)
-      rotate(-3deg);
-    filter: blur(7px);
+    transform: translate(0, 0) rotate(0deg);
+    filter: blur(0);
   }
 
   100% {
     z-index: 0;
-    transform: translate(
-        calc((var(--stack-count) - 1) * var(--stack-drift)),
-        calc((var(--stack-count) - 1) * var(--stack-step))
-      )
-      rotate(0deg);
+    transform: rotate(calc((var(--stack-count) - 1) * var(--stack-fan)));
     filter: blur(0);
   }
 }
@@ -2609,44 +2946,40 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 @keyframes cardstack-deal {
   0% {
     z-index: calc(var(--stack-count) + 1);
-    transform: translate(0, 0) scale(1) rotate(0deg);
+    transform: translate(0, 0) rotate(0deg);
     filter: blur(0);
   }
 
-  /* Anticipation — the beat that makes the exit read as a throw rather than a
-     slide, and what turns a straight path into an arc. */
+  /* Anticipation — a small turn the other way about the same corner, which is
+     what makes the exit read as a card being flicked out of a hand. */
   20% {
     z-index: calc(var(--stack-count) + 1);
-    transform: translate(-3%, calc(var(--stack-step) * -0.8)) scale(1.005) rotate(-2.5deg);
+    transform: translate(0, -2%) rotate(-2.5deg);
     filter: blur(0);
   }
 
   50% {
     z-index: calc(var(--stack-count) + 1);
-    transform: translate(128%, calc(var(--stack-step) * 1.2)) scale(0.94) rotate(9deg);
+    transform: translate(55%, -3%) rotate(24deg);
     filter: blur(7px);
   }
 
-  /* Hidden behind the new front card, sharp again. One frame, and nothing on
-     screen shows the jump: the front card is a pixel or two from home at this
-     point in its own transition, and this card is smaller than it on every
-     edge. */
+  /* Tucked behind the new front card, sharp again, at the front card's own
+     angle. One frame, and nothing on screen shows the jump: the new front card
+     is a fraction of a degree from home at this point in its own transition,
+     and it covers this card exactly. */
   51% {
     z-index: 0;
     transform: translate(0, 0) rotate(0deg);
     filter: blur(0);
   }
 
-  /* Into the deepest slot — the same position `> li` resolves to at that depth — which is what lets the
-     animation hand over to the transition without a step when `data-leaving`
-     moves on to the next card. */
+  /* Out along the fan to the deepest angle — the same transform `> li`
+     resolves to at that depth — which is what lets the animation hand over to
+     the transition without a step when `data-leaving` moves on. */
   100% {
     z-index: 0;
-    transform: translate(
-        calc((var(--stack-count) - 1) * var(--stack-drift)),
-        calc((var(--stack-count) - 1) * var(--stack-step))
-      )
-      rotate(0deg);
+    transform: rotate(calc((var(--stack-count) - 1) * var(--stack-fan)));
     filter: blur(0);
   }
 }
@@ -2992,6 +3325,18 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
     }
 
+    /* PLAYED, AND NOT REWOUND — see `useSceneLatch`. A scene that plays on the
+       way down marks each part once its range has run (or once it has finished
+       on the clock after the reader turned back), and this takes it off the
+       scroll. Same argument as the arrived rule above, from the other end: the
+       resting state is the finished one, so `none` is "done" and scrolling back
+       up has nothing left to rewind. The hook releases the mark once the scene
+       is below the viewport again, so every pass down plays it. Only `'true'`
+       — a part still finishing is `'finishing'` and must keep its animation. */
+    [data-scene-part][data-scene-latched='true'] {
+      animation: none;
+    }
+
     /* A rule that completes itself, left to right. `transform-origin` is on the
        part rather than in the keyframes so a mirrored instance can flip it. */
     [data-scene-part='rule'] {
@@ -3312,7 +3657,6 @@ html.js [data-reveal='lines']:not([data-revealed]) {
         clip-path: inset(0 0 0 0);
       }
     }
-
     /* A line of type rising out from behind its own edge — the masked-line
        gesture every section header already uses, driven by scroll instead of
        by a transition.
@@ -3814,13 +4158,38 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   display: none;
 }
 
+/* MAIN'S MILESTONE CARD, WITH THE ART AS A BAND. The user preferred the quiet
+   card this timeline shipped with on `main` — theme surface, hairline, ink
+   title — to a gradient-header card at this scale, and asked for the best of
+   both. So the card is main's again, word for word in its type, and the one
+   thing it takes from the art card is the colour: a thin band of its own art
+   along the top edge, the same four arts in the same order as every other
+   card on the site.
+
+   THE BAND IS A LIGHTER, MORE VISIBLE CUT OF THE SAME ART, at the user's
+   request, and the card under it stays main's own surface. Taller than the
+   first 0.5rem so it reads as colour rather than as a rule, and lifted with a
+   light veil laid over the art so it is the same hue, only lighter. No type
+   sits on it. */
 .tl-card {
+  position: relative;
+  overflow: clip;
   margin-block-start: 0.75rem;
   margin-inline-start: 1.75rem;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-panel);
   background-color: var(--surface);
-  padding: 1.125rem 1.25rem 1.25rem;
+  padding: 2rem 1.25rem 1.25rem;
+}
+
+.tl-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  block-size: 0.875rem;
+  background:
+    linear-gradient(var(--case-band-veil), var(--case-band-veil)),
+    var(--case-art);
 }
 
 .tl-title {
@@ -3960,16 +4329,6 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     margin-inline-start: 0;
     /* The column gap, paid here rather than by `column-gap` — see above. */
     margin-inline-end: 1.5rem;
-  }
-}
-
-@media (min-width: 64rem) {
-  .tl-card {
-    padding: 1.5rem;
-  }
-
-  .tl-title {
-    font-size: 1.125rem;
   }
 }
 
@@ -4268,65 +4627,16 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   --role-stone-ink-3: color-mix(in srgb, var(--inverse-ink) 72%, transparent);
 }
 
-/* The tone is declared on the `<li>` and consumed on the `.card` inside it, so
-   the grid cell carries the name and the object carries the paint. Five
-   variables, one per thing a card can colour; a tone that left one unset would
-   inherit the page's theme-following value and break the fixed-composition rule
-   above, so all three tones set all five. */
-[data-rolecards] > li,
-[data-rolecards] > li[data-tone='paper'] {
-  --tone-surface: var(--role-paper);
-  --tone-hairline: var(--role-paper-hairline);
-  --tone-ink: var(--role-paper-ink);
-  --tone-reading: var(--role-paper-reading);
-  --tone-ink-3: var(--role-paper-ink-3);
+/* SCOPE'S CARDS ARE ART CARDS (see THE ART CARD). The paper / dark / signal
+   tone ladders that used to be declared here are gone with the per-card
+   surfaces they painted; the role name is the heading inside the art and the
+   claim is the body. Only the sizing is Scope's own. */
+[data-rolecards] > li {
+  --art-room: 4.5rem;
 }
 
-/* The strong hairline, not the plain one. On the pale and sun tones the card's
-   edge is drawn against a ground far away from it in lightness and the ordinary
-   rule is enough; the dark card on the dark ground measures 1.04:1 as a field,
-   and its edge is the only thing that says a card is there at all. */
-[data-rolecards] > li[data-tone='dark'] {
-  --tone-surface: var(--role-dark);
-  --tone-hairline: var(--inverse-hairline-strong);
-  --tone-ink: var(--inverse-ink);
-  --tone-reading: var(--inverse-ink-2);
-  --tone-ink-3: var(--inverse-ink-3);
-}
-
-[data-rolecards] > li[data-tone='signal'] {
-  --tone-surface: var(--signal);
-  --tone-hairline: var(--on-signal-hairline);
-  --tone-ink: var(--on-signal-ink);
-  --tone-reading: var(--on-signal-ink-2);
-  --tone-ink-3: var(--on-signal-ink-3);
-}
-
-/* Unlayered, so these beat the `text-reading` / `text-ink` utilities `Card.tsx`
-   sets — Tailwind's utilities live inside `@layer utilities`, and an unlayered
-   rule outranks a layered one whatever the specificity says. That is the same
-   mechanism `[data-rolecards] .card` above already relies on, not a new trick.
-
-   `.card` itself is untouched. The customer stack shares that shell and every
-   declaration here is scoped behind `[data-rolecards]`. */
-[data-rolecards] > li > .card {
-  background-color: var(--tone-surface);
-  border-color: var(--tone-hairline);
-}
-
-[data-rolecards] > li > .card > .body-serif {
-  color: var(--tone-reading);
-}
-
-[data-rolecards] > li > .card > .card-floor {
-  color: var(--tone-ink);
-}
-
-/* Scope renders no `note` today. The rung is bound anyway because a tone that
-   colours four of a card's five slots is a trap for whoever fills the fifth,
-   and all three values are gated. */
-[data-rolecards] > li > .card > .caption {
-  color: var(--tone-ink-3);
+[data-rolecards] .case-summary {
+  font-size: 1rem;
 }
 
 /* ==========================================================================
@@ -4515,6 +4825,12 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   margin-inline: auto;
 }
 
+/* The flat grid: each card spans an art row and a body row, so a pair side by
+   side shares both (ONE SIZE PER SECTION). */
+[data-slidetrack] > li {
+  grid-row: span 2;
+}
+
 @media (min-width: 40rem) {
   [data-slidetrack] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4625,12 +4941,10 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     inline-size: 100%;
   }
 
-  /* ONE CELL, FOUR OCCUPANTS. Grid items in the same area still contribute to
-     the row's intrinsic height, unlike absolute positioning, so the cell is as
-     tall as the longest claim and all four cards stretch to it — which is what
-     keeps the three visible cards sharing one baseline as the row rotates. */
+  /* ONE CELL, FOUR OCCUPANTS, spanning the art row and the body row every card
+     in the section shares — see ONE SIZE PER SECTION. */
   [data-slidetrack] > li {
-    grid-area: 1 / 1;
+    grid-area: 1 / 1 / span 2;
 
     /* Scale falls out of depth; the offset falls out of scale. */
     --slide-s: calc(1 - var(--slide-depth) * var(--slide-shrink));
@@ -4667,27 +4981,10 @@ html.js [data-reveal='lines']:not([data-revealed]) {
     transition: none;
   }
 
-  /* THE FRONT CARD. Sun, the only saturated surface in the section. */
-  [data-slidetrack] > li[data-depth='0'] {
-    --tone-surface: var(--signal);
-    --tone-hairline: var(--on-signal-hairline);
-    --tone-ink: var(--on-signal-ink);
-    --tone-reading: var(--on-signal-ink-2);
-    --tone-ink-3: var(--on-signal-ink-3);
-  }
-
-  /* THE TWO BESIDE IT, AND THE ONE BEHIND. Same depth for the pair, therefore
-     the same tone — the repeat is structural. The hidden card takes it too: it
-     is covered, so any tone would do, and giving it a fourth would be a
-     distinction nothing can see. */
-  [data-slidetrack] > li[data-depth='1'],
-  [data-slidetrack] > li[data-depth='2'] {
-    --tone-surface: var(--role-muted);
-    --tone-hairline: var(--role-muted-hairline);
-    --tone-ink: var(--role-muted-ink);
-    --tone-reading: var(--role-muted-reading);
-    --tone-ink-3: var(--role-muted-ink-3);
-  }
+  /* NO TONE BY DEPTH ANY MORE. The front card used to be sun and the flanking
+     cards a muted surface, whatever role was in them. Each card now owns its
+     art through `data-tone` and keeps it as it travels the ring (user decision);
+     the front card is told apart by size alone. */
 
   /* THE FOCUS PULL IS GONE WITH THE BLUR. There was a
      `filter: blur(calc(var(--slide-depth) * var(--slide-blur)))` here, drawn on
@@ -4709,10 +5006,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
      and it does not abandon. There is no end state a card can be left in except
      one of the three the stylesheet declares, and a backgrounded tab resumes
      mid-flight rather than freezing, because none of this is on a JS clock. */
-  [data-slidetrack] > li > .card,
-  [data-slidetrack] > li > .card > .body-serif,
-  [data-slidetrack] > li > .card > .card-floor,
-  [data-slidetrack] > li > .card > .caption {
+  [data-slidetrack] > li > .art-card {
     transition:
       background-color 0.5s var(--ease-ui),
       border-color 0.5s var(--ease-ui),
@@ -4722,7 +5016,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 
   /* THE ONE SHADOW. See the header for the §2.7 argument; the tokens are the
      customer pile's own, so no new value is introduced. */
-  [data-slidetrack] > li[data-depth='0'] > .card {
+  [data-slidetrack] > li[data-depth='0'] > .art-card {
     box-shadow:
       0 1px 1px var(--stack-shadow-contact),
       0 14px 26px -14px var(--stack-shadow-cast);
@@ -4844,161 +5138,143 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 }
 
 /* --------------------------------------------------------------------------
-   THINKING — A DRAGGABLE CARD SPOTLIGHT
+   THINKING — AN INDEX AND ONE OPEN CARD
 
-   Four cards move around a circular set of positions. The current card owns the
-   centre while the adjacent cards remain visible at the edges. Dragging moves
-   the front card with the pointer and hands focus to the next or previous card.
+   Chosen by the user from four rendered layouts; the argument is in
+   Thinking.tsx. The list is Radix Tabs (§2.1) and nothing here touches its
+   behaviour (§2.3) — only how the list and the panel look and sit.
    -------------------------------------------------------------------------- */
 
-[data-thinking-carousel] {
-  margin-block-start: 2rem;
-  --thinking-ink: #1d1d1f;
-  --thinking-muted: #4b4b50;
-  --thinking-outline: rgb(29 29 31 / 24%);
-}
-
-[data-thinking-stage] {
+[data-thinking-index] {
   display: grid;
-  min-block-size: clamp(28rem, 56vw, 35rem);
-  place-items: center;
-  overflow: clip;
-  touch-action: pan-y;
-  user-select: none;
-  cursor: grab;
+  gap: 2rem;
+  margin-block-start: 2.5rem;
 }
 
-[data-thinking-carousel][data-dragging] [data-thinking-stage] {
-  cursor: grabbing;
-}
-
-[data-thinking-cards] {
-  display: grid;
-  inline-size: 100%;
-  min-block-size: 28rem;
-  place-items: center;
-}
-
-[data-thinking-card] {
-  grid-area: 1 / 1;
-  inline-size: min(82vw, 31rem);
-  min-block-size: 25rem;
-  color: var(--thinking-ink);
-  border-color: var(--thinking-outline);
-  background: var(--thinking-surface);
-  box-shadow: 0 24px 60px rgb(29 29 31 / calc(0.12 - var(--thinking-depth) * 0.035));
-  transform:
-    translateX(calc(var(--thinking-side) * 92%))
-    scale(calc(1 - var(--thinking-depth) * 0.16));
-  transform-origin: center;
-  transition:
-    transform 500ms var(--ease-ui),
-    background 500ms var(--ease-ui),
-    color 500ms var(--ease-ui),
-    border-color 500ms var(--ease-ui),
-    box-shadow 500ms var(--ease-ui);
-  z-index: calc(var(--thinking-count) - var(--thinking-depth));
-  will-change: transform;
-}
-
-[data-thinking-card][data-depth='0'] {
-  box-shadow: 0 30px 80px rgb(29 29 31 / 18%);
-}
-
-[data-thinking-carousel][data-dragging] [data-thinking-card][data-depth='0'] {
-  transform: translateX(var(--thinking-drag-x)) scale(1.015);
-  transition: none;
-}
-
-[data-thinking-card] h3,
-[data-thinking-card] .label,
-[data-thinking-card] .caption,
-[data-thinking-card] .ui {
-  color: inherit;
-}
-
-[data-thinking-card] .caption,
-[data-thinking-card] .ui,
-[data-thinking-card] .label {
-  color: var(--thinking-muted);
-}
-
-[data-thinking-card] > div {
-  border-color: var(--thinking-outline);
-}
-
-[data-thinking-card][data-tone='sky'] { --thinking-surface: var(--card-sky); }
-[data-thinking-card][data-tone='lavender'] { --thinking-surface: var(--card-lavender); }
-[data-thinking-card][data-tone='peach'] { --thinking-surface: var(--card-peach); }
-[data-thinking-card][data-tone='mint'] { --thinking-surface: var(--card-mint); }
-
-[data-thinking-controls] {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-block-start: 0.75rem;
-}
-
-[data-thinking-controls] > button {
-  display: grid;
-  inline-size: 2.75rem;
-  block-size: 2.75rem;
-  place-items: center;
-  border: 1px solid var(--hairline-strong);
-  border-radius: 50%;
-  color: var(--ink);
-  background: var(--ground);
-  cursor: pointer;
-}
-
-[data-thinking-dots] {
-  display: flex;
-  gap: 0.45rem;
-}
-
-[data-thinking-dots] > button {
-  inline-size: 1.5rem;
-  block-size: 1.5rem;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-[data-thinking-dots] > button::before {
-  content: '';
-  display: block;
-  inline-size: 0.45rem;
-  block-size: 0.45rem;
-  margin: auto;
-  border-radius: 50%;
-  background: var(--hairline-strong);
-}
-
-[data-thinking-dots] > button[aria-current='true']::before {
-  background: var(--ink);
-  transform: scale(1.4);
-}
-
-:where(html[data-theme='dark'], .dark) [data-thinking-carousel] {
-  --thinking-ink: #f5f5f7;
-  --thinking-muted: #d2d2d7;
-  --thinking-outline: rgb(245 245 247 / 28%);
-}
-
-@media (min-width: 48rem) {
-  [data-thinking-card] {
-    inline-size: clamp(20rem, 39vw, 34rem);
-    min-block-size: 27rem;
-    transform:
-      translateX(calc(var(--thinking-side) * 82%))
-      scale(calc(1 - var(--thinking-depth) * 0.16));
+/* SIDE BY SIDE ON DESKTOP, AND THE LIST IS CENTRED ON THE CARD (user
+   requirement). `align-items: center` centres each column on the row, and the
+   row is the card's height because the card is the taller of the two — so the
+   index's midpoint sits on the card's midpoint. It stays there when the
+   selection changes, because the card area never resizes (see the panels). */
+@media (min-width: 56rem) {
+  [data-thinking-index] {
+    /* The card column is exactly the card's width, so `column-gap` is the real
+       air between the list and the card rather than a gap plus leftover track. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 31rem);
+    align-items: center;
+    column-gap: clamp(3.5rem, 7vw, 7.5rem);
+    margin-block-start: 3.5rem;
   }
+}
+
+[data-thinking-list] {
+  display: flex;
+  flex-direction: column;
+  border-block-start: 1px solid var(--hairline);
+}
+
+.thinking-tab {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 1rem;
+  border-block-end: 1px solid var(--hairline);
+  /* Every row carries the indent the accent bar needs, so selecting a row never
+     shifts its text — on a phone the shift squeezed the title column and threw
+     the selected title out of line with the rest. */
+  padding: 1.25rem 0.25rem 1.25rem 1rem;
+  text-align: start;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: color 0.2s var(--ease-ui);
+}
+
+@media (max-width: 40rem) {
+  .thinking-tab {
+    grid-template-columns: 4.75rem minmax(0, 1fr) auto;
+    gap: 0.75rem;
+  }
+}
+
+.thinking-tab:hover {
+  color: var(--ink);
+}
+
+/* The selected rung: full ink, and its own span of accent on the list's
+   leading edge — the vertical form of the mark the nav and the tabs primitive
+   already draw on a hairline. */
+.thinking-tab[data-state='active'] {
+  color: var(--ink);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.thinking-tab-step,
+.thinking-tab-ask {
+  color: var(--ink-3);
+}
+
+.thinking-tab-title {
+  font-size: clamp(1rem, 0.9rem + 0.35vw, 1.1875rem);
+  font-weight: 600;
+  line-height: 1.3;
+  text-wrap: pretty;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-thinking-card] {
+  .thinking-tab {
     transition: none;
   }
+}
+
+/* THE PANELS. All four are mounted (`forceMount`) and stacked in one grid
+   cell, spanning an art row and a body row that every card shares by subgrid —
+   ONE SIZE PER SECTION — so the card area is always the tallest rung's size and
+   switching never moves anything. The three inactive panels are
+   `visibility: hidden`: not drawn, not focusable, not in the accessibility
+   tree. Nothing fades (§3). */
+[data-thinking-panels] {
+  display: grid;
+  grid-template-rows: auto auto;
+  inline-size: 100%;
+  max-inline-size: 31rem;
+}
+
+[data-thinking-panels] > [role='tabpanel'] {
+  grid-area: 1 / 1 / span 2;
+  display: grid;
+  grid-template-rows: subgrid;
+  border-radius: var(--radius-stack);
+  /* Room for the pills above the title, plus a band of colour between them
+     (user request — at 3.875rem the pills sat on the title). */
+  --art-room: 5.75rem;
+}
+
+/* A slightly shorter card (user request): tighter art and body padding and a
+   closer call to action, rather than smaller type. */
+[data-thinking-panels] .case-art {
+  padding-block-end: 1rem;
+}
+
+[data-thinking-panels] .case-body {
+  padding-block: 1rem 1.125rem;
+}
+
+[data-thinking-panels] .case-title {
+  font-size: clamp(1.25rem, 1rem + 0.6vw, 1.5rem);
+}
+
+[data-thinking-panels] .art-floor-note {
+  padding-block-start: 0.875rem;
+}
+
+[data-thinking-panels] > [data-state='inactive'] {
+  visibility: hidden;
+}
+
+[data-thinking-panels] > [role='tabpanel'] > .art-card {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
 }
 
 /* --------------------------------------------------------------------------
@@ -5044,122 +5320,6 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   }
 }
 
-/* --------------------------------------------------------------------------
-   SHARED CARD COLOUR SET
-
-   The soft blue, lavender, peach and mint set introduced in Thinking now runs
-   through every card collection. Each theme owns its four gradients and one
-   consistent ink rule; components only choose a named tone.
-   -------------------------------------------------------------------------- */
-:root[data-theme='light'] {
-  --card-sky: linear-gradient(145deg, #f3f8ff, #cfe3ff);
-  --card-lavender: linear-gradient(145deg, #f7f1ff, #e2d4ff);
-  --card-peach: linear-gradient(145deg, #fff6ee, #ffdcc3);
-  --card-mint: linear-gradient(145deg, #f0faf3, #ceeada);
-}
-
-:root[data-theme='light'] [data-rolecards] > li,
-:root[data-theme='light'] [data-cardstack] > li,
-:root[data-theme='light'] .tl-card[data-tone] {
-  --tone-hairline: rgb(29 29 31 / 24%);
-  --tone-ink: #1d1d1f;
-  --tone-reading: #3f3f44;
-  --tone-ink-3: #55555b;
-  --tone-accent: #1d1d1f;
-}
-
-:root[data-theme='light'] [data-tone='slate'] { --tone-surface: var(--card-sky); }
-:root[data-theme='light'] [data-tone='clay'] { --tone-surface: var(--card-peach); }
-:root[data-theme='light'] [data-tone='sage'] { --tone-surface: var(--card-mint); }
-:root[data-theme='light'] [data-tone='plum'] { --tone-surface: var(--card-lavender); }
-
-:root[data-theme='dark'] {
-  --card-sky: linear-gradient(145deg, #203e60, #152d48);
-  --card-lavender: linear-gradient(145deg, #49375f, #302440);
-  --card-peach: linear-gradient(145deg, #65422f, #432c20);
-  --card-mint: linear-gradient(145deg, #315442, #20382d);
-}
-
-:root[data-theme='dark'] [data-rolecards] > li,
-:root[data-theme='dark'] [data-cardstack] > li,
-:root[data-theme='dark'] .tl-card[data-tone] {
-  --tone-hairline: #f8f7f3;
-  --tone-ink: #f8f7f3;
-  --tone-reading: #f8f7f3;
-  --tone-ink-3: #f8f7f3;
-  --tone-accent: #f8f7f3;
-}
-
-:root[data-theme='dark'] [data-tone='slate'] { --tone-surface: var(--card-sky); }
-:root[data-theme='dark'] [data-tone='clay'] { --tone-surface: var(--card-peach); }
-:root[data-theme='dark'] [data-tone='sage'] { --tone-surface: var(--card-mint); }
-:root[data-theme='dark'] [data-tone='plum'] { --tone-surface: var(--card-lavender); }
-
-[data-rolecards] > li > .card {
-  border-width: 2px;
-  background: var(--tone-surface);
-  justify-content: center;
-}
-
-[data-cardstack] > li[data-tone] > .card,
-.tl-card[data-tone] {
-  border-width: 2px;
-  border-color: var(--tone-hairline);
-  background: var(--tone-surface);
-}
-
-/* In the moving spotlight, colour follows the stage position. This keeps the
-   centre card visually dominant while every card uses the shared palette. */
-[data-slider] [data-slidetrack] > li[data-depth='0'] {
-  --tone-surface: var(--card-sky);
-  --tone-hairline: rgb(29 29 31 / 24%);
-  --tone-ink: #1d1d1f;
-  --tone-reading: #3f3f44;
-  --tone-ink-3: #55555b;
-}
-
-[data-slider] [data-slidetrack] > li:is([data-depth='1'], [data-depth='2']) {
-  --tone-surface: var(--card-lavender);
-  --tone-hairline: rgb(29 29 31 / 24%);
-  --tone-ink: #1d1d1f;
-  --tone-reading: #3f3f44;
-  --tone-ink-3: #55555b;
-}
-
-:root[data-theme='dark'] [data-slider] [data-slidetrack] > li {
-  --tone-hairline: rgb(245 245 247 / 28%);
-  --tone-ink: #f5f5f7;
-  --tone-reading: #e2e2e7;
-  --tone-ink-3: #d2d2d7;
-}
-
-.tl-card[data-tone] .tl-title {
-  color: var(--tone-ink);
-}
-
-.tl-card[data-tone] .tl-body {
-  color: var(--tone-reading);
-}
-
-[data-rolecards] > li > .card > .body-serif {
-  max-inline-size: 30ch;
-  margin-inline: auto;
-  font-family: var(--font-sans);
-  font-size: clamp(1rem, 0.94rem + 0.25vw, 1.125rem);
-  font-weight: 600;
-  line-height: 1.5;
-  text-align: center;
-}
-
-[data-rolecards] > li > .card > .card-floor {
-  align-self: center;
-  margin-block-start: 1.75rem;
-  padding-block-start: 0;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.35;
-  letter-spacing: 0.07em;
-  text-align: center;
-  text-transform: uppercase;
-}
+/* The soft sky / lavender / peach / mint "shared card colour set" that lived
+   here is deleted: every card collection now takes the art-card anatomy and the
+   four gradient arts declared beside `--radius-stack` (see THE ART CARD). */

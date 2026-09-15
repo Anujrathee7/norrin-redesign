@@ -62,12 +62,18 @@ const PHOTOS = [
   { group: 'homepage', file: 'vision-paper', src: 'https://norrin.com/hs-fs/hubfs/AI%20or%20change%20management%20etc.jpg' },
   { group: 'homepage', file: 'careers-9', src: 'https://norrin.com/hs-fs/hubfs/Norrin%202026%20JPG%20Fullsize-9.jpg' },
 
-  /* Named contacts, from norrin.com/contact-us. Same category as the six above —
-     Norrin's own published photographs of Norrin, shown back to Norrin — and the
-     reason `docs/research-brief.md` §7 no longer lists headshots as a gap. Only
-     the people the Contact section actually names are taken; the page publishes
-     ten and eight of them are none of our business. */
+  /* Named contacts. Same category as the six above — Norrin's own published
+     photographs of Norrin, shown back to Norrin — and the reason
+     `docs/research-brief.md` §7 no longer lists headshots as a gap. Only the
+     people the Contact section actually names are taken.
+
+     Antti and Heidi are on norrin.com/contact-us. EMIL IS NOT — that page lists
+     ten people and he is not one of them, which is why this list stopped at two
+     for a while. His headshot is on norrin.com/services, in the same "Contact us"
+     block `contacts` in norrin.ts is sourced from, as the same square crop the
+     other two use. */
   { group: 'contact', file: 'antti-vuolli', src: 'https://norrin.com/hs-fs/hubfs/Antti%20Vuolli%20neli%C3%B6%20(2).png' },
+  { group: 'contact', file: 'emil-sievinen', src: 'https://norrin.com/hs-fs/hubfs/Emil%20Sievinen%20neli%C3%B6%20(2).png' },
   { group: 'contact', file: 'heidi-riihimaki', src: 'https://norrin.com/hs-fs/hubfs/Riihim%C3%A4ki_Heidi.jpg' },
 ]
 
