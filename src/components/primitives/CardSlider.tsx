@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
-import { Card } from '@/components/primitives/Card'
 import { useCardSlider } from '@/hooks/useCardSlider'
 
 export type SlideItem = {
@@ -25,6 +24,10 @@ export type SlideItem = {
    * caller authored for a grid is the composition a reduced-motion reader gets.
    */
   tone?: string
+  /** Short items under the body — Scope: what Norrin names under each role. */
+  points?: readonly string[]
+  /** The small label above `points`. Interface chrome, not content. */
+  pointsLabel?: string
 }
 
 /**
@@ -230,11 +233,10 @@ export function CardSlider({
         onPointerUp={finishDrag}
         onPointerCancel={(event) => finishDrag(event, true)}
       >
-        {/* `data-rolecards` is kept and is load-bearing: the section's tone
-            system is bound behind `[data-rolecards] > li` at the end of
-            index.css, and the flat layout uses it exactly as it was authored.
-            The row re-keys the same five variables to depth rather than
-            re-minting them. */}
+        {/* `data-rolecards` scopes Scope's card sizing in index.css. Colour
+            is no longer keyed to depth: each card owns its art by `data-tone`,
+            the same site-wide mapping the customer deck uses, so a role keeps
+            its colour as it travels the ring (user decision). */}
         <ul data-slidetrack data-rolecards className="m-0 list-none p-0">
           {items.map((item, i) => {
             // How many advances until this card is at the front. Decreases by
@@ -252,8 +254,7 @@ export function CardSlider({
             return (
               <li
                 key={item.id}
-                // Depth carries the tone. `data-tone` carries the flat layout's
-                // tone and is left alone.
+                // Depth carries the size; `data-tone` carries the art.
                 data-depth={depth}
                 data-tone={item.tone}
                 style={{
@@ -261,7 +262,26 @@ export function CardSlider({
                   ['--slide-side' as string]: String(side),
                 }}
               >
-                <Card body={item.body} floor={item.floor} />
+                <article className="art-card">
+                  <div className="case-art">
+                    <h3 className="case-title">{item.floor}</h3>
+                  </div>
+                  <div className="case-body">
+                    <p className="case-summary">{item.body}</p>
+                    {item.points?.length ? (
+                      <div className="case-points">
+                        {item.pointsLabel ? (
+                          <p className="case-points-label">{item.pointsLabel}</p>
+                        ) : null}
+                        <ul>
+                          {item.points.map((point) => (
+                            <li key={point}>{point}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </div>
+                </article>
               </li>
             )
           })}

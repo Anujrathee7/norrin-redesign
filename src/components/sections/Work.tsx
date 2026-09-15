@@ -1,6 +1,7 @@
 import { Container, Grid, SectionHeader } from '@/components/primitives/Layout'
 import { CardStack } from '@/components/primitives/CardStack'
-import { cases, customers, customersIntro } from '@/data/norrin'
+import { caseStackItems } from '@/components/primitives/caseStackItems'
+import { customers, customersIntro } from '@/data/norrin'
 
 /**
  * Work — the roster and the cases.
@@ -179,30 +180,17 @@ export function Work() {
               narrows the card: at six columns it was 744px, which sets the
               quote to two lines and reads as a panel lying on its side rather
               than as a card. */}
-          {/* `md:-mt-18` — the card's top edge rides above the heading's, which
-              is what stops the two columns reading as two halves of the same
-              band. The quotation mark hangs a further 13px above the card, and
-              the section's own top padding is 112px, so there is still 27px of
-              clearance to the section's clip box at the tightest viewport.
+          {/* `md:-mt-6` — the card's top edge still rides above the heading's,
+              which is what stops the two columns reading as two halves of the
+              same band. It was `-mt-18` and was moved 48px down at the user's
+              request, because the pile sat hard under the bar.
 
               `pr` is gone with the right-alignment: it existed to hold the card
               off the container's right edge, and the card is no longer near it.
               Keeping it would have cost the tablet column 50px of a 306px
               budget, which comes straight off the quote's measure. */}
-          <div className="col-span-4 mt-12 md:col-span-5 md:col-start-8  md:-mt-18">
-            <CardStack
-              items={cases.map((c) => ({
-                id: c.id,
-                // The design puts a name and a role on the card floor. Ours are a
-                // company and a sector, because that is what a case is about — see
-                // the note in CardStack about the avatar that is not there.
-                who: c.client,
-                role: c.sector,
-                kicker: c.title,
-                body: c.quote,
-                note: 'attribution' in c && c.attribution ? c.attribution : undefined,
-              }))}
-            />
+          <div className="col-span-4 mt-12 md:col-span-5 md:col-start-8 md:-mt-6">
+            <CardStack items={caseStackItems} />
           </div>
         </Grid>
 

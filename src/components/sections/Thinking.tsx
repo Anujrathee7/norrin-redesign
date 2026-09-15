@@ -1,8 +1,6 @@
-import { useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent } from 'react'
+import { Tabs as TabsPrimitive } from 'radix-ui'
 import { Container, SectionHeader } from '@/components/primitives/Layout'
 import { publications } from '@/data/norrin'
-import { useCardSlider } from '@/hooks/useCardSlider'
 
 /**
  * Thinking — the commitment ladder.
@@ -21,17 +19,38 @@ import { useCardSlider } from '@/hooks/useCardSlider'
  * it asks the most and because a dated promo is the most perishable thing a
  * homepage can lead with.
  *
- * Two deliberate absences:
+ * ---------------------------------------------------------------------------
+ * AN INDEX AND ONE OPEN CARD — chosen by the user from four rendered layouts
+ * ---------------------------------------------------------------------------
+ * It replaced a draggable spotlight carousel that overlapped its cards and
+ * cropped the two flanking ones mid-sentence. The four rungs are now a list on
+ * the left — step, title, and what each asks for — and the selected rung opens
+ * as one full card on the right. Nothing is cropped, nothing moves on its own
+ * (so the carousel's open WCAG 2.2.2 pause question is gone with it), and the
+ * ladder's order is visible all at once instead of one slot at a time.
+ *
+ * REAL TABS, FROM RADIX (§2.1). Roving tabindex, arrow keys and the
+ * tab/panel wiring are the primitive's, not hand-written. `forceMount` keeps
+ * all four panels rendered in one grid cell so the card area is always the
+ * tallest card's size — switching never resizes the section or moves the list
+ * — and the inactive three are `visibility: hidden`, which also takes them out
+ * of the accessibility tree and the tab order, exactly as unmounting would.
+ *
+ * THE CARD takes its labels into the art as two pills (user pick, card 2):
+ * the step top-left, the commitment top-right, the title settled at the art's
+ * floor. The call to action stays a statement with no arrow — these rungs are
+ * shown rather than linked, and an arrow is a link's affordance (§3).
+ *
+ * Two deliberate absences, unchanged:
  *
  * The rungs are not numbered. The heading directly above them says "Start
  * anywhere you like." and 01/02/03 in fixed order says the opposite, in the same
  * viewport. What the reader needs is the COMMITMENT each one asks for, which is
- * already the right-hand label — so that carries the row and the digit goes.
+ * what the right-hand label in the index carries.
  *
- * The calls to action are not links. They were `<a href="#thinking">` inside
- * `<section id="thinking">` under labels naming real destinations. We hold no
- * sourced URL for any of the three, and inventing one is the same failure as
- * inventing a statistic, so the section states where they live instead.
+ * The calls to action are not links. We hold no sourced URL for any of them, and
+ * inventing one is the same failure as inventing a statistic, so the section
+ * states where they live instead.
  */
 
 const RUNGS = [
@@ -40,6 +59,7 @@ const RUNGS = [
     commitment: 'No email',
     title: publications.insights.title,
     body: publications.insights.excerpt,
+    detail: publications.insights.detail,
     cta: 'Browse NorrInsights',
   },
   {
@@ -47,6 +67,7 @@ const RUNGS = [
     commitment: 'No email',
     title: publications.pod.title,
     body: publications.pod.excerpt,
+    detail: publications.pod.detail,
     cta: 'Listen to the Pod',
   },
   {
@@ -54,6 +75,7 @@ const RUNGS = [
     commitment: 'Email',
     title: publications.visionPaper.title,
     body: publications.visionPaper.excerpt,
+    detail: publications.visionPaper.detail,
     cta: publications.visionPaper.cta,
   },
   /**
@@ -67,61 +89,28 @@ const RUNGS = [
    * position that should carry the most durable. Here it is the top of the
    * ladder because it asks the most, not because it is the most important.
    *
-   * "Registration" IS AN INFERENCE, and the only one in this file. Their card
-   * does not say whether the webinar is gated, live or on demand, so this does
-   * not claim an email is required — `Email` would have been that claim.
-   * "Registration" describes the act a webinar involves and nothing more. If it
-   * turns out to be an open link, the correction is one word.
+   * IT IS A RECORDING, NOT AN EVENT. This rung read "Attend · Registration ·
+   * See upcoming webinars" until the webinar's own page was read: it offers
+   * "Download the webinar recording", so there is nothing to attend and no
+   * "upcoming" to see. Whether that download sits behind a form is not visible
+   * without running their page's scripts, so the commitment names the format
+   * rather than claiming an email — `Email` would be that claim, unverified.
    */
   {
-    step: 'Attend',
-    commitment: 'Registration',
+    step: 'Watch',
+    commitment: 'Recording',
     title: publications.webinar.title,
     body: publications.webinar.excerpt,
-    cta: 'See upcoming webinars',
+    detail: publications.webinar.detail,
+    cta: publications.webinar.cta,
   },
 ]
 
-const TONES = ['sky', 'lavender', 'peach', 'mint'] as const
+// The site-wide art names (index.css, THE ART CARD). The order keeps the colours
+// this row had under its old pastel names: ocean, violet, ember, forest.
+const TONES = ['slate', 'plum', 'clay', 'sage'] as const
 
 export function Thinking() {
-  const { index, go, next, prev, regionProps, holdProps } = useCardSlider(RUNGS.length)
-  const [dragX, setDragX] = useState(0)
-  const [dragging, setDragging] = useState(false)
-  const gesture = useRef<{ pointerId: number; startX: number } | null>(null)
-
-  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return
-    gesture.current = { pointerId: event.pointerId, startX: event.clientX }
-    event.currentTarget.setPointerCapture(event.pointerId)
-    setDragging(true)
-    setDragX(0)
-    holdProps.onPointerDown()
-  }
-
-  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const active = gesture.current
-    if (!active || active.pointerId !== event.pointerId) return
-    setDragX(event.clientX - active.startX)
-  }
-
-  const finishDrag = (event: ReactPointerEvent<HTMLDivElement>, cancelled = false) => {
-    const active = gesture.current
-    if (!active || active.pointerId !== event.pointerId) return
-    const distance = event.clientX - active.startX
-    const threshold = Math.min(88, event.currentTarget.clientWidth * 0.16)
-    gesture.current = null
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId)
-    }
-    setDragging(false)
-    setDragX(0)
-    holdProps.onPointerUp()
-
-    if (!cancelled && distance <= -threshold) next()
-    if (!cancelled && distance >= threshold) prev()
-  }
-
   return (
     <section
       id="thinking"
@@ -141,76 +130,40 @@ export function Thinking() {
           Start anywhere you like.
         </SectionHeader>
 
-        <div
-          {...regionProps}
-          data-thinking-carousel
-          data-dragging={dragging ? '' : undefined}
-          style={{
-            ['--thinking-count' as string]: String(RUNGS.length),
-            ['--thinking-drag-x' as string]: `${dragX}px`,
-          }}
-        >
-          <div
-            data-thinking-stage
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={finishDrag}
-            onPointerCancel={(event) => finishDrag(event, true)}
-          >
-            <ol data-thinking-cards className="m-0 list-none p-0">
-              {RUNGS.map((r, cardIndex) => {
-                const position = (cardIndex - index + RUNGS.length) % RUNGS.length
-                const depth = Math.min(position, RUNGS.length - position)
-                const onAxis = position === 0 || position * 2 === RUNGS.length
-                const side = onAxis ? 0 : position * 2 < RUNGS.length ? 1 : -1
+        <TabsPrimitive.Root defaultValue={RUNGS[0].title} orientation="vertical" data-thinking-index>
+          <TabsPrimitive.List aria-label="Thinking, by what each asks of you" data-thinking-list>
+            {RUNGS.map((r) => (
+              <TabsPrimitive.Trigger key={r.title} value={r.title} className="thinking-tab">
+                <span className="label thinking-tab-step">{r.step}</span>
+                <span className="thinking-tab-title">{r.title}</span>
+                <span className="label thinking-tab-ask">{r.commitment}</span>
+              </TabsPrimitive.Trigger>
+            ))}
+          </TabsPrimitive.List>
 
-                return (
-                <li
-                  key={r.title}
-                  data-thinking-card
-                  data-depth={depth}
-                  data-tone={TONES[cardIndex]}
-                  style={{
-                    ['--thinking-depth' as string]: String(depth),
-                    ['--thinking-side' as string]: String(side),
-                  }}
-                  className="flex flex-col rounded-panel border p-7 md:p-9"
-                >
-                <div className="mb-7 flex items-baseline justify-between gap-4 border-b border-hairline pb-4">
-                  <span className="label text-ink-3">{r.step}</span>
-                  <span className="label text-ink-3">{r.commitment}</span>
-                </div>
-
-                <h3 className="display-4">
-                  {r.title}
-                </h3>
-                <p className="caption mt-4 grow text-ink-2">{r.body}</p>
-
-                <p className="mt-8 ui text-ink-3">{r.cta}</p>
-              </li>
-                )
-              })}
-            </ol>
+          <div data-thinking-panels>
+            {RUNGS.map((r, i) => (
+              <TabsPrimitive.Content key={r.title} value={r.title} forceMount data-tone={TONES[i]}>
+                <article className="art-card">
+                  <div className="case-art">
+                    <div className="art-top">
+                      <span className="art-pill">{r.step}</span>
+                      <span className="art-pill">{r.commitment}</span>
+                    </div>
+                    <h3 className="case-title">{r.title}</h3>
+                  </div>
+                  <div className="case-body">
+                    <p className="case-summary">{r.body}</p>
+                    <p className="art-detail">{r.detail}</p>
+                    <p className="art-floor-note">{r.cta}</p>
+                  </div>
+                </article>
+              </TabsPrimitive.Content>
+            ))}
           </div>
+        </TabsPrimitive.Root>
 
-          <div data-thinking-controls>
-            <button type="button" onClick={prev} aria-label="Previous Thinking card">←</button>
-            <div data-thinking-dots>
-              {RUNGS.map((r, cardIndex) => (
-                <button
-                  key={r.title}
-                  type="button"
-                  onClick={() => go(cardIndex)}
-                  aria-label={`Show ${r.step}: ${r.title}`}
-                  aria-current={cardIndex === index ? 'true' : undefined}
-                />
-              ))}
-            </div>
-            <button type="button" onClick={next} aria-label="Next Thinking card">→</button>
-          </div>
-        </div>
-
-        <p className="caption mt-8 text-ink-3">
+        <p className="caption mt-10 text-ink-3">
           Each of these is published or announced on norrin.com. This speculative rebuild
           does not reproduce them, so the rungs above are shown rather than linked.
         </p>

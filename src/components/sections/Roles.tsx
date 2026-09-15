@@ -226,9 +226,11 @@ export function Roles() {
           items={roles.map((r, i) => ({
             id: r.id,
             body: r.claim,
+            points: r.points,
+            pointsLabel: 'In practice',
             floor: r.role,
             label: r.role,
-            tone: TONES[i] ?? 'paper',
+            tone: TONES[i % TONES.length],
           }))}
         />
       </div>
