@@ -582,16 +582,11 @@
      shell and needs the same corner. */
   --radius-stack: 22px;
 
-  --font-sans:
-    'Schibsted Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  /* FRAUNCES IS THE SERIF NOW, replacing Newsreader outright rather than
-     sitting beside it. Picking a serif for display made the old pairing
-     untenable: Fraunces at 94px over Newsreader at 17px is two serifs with
-     different axes of contrast doing adjacent jobs, which reads as an
-     accident rather than a system. One serif covering display AND the
-     argument copy is the arrangement Reaktor uses (Larken over Scto), and it
-     leaves three voices instead of four. */
-  --font-serif: 'Fraunces Variable', ui-serif, Georgia, 'Times New Roman', serif;
+  /* Norrin's primary and decorative type roles. The proprietary faces are
+     named first so licensed webfont files can be added without changing any
+     component; the supplied fallbacks keep both roles usable until then. */
+  --font-sans: 'ABC Camera Plain', Helvetica, Arial, sans-serif;
+  --font-serif: 'LFS Adelia', 'Trebuchet MS', Helvetica, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
   /* Motion. Three easings, on purpose. */
@@ -729,8 +724,6 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Schibsted Grotesk ships contextual alternates that tidy the flat-sided
-       grotesque joins; leaving them on is closer to the designer's intent. */
     font-feature-settings: 'calt' 1;
   }
 
