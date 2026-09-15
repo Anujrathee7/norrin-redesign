@@ -106,10 +106,10 @@ export function setTheme(theme: Theme, origin?: ThemeOrigin) {
   const reduced =
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  // Dark enters as a circle expanding from the control that was pressed. The
-  // View Transitions API is an enhancement: light mode, reduced motion and
+  // The next theme enters as a circle expanding from the control that was
+  // pressed. The View Transitions API is an enhancement: reduced motion and
   // browsers without support keep the existing immediate switch.
-  if (theme !== 'dark' || !origin || reduced || !doc?.startViewTransition) {
+  if (!origin || reduced || !doc?.startViewTransition) {
     apply(theme)
     return
   }

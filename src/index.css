@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Dark mode expands from the theme control as one circular field. Browsers
+/* Either theme expands from the theme control as one circular field. Browsers
    without View Transitions ignore these pseudo-elements, and reduced-motion
    users retain the immediate theme switch. */
 @media (prefers-reduced-motion: no-preference) {
@@ -16,12 +16,12 @@
     z-index: 1;
   }
 
-  :root[data-theme='dark']::view-transition-new(root) {
-    animation-name: theme-reveal-dark;
+  ::view-transition-new(root) {
+    animation-name: theme-reveal;
     z-index: 2;
   }
 
-  @keyframes theme-reveal-dark {
+  @keyframes theme-reveal {
     from {
       clip-path: circle(0 at var(--theme-reveal-x) var(--theme-reveal-y));
     }
