@@ -2,6 +2,7 @@ import { Hero } from '@/components/sections/Hero'
 import { TheGap } from '@/components/sections/TheGap'
 import { Pillars } from '@/components/sections/Pillars'
 import { Contact } from '@/components/sections/Contact'
+import { PhotoInterlude } from '@/components/sections/PhotoInterlude'
 
 /**
  * `/` — the hero and the problem it names.
@@ -50,6 +51,7 @@ export function Home() {
         <div aria-hidden="true" data-deck-hold />
       </div>
       <TheGap />
+      <PhotoInterlude />
       {/* WHAT YOU CAN BUY, DIRECTLY UNDER THE GAP.
 
           It came here from `/what-we-do`, which is deleted. It sits under The
