@@ -1,5 +1,8 @@
+import { useRef, useState } from 'react'
+import type { PointerEvent as ReactPointerEvent } from 'react'
 import { Container, SectionHeader } from '@/components/primitives/Layout'
 import { publications } from '@/data/norrin'
+import { useCardSlider } from '@/hooks/useCardSlider'
 
 /**
  * Thinking — the commitment ladder.
@@ -79,7 +82,46 @@ const RUNGS = [
   },
 ]
 
+const TONES = ['sky', 'lavender', 'peach', 'mint'] as const
+
 export function Thinking() {
+  const { index, go, next, prev, regionProps, holdProps } = useCardSlider(RUNGS.length)
+  const [dragX, setDragX] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const gesture = useRef<{ pointerId: number; startX: number } | null>(null)
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return
+    gesture.current = { pointerId: event.pointerId, startX: event.clientX }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    setDragging(true)
+    setDragX(0)
+    holdProps.onPointerDown()
+  }
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const active = gesture.current
+    if (!active || active.pointerId !== event.pointerId) return
+    setDragX(event.clientX - active.startX)
+  }
+
+  const finishDrag = (event: ReactPointerEvent<HTMLDivElement>, cancelled = false) => {
+    const active = gesture.current
+    if (!active || active.pointerId !== event.pointerId) return
+    const distance = event.clientX - active.startX
+    const threshold = Math.min(88, event.currentTarget.clientWidth * 0.16)
+    gesture.current = null
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+    setDragging(false)
+    setDragX(0)
+    holdProps.onPointerUp()
+
+    if (!cancelled && distance <= -threshold) next()
+    if (!cancelled && distance >= threshold) prev()
+  }
+
   return (
     <section
       id="thinking"
@@ -99,17 +141,41 @@ export function Thinking() {
           Start anywhere you like.
         </SectionHeader>
 
-        {/* A scroll-controlled spotlight, not an autoplaying carousel. The
-            runway supplies exactly three transitions for four cards. Each card
-            moves independently into or away from the centre; the row itself
-            never translates. Because the timeline is scroll progress, reversing
-            direction reverses the same frame immediately with no duration to
-            finish and no completed-state pause. */}
-        <div data-thinking-stage>
-          <div data-thinking-pin>
+        <div
+          {...regionProps}
+          data-thinking-carousel
+          data-dragging={dragging ? '' : undefined}
+          style={{
+            ['--thinking-count' as string]: String(RUNGS.length),
+            ['--thinking-drag-x' as string]: `${dragX}px`,
+          }}
+        >
+          <div
+            data-thinking-stage
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={finishDrag}
+            onPointerCancel={(event) => finishDrag(event, true)}
+          >
             <ol data-thinking-cards className="m-0 list-none p-0">
-              {RUNGS.map((r, index) => (
-                <li key={r.title} data-thinking-card={index} className="flex flex-col rounded-panel border border-hairline bg-ground p-7 md:p-9">
+              {RUNGS.map((r, cardIndex) => {
+                const position = (cardIndex - index + RUNGS.length) % RUNGS.length
+                const depth = Math.min(position, RUNGS.length - position)
+                const onAxis = position === 0 || position * 2 === RUNGS.length
+                const side = onAxis ? 0 : position * 2 < RUNGS.length ? 1 : -1
+
+                return (
+                <li
+                  key={r.title}
+                  data-thinking-card
+                  data-depth={depth}
+                  data-tone={TONES[cardIndex]}
+                  style={{
+                    ['--thinking-depth' as string]: String(depth),
+                    ['--thinking-side' as string]: String(side),
+                  }}
+                  className="flex flex-col rounded-panel border p-7 md:p-9"
+                >
                 <div className="mb-7 flex items-baseline justify-between gap-4 border-b border-hairline pb-4">
                   <span className="label text-ink-3">{r.step}</span>
                   <span className="label text-ink-3">{r.commitment}</span>
@@ -122,11 +188,25 @@ export function Thinking() {
 
                 <p className="mt-8 ui text-ink-3">{r.cta}</p>
               </li>
-              ))}
+                )
+              })}
             </ol>
-            <div data-thinking-progress aria-hidden="true">
-              {RUNGS.map((r, index) => <span key={r.title} data-thinking-step={index} />)}
+          </div>
+
+          <div data-thinking-controls>
+            <button type="button" onClick={prev} aria-label="Previous Thinking card">←</button>
+            <div data-thinking-dots>
+              {RUNGS.map((r, cardIndex) => (
+                <button
+                  key={r.title}
+                  type="button"
+                  onClick={() => go(cardIndex)}
+                  aria-label={`Show ${r.step}: ${r.title}`}
+                  aria-current={cardIndex === index ? 'true' : undefined}
+                />
+              ))}
             </div>
+            <button type="button" onClick={next} aria-label="Next Thinking card">→</button>
           </div>
         </div>
 

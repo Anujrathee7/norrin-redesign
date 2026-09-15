@@ -4844,136 +4844,160 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 }
 
 /* --------------------------------------------------------------------------
-   THINKING — A SCROLL-SCRUBBED CARD SPOTLIGHT
+   THINKING — A DRAGGABLE CARD SPOTLIGHT
 
-   The runway is three viewport-heights because four cards make three handoffs.
-   The sticky stage stays still while each card independently changes position
-   and scale. There is no duration: the named timeline is the only clock, so a
-   wheel or trackpad reversal changes direction on the very next painted frame.
-
-   The base layout is a plain list. Browsers without scroll timelines and people
-   asking for reduced motion get every card at full size in reading order.
+   Four cards move around a circular set of positions. The current card owns the
+   centre while the adjacent cards remain visible at the edges. Dragging moves
+   the front card with the pointer and hands focus to the next or previous card.
    -------------------------------------------------------------------------- */
+
+[data-thinking-carousel] {
+  margin-block-start: 2rem;
+  --thinking-ink: #1d1d1f;
+  --thinking-muted: #4b4b50;
+  --thinking-outline: rgb(29 29 31 / 24%);
+}
+
+[data-thinking-stage] {
+  display: grid;
+  min-block-size: clamp(28rem, 56vw, 35rem);
+  place-items: center;
+  overflow: clip;
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+}
+
+[data-thinking-carousel][data-dragging] [data-thinking-stage] {
+  cursor: grabbing;
+}
 
 [data-thinking-cards] {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  inline-size: 100%;
+  min-block-size: 28rem;
+  place-items: center;
 }
 
 [data-thinking-card] {
-  min-block-size: 21rem;
+  grid-area: 1 / 1;
+  inline-size: min(82vw, 31rem);
+  min-block-size: 25rem;
+  color: var(--thinking-ink);
+  border-color: var(--thinking-outline);
+  background: var(--thinking-surface);
+  box-shadow: 0 24px 60px rgb(29 29 31 / calc(0.12 - var(--thinking-depth) * 0.035));
+  transform:
+    translateX(calc(var(--thinking-side) * 92%))
+    scale(calc(1 - var(--thinking-depth) * 0.16));
+  transform-origin: center;
+  transition:
+    transform 500ms var(--ease-ui),
+    background 500ms var(--ease-ui),
+    color 500ms var(--ease-ui),
+    border-color 500ms var(--ease-ui),
+    box-shadow 500ms var(--ease-ui);
+  z-index: calc(var(--thinking-count) - var(--thinking-depth));
+  will-change: transform;
 }
 
-[data-thinking-progress] {
-  display: none;
+[data-thinking-card][data-depth='0'] {
+  box-shadow: 0 30px 80px rgb(29 29 31 / 18%);
 }
 
-@media (prefers-reduced-motion: no-preference) and (min-width: 48rem) {
-  @supports (animation-timeline: view()) {
-    [data-thinking-stage] {
-      height: 320svh;
-      margin-block-start: 2rem;
-      view-timeline-name: --thinking-stage;
-    }
+[data-thinking-carousel][data-dragging] [data-thinking-card][data-depth='0'] {
+  transform: translateX(var(--thinking-drag-x)) scale(1.015);
+  transition: none;
+}
 
-    [data-thinking-pin] {
-      position: sticky;
-      top: max(82px, 8svh);
-      display: grid;
-      min-block-size: min(44rem, calc(100svh - max(82px, 8svh) - 3rem));
-      place-items: center;
-      overflow: clip;
-    }
+[data-thinking-card] h3,
+[data-thinking-card] .label,
+[data-thinking-card] .caption,
+[data-thinking-card] .ui {
+  color: inherit;
+}
 
-    [data-thinking-cards] {
-      display: grid;
-      inline-size: 100%;
-      min-block-size: 32rem;
-      place-items: center;
-    }
+[data-thinking-card] .caption,
+[data-thinking-card] .ui,
+[data-thinking-card] .label {
+  color: var(--thinking-muted);
+}
 
-    [data-thinking-card] {
-      grid-area: 1 / 1;
-      inline-size: clamp(20rem, 39vw, 34rem);
-      min-block-size: 27rem;
-      transform-origin: center;
-      will-change: transform;
-      animation-duration: 1ms;
-      animation-timeline: --thinking-stage;
-      animation-range: contain 0% contain 100%;
-      animation-timing-function: linear;
-      animation-fill-mode: both;
-    }
+[data-thinking-card] > div {
+  border-color: var(--thinking-outline);
+}
 
-    [data-thinking-card='0'] { animation-name: thinking-card-0; }
-    [data-thinking-card='1'] { animation-name: thinking-card-1; }
-    [data-thinking-card='2'] { animation-name: thinking-card-2; }
-    [data-thinking-card='3'] { animation-name: thinking-card-3; }
+[data-thinking-card][data-tone='sky'] { --thinking-surface: var(--card-sky); }
+[data-thinking-card][data-tone='lavender'] { --thinking-surface: var(--card-lavender); }
+[data-thinking-card][data-tone='peach'] { --thinking-surface: var(--card-peach); }
+[data-thinking-card][data-tone='mint'] { --thinking-surface: var(--card-mint); }
 
-    @keyframes thinking-card-0 {
-      0%, 8% { transform: translateX(0) scale(1); z-index: 4; }
-      33% { transform: translateX(-82%) scale(0.74); z-index: 3; }
-      66% { transform: translateX(-132%) scale(0.62); z-index: 2; }
-      100% { transform: translateX(-166%) scale(0.56); z-index: 1; }
-    }
+[data-thinking-controls] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-block-start: 0.75rem;
+}
 
-    @keyframes thinking-card-1 {
-      0%, 8% { transform: translateX(82%) scale(0.74); z-index: 3; }
-      33%, 41% { transform: translateX(0) scale(1); z-index: 4; }
-      66% { transform: translateX(-82%) scale(0.74); z-index: 3; }
-      100% { transform: translateX(-132%) scale(0.62); z-index: 2; }
-    }
+[data-thinking-controls] > button {
+  display: grid;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  place-items: center;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 50%;
+  color: var(--ink);
+  background: var(--ground);
+  cursor: pointer;
+}
 
-    @keyframes thinking-card-2 {
-      0%, 8% { transform: translateX(132%) scale(0.62); z-index: 2; }
-      33% { transform: translateX(82%) scale(0.74); z-index: 3; }
-      66%, 74% { transform: translateX(0) scale(1); z-index: 4; }
-      100% { transform: translateX(-82%) scale(0.74); z-index: 3; }
-    }
+[data-thinking-dots] {
+  display: flex;
+  gap: 0.45rem;
+}
 
-    @keyframes thinking-card-3 {
-      0%, 8% { transform: translateX(166%) scale(0.56); z-index: 1; }
-      33% { transform: translateX(132%) scale(0.62); z-index: 2; }
-      66% { transform: translateX(82%) scale(0.74); z-index: 3; }
-      92%, 100% { transform: translateX(0) scale(1); z-index: 4; }
-    }
+[data-thinking-dots] > button {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+}
 
-    [data-thinking-progress] {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      justify-content: center;
-    }
+[data-thinking-dots] > button::before {
+  content: '';
+  display: block;
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  margin: auto;
+  border-radius: 50%;
+  background: var(--hairline-strong);
+}
 
-    [data-thinking-progress]::before {
-      content: 'Scroll to shift focus';
-      margin-inline-end: 0.5rem;
-      color: var(--ink-3);
-      font: var(--label);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
+[data-thinking-dots] > button[aria-current='true']::before {
+  background: var(--ink);
+  transform: scale(1.4);
+}
 
-    [data-thinking-step] {
-      inline-size: 1.75rem;
-      block-size: 2px;
-      background: var(--hairline-strong);
-    }
+:where(html[data-theme='dark'], .dark) [data-thinking-carousel] {
+  --thinking-ink: #f5f5f7;
+  --thinking-muted: #d2d2d7;
+  --thinking-outline: rgb(245 245 247 / 28%);
+}
+
+@media (min-width: 48rem) {
+  [data-thinking-card] {
+    inline-size: clamp(20rem, 39vw, 34rem);
+    min-block-size: 27rem;
+    transform:
+      translateX(calc(var(--thinking-side) * 82%))
+      scale(calc(1 - var(--thinking-depth) * 0.16));
   }
 }
 
-@media (min-width: 40rem) {
-  [data-thinking-cards] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) and (min-width: 48rem) {
-  @supports (animation-timeline: view()) {
-    [data-thinking-cards] {
-      grid-template-columns: 1fr;
-    }
+@media (prefers-reduced-motion: reduce) {
+  [data-thinking-card] {
+    transition: none;
   }
 }
 
@@ -5021,26 +5045,40 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 }
 
 /* --------------------------------------------------------------------------
-   SCOPE CARD COLOUR SET
+   SHARED CARD COLOUR SET
 
-   These tones belong to the four responsibilities, so their colour travels
-   with the card through the circular stack. The surfaces stay muted; ink and
-   outlines follow one consistent rule per page theme.
+   The soft blue, lavender, peach and mint set introduced in Thinking now runs
+   through every card collection. Each theme owns its four gradients and one
+   consistent ink rule; components only choose a named tone.
    -------------------------------------------------------------------------- */
+:root[data-theme='light'] {
+  --card-sky: linear-gradient(145deg, #f3f8ff, #cfe3ff);
+  --card-lavender: linear-gradient(145deg, #f7f1ff, #e2d4ff);
+  --card-peach: linear-gradient(145deg, #fff6ee, #ffdcc3);
+  --card-mint: linear-gradient(145deg, #f0faf3, #ceeada);
+}
+
 :root[data-theme='light'] [data-rolecards] > li,
 :root[data-theme='light'] [data-cardstack] > li,
 :root[data-theme='light'] .tl-card[data-tone] {
-  --tone-hairline: #14170f;
-  --tone-ink: #14170f;
-  --tone-reading: #14170f;
-  --tone-ink-3: #14170f;
-  --tone-accent: #14170f;
+  --tone-hairline: rgb(29 29 31 / 24%);
+  --tone-ink: #1d1d1f;
+  --tone-reading: #3f3f44;
+  --tone-ink-3: #55555b;
+  --tone-accent: #1d1d1f;
 }
 
-:root[data-theme='light'] [data-tone='slate'] { --tone-surface: #aebbd2; }
-:root[data-theme='light'] [data-tone='clay'] { --tone-surface: #d7a08f; }
-:root[data-theme='light'] [data-tone='sage'] { --tone-surface: #b8c5a6; }
-:root[data-theme='light'] [data-tone='plum'] { --tone-surface: #beb0d0; }
+:root[data-theme='light'] [data-tone='slate'] { --tone-surface: var(--card-sky); }
+:root[data-theme='light'] [data-tone='clay'] { --tone-surface: var(--card-peach); }
+:root[data-theme='light'] [data-tone='sage'] { --tone-surface: var(--card-mint); }
+:root[data-theme='light'] [data-tone='plum'] { --tone-surface: var(--card-lavender); }
+
+:root[data-theme='dark'] {
+  --card-sky: linear-gradient(145deg, #203e60, #152d48);
+  --card-lavender: linear-gradient(145deg, #49375f, #302440);
+  --card-peach: linear-gradient(145deg, #65422f, #432c20);
+  --card-mint: linear-gradient(145deg, #315442, #20382d);
+}
 
 :root[data-theme='dark'] [data-rolecards] > li,
 :root[data-theme='dark'] [data-cardstack] > li,
@@ -5052,13 +5090,14 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   --tone-accent: #f8f7f3;
 }
 
-:root[data-theme='dark'] [data-tone='slate'] { --tone-surface: #35425c; }
-:root[data-theme='dark'] [data-tone='clay'] { --tone-surface: #5a3f38; }
-:root[data-theme='dark'] [data-tone='sage'] { --tone-surface: #3e4c39; }
-:root[data-theme='dark'] [data-tone='plum'] { --tone-surface: #493c59; }
+:root[data-theme='dark'] [data-tone='slate'] { --tone-surface: var(--card-sky); }
+:root[data-theme='dark'] [data-tone='clay'] { --tone-surface: var(--card-peach); }
+:root[data-theme='dark'] [data-tone='sage'] { --tone-surface: var(--card-mint); }
+:root[data-theme='dark'] [data-tone='plum'] { --tone-surface: var(--card-lavender); }
 
 [data-rolecards] > li > .card {
   border-width: 2px;
+  background: var(--tone-surface);
   justify-content: center;
 }
 
@@ -5066,7 +5105,32 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 .tl-card[data-tone] {
   border-width: 2px;
   border-color: var(--tone-hairline);
-  background-color: var(--tone-surface);
+  background: var(--tone-surface);
+}
+
+/* In the moving spotlight, colour follows the stage position. This keeps the
+   centre card visually dominant while every card uses the shared palette. */
+[data-slider] [data-slidetrack] > li[data-depth='0'] {
+  --tone-surface: var(--card-sky);
+  --tone-hairline: rgb(29 29 31 / 24%);
+  --tone-ink: #1d1d1f;
+  --tone-reading: #3f3f44;
+  --tone-ink-3: #55555b;
+}
+
+[data-slider] [data-slidetrack] > li:is([data-depth='1'], [data-depth='2']) {
+  --tone-surface: var(--card-lavender);
+  --tone-hairline: rgb(29 29 31 / 24%);
+  --tone-ink: #1d1d1f;
+  --tone-reading: #3f3f44;
+  --tone-ink-3: #55555b;
+}
+
+:root[data-theme='dark'] [data-slider] [data-slidetrack] > li {
+  --tone-hairline: rgb(245 245 247 / 28%);
+  --tone-ink: #f5f5f7;
+  --tone-reading: #e2e2e7;
+  --tone-ink-3: #d2d2d7;
 }
 
 .tl-card[data-tone] .tl-title {
