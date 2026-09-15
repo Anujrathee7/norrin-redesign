@@ -56,22 +56,46 @@ export const positioning = {
  * Norrin's own four-role framing, verbatim from the homepage "Enabling Enterprise AI"
  * paragraph. We use this as the spine of the site because it is the clearest
  * articulation of scope they have written.
+ *
+ * `points` are verbatim headings and sentence fragments from Norrin's service
+ * pages, one source per role, noted inline. norrin.com does not itself map
+ * service pages to roles — which page backs which role is OUR pairing. Items
+ * marked (fragment) are Norrin's words with the rest of the sentence dropped,
+ * never reworded.
  */
 export const roles = [
   {
     id: 'integrator',
     role: 'Integrator',
     claim: 'We connect models to your data, tools, and workflows.',
+    // norrin.com/services/system-integrations — section headings
+    points: ['Open your data to AI', 'Implement API management', 'Build for real time'],
   },
   {
     id: 'deployer',
     role: 'Deployer',
     claim: 'We build and ship the agents and applications that do the real work.',
+    // norrin.com/services/artificial-intelligence — headings; the third is the
+    // homepage Applied AI Solutions block, without its full stop
+    points: [
+      'AI agents and workflow automation',
+      'Computer vision for quality control and anomaly detection',
+      'Every solution ships through our deployment framework',
+    ],
   },
   {
     id: 'infrastructure',
     role: 'Infrastructure partner',
     claim: 'We run the platforms underneath.',
+    // norrin.com/services/cloud-infrastructure (fragments of "Norrin builds
+    // growth-ready enterprise clouds on Microsoft Azure, from architecture and
+    // migration to ongoing management."); the third is the homepage Enterprise
+    // AI Foundation block, verbatim
+    points: [
+      'Growth-ready enterprise clouds on Microsoft Azure',
+      'From architecture and migration to ongoing management',
+      'Continuous services and AIOps keep it all running 24/7.',
+    ],
   },
   {
     id: 'transformation',
@@ -79,6 +103,9 @@ export const roles = [
     claim:
       'We provide the transformation leadership and adoption support that carry the change ' +
       'from individual contributors to the C-suite.',
+    // norrin.com/services/artificial-intelligence (AI Enablement Team headings);
+    // the third is a heading on norrin.com/services/advisory
+    points: ['AI strategy and vision', 'Roadmaps and operating models', 'Change management'],
   },
 ] as const
 
@@ -198,6 +225,13 @@ export const customers = [
 /**
  * Case summaries quoted from public case pages. `quote` strings are verbatim.
  * No metric appears here that Norrin has not published itself.
+ *
+ * `short` IS A PARAPHRASE, and flagged per case with `paraphrase: true`. The
+ * customer cards were asked to carry less copy, and the verbatim `quote` sits
+ * directly above each one as its source. Every short line is a cut of that
+ * quote: nothing added, nothing strengthened, and where the title already
+ * states a fact (the 87,300 km, "data architecture quality") the short line
+ * does not state it a second time.
  */
 export const cases = [
   {
@@ -210,6 +244,10 @@ export const cases = [
     quote:
       'Together with Norrin, Caruna built a computer vision application to help identify damages ' +
       'to their 87,300-kilometer-long electrical network.',
+    paraphrase: true,
+    short:
+      'Together with Norrin, Caruna built a computer vision application that helps identify ' +
+      'damage to its electrical network.',
   },
   {
     id: 'skanska',
@@ -221,6 +259,12 @@ export const cases = [
       'development services. Chief Information Officer Artturi Kantanen has been advancing ' +
       'Skanska’s journey towards a data-driven organization in Finland.',
     attribution: 'Artturi Kantanen, Chief Information Officer, Skanska',
+    paraphrase: true,
+    // The CIO is named on the card's floor from `attribution`, so the short
+    // line does not name him again.
+    short:
+      'One of the world’s leading construction and project development companies, on its ' +
+      'journey towards a data-driven organization in Finland.',
   },
   {
     id: 's-pankki',
@@ -230,6 +274,10 @@ export const cases = [
     quote:
       'Norrin helped S-Pankki develop solutions to prevent data quality errors in the positive ' +
       'credit register, which S-Pankki successfully adopted in April.',
+    paraphrase: true,
+    short:
+      'Norrin helped S-Pankki prevent data quality errors in the positive credit register. ' +
+      'Adopted in April.',
   },
   {
     id: 'sponda',
@@ -240,6 +288,10 @@ export const cases = [
       'Sponda has made significant investments to ensure the quality of its data architecture. ' +
       'In addition to technological investments, this requires developing the organization’s ' +
       'capabilities to ensure data quality, availability, business-centricity, and security.',
+    paraphrase: true,
+    short:
+      'Beyond the technology, developing the organization’s capabilities for data quality, ' +
+      'availability, business-centricity and security.',
   },
 ] as const
 
@@ -436,7 +488,18 @@ export const offices = [
 
 /* ------------------------------------------------------------------ *
  * People — source: /services "Contact us" block (public names + titles).
- * No photographs are used: we hold no rights to their headshots.
+ *
+ * HEADSHOTS NOW, from that same block. This used to say no photographs were
+ * used because we held no rights to them — but these are Norrin's own
+ * published photographs of their own people, the same category as `photos`
+ * below, shown back to Norrin in a private demo. Emil's is only on /services;
+ * /contact-us lists the other two. Fetched and encoded by `tools/photos.mjs`.
+ * `alt` is ours, written from each picture (CLAUDE.md §1.9).
+ *
+ * `email`, `phone` and `tel` come from the same /services block, read from its
+ * raw HTML (its own `mailto:` and `tel:` hrefs), not retyped from the rendered
+ * page. `phone` is the number as Norrin displays it; `tel` is the dialable form
+ * their link uses. All three are Norrin's published business contacts.
  * ------------------------------------------------------------------ */
 
 /**
@@ -450,9 +513,51 @@ export const offices = [
 export const contactEmail = { address: 'info@norrin.com', placeholder: true } as const
 
 export const contacts = [
-  { name: 'Antti Vuolli', title: 'Chief Commercial Officer' },
-  { name: 'Emil Sievinen', title: 'Chief Technology Officer' },
-  { name: 'Heidi Riihimäki', title: 'Sales Operations Manager' },
+  {
+    name: 'Antti Vuolli',
+    title: 'Chief Commercial Officer',
+    email: 'antti.vuolli@norrin.com',
+    phone: '+358 50 487 4172',
+    tel: '+358504874172',
+    photo: {
+      file: 'antti-vuolli',
+      src: 'https://norrin.com/hs-fs/hubfs/Antti%20Vuolli%20neli%C3%B6%20(2).png',
+      w: 4316,
+      h: 4316,
+      alt: 'Antti Vuolli, smiling, in dark-rimmed glasses and a navy suit.',
+      altIsOurs: true,
+    },
+  },
+  {
+    name: 'Emil Sievinen',
+    title: 'Chief Technology Officer',
+    email: 'emil.sievinen@norrin.com',
+    phone: '+358 40 078 1213',
+    tel: '+358400781213',
+    photo: {
+      file: 'emil-sievinen',
+      src: 'https://norrin.com/hs-fs/hubfs/Emil%20Sievinen%20neli%C3%B6%20(2).png',
+      w: 3735,
+      h: 3735,
+      alt: 'Emil Sievinen, smiling, bearded, in round glasses and a tweed jacket, arms folded.',
+      altIsOurs: true,
+    },
+  },
+  {
+    name: 'Heidi Riihimäki',
+    title: 'Sales Operations Manager',
+    email: 'heidi.riihimaki@norrin.com',
+    phone: '+358 44 029 0496',
+    tel: '+358440290496',
+    photo: {
+      file: 'heidi-riihimaki',
+      src: 'https://norrin.com/hs-fs/hubfs/Riihim%C3%A4ki_Heidi.jpg',
+      w: 3024,
+      h: 3024,
+      alt: 'Heidi Riihimäki, smiling, in a dark pinstripe blazer.',
+      altIsOurs: true,
+    },
+  },
 ] as const
 
 /* ------------------------------------------------------------------ *
@@ -464,6 +569,11 @@ export const contacts = [
  * The heuristic version took the Vision Paper's opening — a sentence about the
  * problem — and threw away the clause that says what is actually in the paper,
  * directly above a button reading "Download the paper".
+ *
+ * `detail` is the one concrete fact each item's OWN page adds — a question, a
+ * host, a headline, the speakers — taken from that page rather than from the
+ * homepage card, which is why the Thinking cards stopped reading as empty. Each
+ * names its source URL; the webinar's is the only paraphrase and says so.
  */
 export const publications = {
   visionPaper: {
@@ -474,8 +584,11 @@ export const publications = {
       'paper, we explore how AI-augmented, multi-modal, and asynchronous experiences can redefine ' +
       'enterprise applications.',
     excerpt:
-      'In this paper, we explore how AI-augmented, multi-modal, and asynchronous experiences ' +
-      'can redefine enterprise applications.',
+      'We believe AI can change the interface between humans and machines profoundly. In this ' +
+      'paper, we explore how AI-augmented, multi-modal, and asynchronous experiences can ' +
+      'redefine enterprise applications.',
+    /** Verbatim, the paper page's opening question — norrin.com/norrin-face-of-ai-vision-paper */
+    detail: 'How will enterprise software systems and their user experiences evolve by 2030?',
     cta: 'Download the paper',
   },
   pod: {
@@ -488,11 +601,29 @@ export const publications = {
     excerpt:
       'It blends technical insight with the human angle: what AI means for people, why some ' +
       'initiatives thrive while others stall, and what leaders must actually do to unlock impact.',
+    /** Verbatim, both clauses — norrin.com/norrin-pod */
+    detail:
+      'Hosted by Jouni Heikniemi, a long-time IT thought leader. Most of the episodes are in Finnish.',
   },
+  /**
+   * The old line here — "Writing and a newsletter on enterprise AI, data and
+   * adoption." — was ours, written before the page was read. It is replaced with
+   * the page's own description.
+   */
   insights: {
     title: 'NorrInsights',
-    body: 'Writing and a newsletter on enterprise AI, data and adoption.',
-    excerpt: 'Writing and a newsletter on enterprise AI, data and adoption.',
+    body:
+      'NorrInsights offers a view into the industry—market intelligence and technologies, ' +
+      'delivered with context, clarity, and direction.',
+    excerpt:
+      'NorrInsights offers a view into the industry—market intelligence and technologies, ' +
+      'delivered with context, clarity, and direction.',
+    /**
+     * A verbatim article headline from norrin.com/insights, as listed in
+     * September 2026. Perishable: it goes stale when they publish, and "Recent"
+     * rather than "Latest" is deliberate, since no date was checked against it.
+     */
+    detail: 'Recent: “AI in 2026: leadership, governance & trust as the differentiators”',
   },
   /**
    * The webinar card from their "Highlights and News" band. It is the one item
@@ -511,7 +642,19 @@ export const publications = {
       'results? In the webinar, we walk through what industrial AI looks like when it works, ' +
       'with real use cases.',
     excerpt:
-      'We walk through what industrial AI looks like when it works, with real use cases.',
+      'What does it take to deploy AI in a production environment so that it delivers ' +
+      'measurable results? In the webinar, we walk through what industrial AI looks like when it ' +
+      'works, with real use cases.',
+    /**
+     * PARAPHRASE of the speaker list on norrin.com/webinar-industrial-ai, which
+     * names Veikko Saikkonen ("Head of Industrial AI") and Anton Nyman ("Business
+     * Analyst for Mill Operations at Boliden"), plus David Arenbo. Shortened to fit
+     * one line; the names and the employer are theirs.
+     */
+    detail: 'With Veikko Saikkonen, Head of Industrial AI, and Anton Nyman of Boliden.',
+    paraphrase: true,
+    /** The page offers it as "Download the webinar recording" — past, not upcoming. */
+    cta: 'Download the recording',
   },
 } as const
 

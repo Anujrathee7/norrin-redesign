@@ -1,143 +1,189 @@
-import { Container, Grid, SectionHeader } from '@/components/primitives/Layout'
+import { Container, Eyebrow, Grid, SectionHeader } from '@/components/primitives/Layout'
 import { Photo } from '@/components/primitives/Photo'
-import { careers, photos } from '@/data/norrin'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { aboutHeadline, beliefs, careers, photos, waysOfWorking } from '@/data/norrin'
 
 /**
- * Careers — "Work at Norrin".
+ * Careers — "Work at Norrin", with Norrin's values beside it.
  *
  * THE ONE SECTION OF THEIR HOMEPAGE THIS SITE HAD NO COUNTERPART FOR. Every
- * other band on norrin.com mapped onto something here — their hero to ours,
- * their thesis to `TheGap`, their three service cards to `Roles` + `Pillars`,
- * their customer list to `Work`, their vision paper and podcast into
- * `Thinking`. Careers had nothing, and for a company whose stated problem is
- * that it is growing faster than it can hire, that is not a small omission.
+ * other band on norrin.com mapped onto something here; Careers had nothing, and
+ * for a company whose stated problem is that it is growing faster than it can
+ * hire, that is not a small omission.
  *
- * WHY IT SITS HERE, immediately before the track record. Norrin runs it
- * directly after the customer roster, and the logic of that is right — the
- * roster answers "who trusts them", this answers "who are they", and `Proof`
- * then answers "will they still be here in three years".
+ * ONE BAND, TWO BLOCKS. Careers and Values used to be consecutive sections on
+ * `/company` — a copy/photograph split, then a heading held against a tab row.
+ * The repo owner merged them and picked this layout from four rendered options:
+ * the invitation on the left, and the claims that back it on the right.
  *
- * It is one place later than theirs for a structural reason, not a taste one.
- * The navbar marks the current section with its own length of the bar's bottom
- * rule, and that only reads as wayfinding if each nav item owns a CONTIGUOUS
- * run of sections (see the note in `App.tsx`). Careers belongs under "Company"
- * alongside `Proof`; dropping it between `Work` and `Thinking` would split that
- * item's run in two and send the marker backwards on the way down the page.
- * So it sits after `Thinking`, and Company owns `careers` + `proof` as one run.
+ * THE BAND STANDS ON THE PHOTOGRAPH, under a flat `--scrim-deep`. That is the
+ * second treated Norrin photograph on the site and so the second recorded
+ * exception to CLAUDE.md §1.8 — granted by the repo owner, not inherited from
+ * the first. 88% rather than Contact's 76%: this picture is faces at close
+ * range, and at 76% the repo owner found the copy hard to focus on. Every pair
+ * is still measured against the LIGHTEST pixel type can land on (WCAG F83) and
+ * gated in `tools/palette.mjs`. The photograph used to sit in its own
+ * framed 3:2 with a wipe and a pan; as a ground it holds still, because a
+ * moving picture under running text is a reading problem, not a flourish.
  *
- * THE PHOTOGRAPH IS THE POINT OF THE SECTION, and it is the only place on the
- * site where that is true. Everywhere else the argument is carried by type and
- * one rule; here the claim is "this is a place worth working" and no amount of
- * typography makes that case. It is also the right section to spend the site's
- * first photograph on, because it is the one making a human claim rather than a
- * technical one.
+ * NO LINES. The values list's hairlines between statements and the tab row's
+ * rule are both gone — the repo owner's verdict on separator rules was that
+ * they read as generated. Space and type contrast part the statements, and the
+ * active tab is a filled pill (`--inverse-field`) rather than a stretch of rule.
  *
- * NO INVENTED PROOF. Their page has no headcount-growth figure, no glassdoor
- * score, no employee quote, and no open-roles count, so neither does this. The
- * growth numbers that DO exist publicly are already in `Proof`, where they are
- * evidence about the business rather than a recruitment claim. The CTA states
- * where roles live rather than linking to a URL we have not verified — the same
- * rule the `Thinking` rungs follow.
+ * THE TABS ARE THE SOURCE'S OWN STRUCTURE. `/about-us` prints "We believe in"
+ * and "Ways of working" as two separately headed sections; the trigger labels
+ * are those headings verbatim, and every statement is shown in full in its
+ * panel.
+ *
+ * NO INVENTED PROOF. No headcount figure, no Glassdoor score, no employee
+ * quote, no open-roles count — Norrin publishes none of them. The CTA states
+ * where roles live rather than linking to a URL we have not verified.
  */
 export function Careers() {
   return (
-    // `data-scene` declares the timeline everything below is scrubbed against
-    // (`view-timeline-name: --scene`), so the photograph and the copy are timed
-    // against THIS section's own scroll range rather than each against its own.
-    // That is what lets them be choreographed relative to one another.
-    //
-    // Note the SectionHeader inside carries its own `data-scene`; its parts
-    // resolve to the nearest named ancestor, so the heading keeps its own
-    // entrance and the parts here take the section's. Nested on purpose.
+    // `data-scene` declares the timeline the parts below are scrubbed against,
+    // so the copy on both sides arrives against THIS section's scroll range.
     <section
       id="careers"
       data-shot="careers"
       aria-labelledby="careers-heading"
       data-scene
-      // BACK TO THE PAGE'S ORDINARY `py-20 md:py-28`. This briefly ran `pt-28`
-      // below `md` because Careers was the whole of `/careers` and its eyebrow
-      // rendered 7px under the fixed header. Thinking opens `/company` now and
-      // Careers follows it, so what is above it is a section again and the extra
-      // clearance would only make one mid-page gap taller than every other.
-      className="py-20 md:pt-28 md:pb-14"
+      data-tone="inverse"
+      className="relative isolate overflow-clip bg-inverse pt-28 pb-20 text-inverse-ink md:py-28"
     >
+      {/* `isolate` so the two negative layers stay inside the band. */}
+      <div className="absolute inset-0 -z-20">
+        <Photo
+          file={photos.careers.file}
+          alt={photos.careers.alt}
+          width={photos.careers.w}
+          height={photos.careers.h}
+          sizes="100vw"
+          loading="eager"
+          frame={false}
+          // Anchored to the top, so a band shorter than the 3:2 source loses
+          // the table and laptops from the bottom and keeps the people's heads.
+          // The default centre crop took them off at the forehead.
+          className="h-full w-full [&_img]:object-top"
+        />
+      </div>
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-scrim-deep" />
+
       <Container>
-        <Grid>
-          {/* Copy left, photograph right. The reverse — a full-bleed image with
-              text over it — is their layout and it is the reason their careers
-              band says nothing: white type on a mid-tone photograph at whatever
-              contrast the crop happens to give you. Keeping them side by side
-              means the type sits on the page's own ground and the photograph
-              does not have to be legible as a background. */}
-          {/* Centred against the photograph from `lg`, where the two sit side
-              by side. The copy is three short paragraphs and the image is a 3:2
-              at half the grid, so top-aligning them leaves ~250px of empty
-              column under the CTA — the same dead-corner problem the hero had.
-              Below `lg` they stack and there is nothing to centre against. */}
-          <div className="col-span-4 md:col-span-8 lg:col-span-5 lg:self-center">
-            <SectionHeader label="Careers" id="careers-heading" gap="tight">
+        <Grid className="gap-y-16">
+          <div className="col-span-4 md:col-span-8 lg:col-span-5">
+            <SectionHeader label="Careers" id="careers-heading" gap="tight" tone="inverse">
               {careers.title}
             </SectionHeader>
 
             <p
               data-scene-part="enter"
               style={{ ['--scene-from' as string]: 'cover 22%', ['--scene-to' as string]: 'cover 48%' }}
-              className="body-serif measure-serif mt-6 text-reading"
+              className="body-serif measure-serif mt-6 text-inverse-ink-2"
             >
               {careers.body}
             </p>
 
             {/* Text, not a link — we hold no sourced URL for their careers page
                 and a button whose destination we invented is the same failure
-                as an invented statistic. `Thinking` states its destinations the
-                same way and for the same reason. */}
+                as an invented statistic. */}
             <p
               data-scene-part="enter"
               style={{ ['--scene-from' as string]: 'cover 28%', ['--scene-to' as string]: 'cover 54%' }}
-              className="label mt-8 text-ink-3"
+              className="label mt-8 text-inverse-ink-3"
             >
               {careers.cta} <span aria-hidden="true">·</span> norrin.com
             </p>
           </div>
 
-          {/* `sizes` is measured off the grid, not guessed: this column is 6 of
-              12 from `lg` and full width below it. Getting this wrong is silent
-              — the browser picks a variant against a claim that is not true —
-              which is why `Photo` refuses to default it. */}
-          {/* TWO MOTIONS, AND THEY DO DIFFERENT JOBS.
+          <div className="col-span-4 md:col-span-12 lg:col-span-6 lg:col-start-7">
+            <div
+              data-scene-part="enter"
+              style={{ ['--scene-from' as string]: 'cover 18%', ['--scene-to' as string]: 'cover 44%' }}
+            >
+              <Eyebrow label="Values" tone="inverse" />
+            </div>
+            <h3
+              data-scene-part="enter"
+              style={{ ['--scene-from' as string]: 'cover 22%', ['--scene-to' as string]: 'cover 48%' }}
+              className="display-2 mt-8"
+            >
+              {aboutHeadline}
+            </h3>
 
-              `uncover` is the ARRIVAL: the frame is wiped in left to right on
-              `clip-path` as the section is read. index.css picks this part for
-              "a ruled row or a framed block, where the rule above it is already
-              a horizontal gesture and a rise would fight it" — which is exactly
-              a bordered 3:2 sitting beside a ruled eyebrow.
+            <Tabs defaultValue="believe" className="mt-10">
+              {/* Pills, not the primitive's ruled row: classes only, behaviour
+                  untouched (§2.3). There is no track behind them — shadcn's
+                  stock tell is the filled track holding a lighter pill — just
+                  the active trigger filled with the band's field step. */}
+              <TabsList className="gap-2 border-b-0">
+                <TabsTrigger value="believe" className={pill}>
+                  We believe in
+                </TabsTrigger>
+                <TabsTrigger value="ways" className={pill}>
+                  Ways of working
+                </TabsTrigger>
+              </TabsList>
 
-              `photo-pan` is what happens AFTER it has arrived. The wipe is a
-              one-shot; the pan runs for the whole time the section is on screen
-              and unwinds on the way back up, which is the difference between a
-              page that animates and a page that played an animation once.
-
-              They do not collide: the wipe is a `clip-path` on this box against
-              the section's `--scene` timeline, the pan is a `transform` on the
-              <img> inside against its own `view()`. Different properties,
-              different elements, different timelines. */}
-          <div
-            data-scene-part="uncover"
-            data-scroll="photo-pan"
-            style={{ ['--scene-from' as string]: 'cover 18%', ['--scene-to' as string]: 'cover 52%' }}
-            className="col-span-4 mt-10 md:col-span-8 lg:col-span-6 lg:col-start-7 lg:mt-0"
-          >
-            <Photo
-              file={photos.careers.file}
-              alt={photos.careers.alt}
-              width={photos.careers.w}
-              height={photos.careers.h}
-              sizes="(min-width: 1024px) 46vw, 100vw"
-              className="aspect-[3/2]"
-            />
+              {/* THREE BELIEFS, NOT FOUR, so the two panels have the same shape
+                  and switching tabs does not change the band's height. The repo
+                  owner asked for three a side. Norrin publishes four, so one is
+                  left out rather than any being reworded or merged (§3 governs
+                  their words, not how many we set): "integrity in every
+                  interaction", whose body — direct, transparent, full ownership
+                  — is already said by the first way of working. `norrin.ts`
+                  still carries all four. */}
+              <TabsContent value="believe" className="mt-10">
+                <StatementList items={beliefs.slice(0, 3).map((b) => ({ title: b.predicate, body: b.body }))} />
+              </TabsContent>
+              <TabsContent value="ways" className="mt-10">
+                <StatementList items={waysOfWorking.map((w) => ({ title: w.title, body: w.body }))} />
+              </TabsContent>
+            </Tabs>
           </div>
         </Grid>
       </Container>
     </section>
+  )
+}
+
+const pill =
+  'mb-0 rounded-(--radius-action) border-b-0 px-4 py-2 text-inverse-ink-2 hover:text-inverse-ink data-[state=active]:bg-inverse-field data-[state=active]:text-inverse-ink'
+
+/**
+ * One panel's statements.
+ *
+ * The beliefs pass their `predicate`: the active trigger already reads "We
+ * believe in", so each item carries the rest of Norrin's sentence and the
+ * wording is unchanged. Numbered because these ARE a sequence in the source —
+ * statements printed in order under one heading. The number is `aria-hidden`;
+ * an ordered list already announces position.
+ */
+function StatementList({ items }: { items: { title: string; body: string }[] }) {
+  return (
+    <ol className="grid gap-8">
+      {items.map((item, i) => (
+        <li
+          key={item.title}
+          data-scene-part="enter"
+          style={{
+            ['--scene-from' as string]: `cover ${18 + i * 5}%`,
+            ['--scene-to' as string]: `cover ${44 + i * 5}%`,
+          }}
+          className="grid grid-cols-[auto_1fr] gap-x-6"
+        >
+          <span aria-hidden="true" className="label pt-1.5 tabular-nums text-inverse-ink-3">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <div>
+            <h4 className="display-4 text-balance text-inverse-ink">{item.title}</h4>
+            {/* `ui`, not `caption`: 13px over a photograph was the first thing
+                to dissolve into it. */}
+            <p className="ui mt-3 text-inverse-ink-2">{item.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
   )
 }

@@ -1,5 +1,9 @@
+import { useRef } from 'react'
 import { Container, Eyebrow } from '@/components/primitives/Layout'
 import { story, timeline } from '@/data/norrin'
+import { useSceneLatch } from '@/hooks/useSceneLatch'
+
+const WORK_TONES = ['slate', 'clay', 'sage', 'plum'] as const
 
 /**
  * Proof — how it got here.
@@ -47,6 +51,10 @@ import { story, timeline } from '@/data/norrin'
  * §3, not decoration.
  */
 export function Proof() {
+  // Forward only: the cards stay uncovered when the reader scrolls back up.
+  const scene = useRef<HTMLDivElement>(null)
+  useSceneLatch(scene)
+
   /* Flattened once here rather than probed inside the map. The dash on a
      segment depends on the NEXT station's flag, and `'future' in t` narrowing
      inside a `timeline[i + 1]` lookup is both unreadable and easy to get
@@ -124,6 +132,7 @@ export function Proof() {
             scene pins, and an entrance timed that way would freeze half-done.
             The hold IS their gesture. */}
         <div
+          ref={scene}
           data-scene
           data-scene-runway
           data-scene-unpin-tall
@@ -132,7 +141,15 @@ export function Proof() {
           <div data-scene-pin className="sticky top-[max(88px,12svh)]">
             <Eyebrow label="Track record" className="mb-8" />
 
-            <h2 id="proof-heading" className="display-2 max-w-[22ch]">
+            {/* 30ch, not 22. At 22 the claim broke into four short lines and left
+                the right two-thirds of the block empty beside it; the repo owner
+                asked for the three-line break. Measured live: every cap from
+                26ch to 32ch gives "Recognized as Finland's / fastest-growing IT /
+                consulting company in 2025." from 834px up, and 34ch drops to two.
+                30ch sits in the middle of that band so a font-metric wobble
+                cannot tip it either way. Phones stay at four — the container,
+                not the cap, is what binds there. */}
+            <h2 id="proof-heading" className="display-2 max-w-[30ch]">
               {story.recognition}
             </h2>
 
@@ -237,6 +254,10 @@ export function Proof() {
                        screen throughout, which is the ordinary end of a pinned
                        section rather than a defect. */
                     const s = 4 + i * 24
+                    /* Every range below is `contain N%` plus `--tl-lead`, which
+                       is 0 while pinned and a fixed distance once the section
+                       unpins on a tall screen — see THE LEAD in index.css. */
+                    const at = (n: number) => `contain calc(${n}% + var(--tl-lead, 0px))`
 
                     return (
                       <li
@@ -257,8 +278,8 @@ export function Proof() {
                             aria-hidden="true"
                             data-scene-part="pop"
                             style={{
-                              ['--scene-from' as string]: `contain ${s}%`,
-                              ['--scene-to' as string]: `contain ${s + 8}%`,
+                              ['--scene-from' as string]: at(s),
+                              ['--scene-to' as string]: at(s + 8),
                             }}
                             className="tl-node"
                           />
@@ -284,16 +305,16 @@ export function Proof() {
                                 <span
                                   data-scene-part="rule"
                                   style={{
-                                    ['--scene-from' as string]: `contain ${s + 4}%`,
-                                    ['--scene-to' as string]: `contain ${s + 21}%`,
+                                    ['--scene-from' as string]: at(s + 4),
+                                    ['--scene-to' as string]: at(s + 21),
                                   }}
                                   className="tl-fill tl-fill-h"
                                 />
                                 <span
                                   data-scene-part="rule-v"
                                   style={{
-                                    ['--scene-from' as string]: `contain ${s + 4}%`,
-                                    ['--scene-to' as string]: `contain ${s + 21}%`,
+                                    ['--scene-from' as string]: at(s + 4),
+                                    ['--scene-to' as string]: at(s + 21),
                                   }}
                                   className="tl-fill tl-fill-v"
                                 />
@@ -328,10 +349,12 @@ export function Proof() {
                             there. */}
                         <div
                           className="tl-card"
+                          // Names the art for the card's top band only (§2.4).
+                          data-tone={WORK_TONES[i % WORK_TONES.length]}
                           data-scene-part="uncover"
                           style={{
-                            ['--scene-from' as string]: `contain ${s + 3}%`,
-                            ['--scene-to' as string]: `contain ${s + 21}%`,
+                            ['--scene-from' as string]: at(s + 3),
+                            ['--scene-to' as string]: at(s + 21),
                           }}
                         >
                           <h3 className="tl-title">{m.title}</h3>

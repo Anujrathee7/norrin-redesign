@@ -22,6 +22,10 @@ import { useSyncExternalStore } from 'react'
  */
 
 export type Theme = 'light' | 'dark'
+type ThemeOrigin = { x: number; y: number }
+type TransitionDocument = Document & {
+  startViewTransition?: (update: () => void) => { finished: Promise<void> }
+}
 
 const KEY = 'norrin-theme'
 const listeners = new Set<() => void>()
@@ -97,8 +101,35 @@ function apply(theme: Theme, { persist = true } = {}) {
   for (const fn of listeners) fn()
 }
 
-export function setTheme(theme: Theme) {
-  apply(theme)
+export function setTheme(theme: Theme, origin?: ThemeOrigin) {
+  const doc = typeof document === 'undefined' ? null : (document as TransitionDocument)
+  const reduced =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  // The next theme enters as a circle expanding from the control that was
+  // pressed. The View Transitions API is an enhancement: reduced motion and
+  // browsers without support keep the existing immediate switch.
+  if (!origin || reduced || !doc?.startViewTransition) {
+    apply(theme)
+    return
+  }
+
+  const el = root()
+  if (!el) return
+  const radius = Math.hypot(
+    Math.max(origin.x, window.innerWidth - origin.x),
+    Math.max(origin.y, window.innerHeight - origin.y),
+  )
+  el.style.setProperty('--theme-reveal-x', `${origin.x}px`)
+  el.style.setProperty('--theme-reveal-y', `${origin.y}px`)
+  el.style.setProperty('--theme-reveal-radius', `${radius}px`)
+
+  const transition = doc.startViewTransition(() => apply(theme))
+  void transition.finished.finally(() => {
+    el.style.removeProperty('--theme-reveal-x')
+    el.style.removeProperty('--theme-reveal-y')
+    el.style.removeProperty('--theme-reveal-radius')
+  })
 }
 
 export function useTheme(): Theme {

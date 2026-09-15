@@ -159,7 +159,10 @@ belongs in that company.
    where content is a genuine sequence.
 3. **Proceed with the script accent**, one word at display size — Vincit's precedent.
 4. **Proceed with named contacts and portraits** — Solita's precedent, and it beats
-   three of the four.
+   three of the four. *Done:* the Contact band now puts the ask and a form on the left
+   and the three people on the right, portraits stepped in two columns, each with
+   their published email and phone. Separated by heading, space and type contrast,
+   never rules — as Siili (/contact), Bekk (/kontakt) and Futurice (/contact) do.
 5. **Leave the hero photograph-free** — Reaktor's precedent.
 6. **Thin the motion.** Denser here than three of the four references.
 7. **Do not change** the no-shadow, no-gradient, no-filter, hard-corner rules. All four

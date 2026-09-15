@@ -4,8 +4,8 @@ import { Photo } from '@/components/primitives/Photo'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { useTheme } from '@/hooks/useTheme'
 import { measure } from '@/lib/contrast'
-import { Card } from '@/components/primitives/Card'
 import { CardStack } from '@/components/primitives/CardStack'
+import { caseStackItems } from '@/components/primitives/caseStackItems'
 import { CardSlider } from '@/components/primitives/CardSlider'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -226,12 +226,15 @@ function Rule({ children }: { children: ReactNode }) {
 /**
  * The pile's geometry, read off the live DOM.
  *
- * WHAT THIS READOUT IS FOR. `--stack-step` is paid for out of the front card's
- * own width — the region subtracts the pile's whole travel before sizing the
- * card, so that the PILE fits its column rather than the card fitting it and the
- * three cards behind hanging out into the clip. That makes the card width a
- * consequence of the step and the column, and a consequence is exactly the kind
- * of number a style guide should print rather than assert.
+ * WHAT THIS READOUT IS FOR. The fan is paid for out of the front card's own
+ * width — the region subtracts `--stack-reach` before sizing the card, so that
+ * the HAND fits its column rather than the card fitting it and the cards behind
+ * turning out into the clip. That makes the card width a consequence of the fan
+ * and the column, and a consequence is exactly the kind of number a style guide
+ * should print rather than assert.
+ *
+ * IT MEASURED `--stack-step` UNTIL THE PILE BECAME A HAND. The step is deleted;
+ * reading it would print `NaN`, which is the defect described below, again.
  *
  * IT USED TO MEASURE `--stack-shrink`, A TOKEN THAT NO LONGER EXISTS, and it
  * printed `NaN` in two of its six rows for however long that had been true. It
@@ -250,17 +253,19 @@ function StackSpec() {
     if (!ol || !card) return
     const region = host.current?.querySelector('[data-cardstack-region]')
     const cs = getComputedStyle(region ?? ol)
-    const step = parseFloat(cs.getPropertyValue('--stack-step'))
+    const fan = parseFloat(cs.getPropertyValue('--stack-fan'))
     const count = parseFloat(cs.getPropertyValue('--stack-count'))
-    const width = card.getBoundingClientRect().width
+    // Unrotated size: the front card's `li` is at 0deg, so offsetWidth is honest.
+    const width = (card as HTMLElement).offsetWidth
     const cardCs = getComputedStyle(card)
     setRows([
-      { label: '--stack-step', value: `${step}px, down and right` },
+      { label: '--stack-fan', value: `${fan}deg per card, about the bottom-left corner` },
+      { label: 'deepest angle', value: `${((count - 1) * fan).toFixed(0)}deg` },
+      { label: '--stack-reach', value: cs.getPropertyValue('--stack-reach').trim() },
+      { label: '--stack-dip', value: cs.getPropertyValue('--stack-dip').trim() },
       { label: '--radius-stack', value: cs.getPropertyValue('--radius-stack').trim() },
       { label: 'card width, measured', value: `${width.toFixed(1)}px` },
-      { label: 'pile travel', value: `${((count - 1) * step).toFixed(0)}px` },
-      { label: 'pile width, card + travel', value: `${(width + (count - 1) * step).toFixed(1)}px` },
-      { label: 'deepest card fill', value: cardCs.backgroundColor },
+      { label: 'card body fill', value: cardCs.backgroundColor },
       { label: 'list overflow', value: getComputedStyle(ol).overflow },
     ])
   }, [theme])
@@ -275,17 +280,7 @@ function StackSpec() {
     <div ref={host}>
       <Grid>
         <div className="col-span-4 md:col-span-5 md:col-start-8">
-      <CardStack
-        paused
-        items={cases.map((c) => ({
-          id: c.id,
-          who: c.client,
-          role: c.sector,
-          kicker: c.title,
-          body: c.quote,
-          note: 'attribution' in c && c.attribution ? c.attribution : undefined,
-        }))}
-      />
+      <CardStack paused items={caseStackItems} />
         </div>
       </Grid>
       <ul className="mt-12 border-t border-hairline-strong">
@@ -615,9 +610,13 @@ export function StyleGuide() {
               items={roles.map((r, i) => ({
                 id: r.id,
                 body: r.claim,
+                points: r.points,
+                pointsLabel: 'In practice',
                 floor: r.role,
                 label: r.role,
-                tone: (['dark', 'paper', 'paper', 'signal'] as const)[i] ?? 'paper',
+                // The site-wide art names; the retired dark/paper/signal tones
+                // have no art, and rendered a white title on a white card here.
+                tone: (['slate', 'clay', 'sage', 'plum'] as const)[i % 4],
               }))}
             />
             <p className="caption mt-6 max-w-[62ch] text-ink-3">
@@ -641,24 +640,35 @@ export function StyleGuide() {
           <Container>
             <h2 className="display-3 mb-3">The card</h2>
             <p className="body-serif measure-serif mb-12 text-reading">
-              One component, filled two ways. Scope takes the body and the floor; the customer
-              stack takes the eyebrow, the heading, the lede and the body. Both specimens carry the
-              real strings they carry on the page &mdash; a card filled with placeholder copy tells
-              you nothing about the thing this component exists to solve, which is four ragged copy
-              lengths sharing a floor.
+              One anatomy for every card on the site: a gradient art with the heading inside it,
+              over a white body. Scope, Thinking, the track record and the customer deck all use
+              it, with the art taken by position from four tones. Both specimens carry the real
+              strings they carry on the page.
             </p>
             <div className="grid grid-cols-1 items-stretch gap-5 md:grid-cols-2">
-              <Card body={roles[0].claim} floor={roles[0].role} />
-              <Card
-                eyebrow={cases[0].sector}
-                title={cases[0].client}
-                lede={cases[0].title}
-                body={cases[0].quote}
-              />
+              <article className="art-card" data-tone="slate">
+                <div className="case-art">
+                  <h3 className="case-title">{roles[0].role}</h3>
+                </div>
+                <div className="case-body">
+                  <p className="case-summary">{roles[0].claim}</p>
+                </div>
+              </article>
+              <article className="art-card" data-tone="sage">
+                <div className="case-art">
+                  <h3 className="case-title">{cases[2].title}</h3>
+                </div>
+                <div className="case-body">
+                  <p className="case-summary">{cases[2].short}</p>
+                  <div className="case-floor">
+                    <p className="case-client">{cases[2].client}</p>
+                  </div>
+                </div>
+              </article>
             </div>
             <p className="caption mt-4 text-ink-3">
-              Left: Scope. Right: the customer stack, shown flat &mdash; the stacking geometry is
-              the section below, not the card.
+              Left: Scope. Right: a customer case, shown flat &mdash; the fan is the section
+              below, not the card.
             </p>
           </Container>
         </section>

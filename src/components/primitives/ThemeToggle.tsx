@@ -28,7 +28,14 @@ export function ThemeToggle({ inverted = false }: { inverted?: boolean }) {
   return (
     <button
       type="button"
-      onClick={() => setTheme(dark ? 'light' : 'dark')}
+      onClick={(event) => {
+        const next = dark ? 'light' : 'dark'
+        const box = event.currentTarget.getBoundingClientRect()
+        setTheme(next, {
+          x: box.left + box.width / 2,
+          y: box.top + box.height / 2,
+        })
+      }}
       // Not aria-pressed: this is not a control that is on or off, it is a
       // control that swaps between two named states, and the label carries
       // which one you get. `aria-live` is deliberately absent — the label

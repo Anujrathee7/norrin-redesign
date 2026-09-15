@@ -83,6 +83,21 @@ const pairs = [
   // The dark theme's half of the navbar focus ring — see the light entry above.
   { note: 'D accent    / ground ', fg: '#9fb87e', bg: '#0e120f', min: 4.5 },
   { note: 'D accent    / surface', fg: '#9fb87e', bg: '#161b17', min: 4.5 },
+  // Contact and Careers: inverse type over a photograph under --scrim. The
+  // ground is the WORST case, a pure white pixel under 76% black (#3d3d3d),
+  // and the translucent rungs are pre-composited onto it (WCAG F83).
+  { note: 'S inv-ink   / scrim  ', fg: '#f5f5f7', bg: '#3d3d3d', min: 4.5 },
+  { note: 'S inv-ink-2 / scrim  ', fg: '#cccccd', bg: '#3d3d3d', min: 4.5 },
+  { note: 'S inv-ink-3 / scrim  ', fg: '#afafaf', bg: '#3d3d3d', min: 4.5 },
+  // Typed text in a form field: --inverse-field (inverse-ink at 14%) over the
+  // same worst-case scrim pixel composites to #575757.
+  { note: 'S inv-ink   / field  ', fg: '#f5f5f7', bg: '#575757', min: 4.5 },
+  // Careers: the same ramp under --scrim-deep (88% black), whose worst-case
+  // pixel composites to #1f1f1f; the active tab pill's field over it is #3d3d3d.
+  { note: 'S inv-ink   / deep   ', fg: '#f5f5f7', bg: '#1f1f1f', min: 4.5 },
+  { note: 'S inv-ink-2 / deep   ', fg: '#cccccd', bg: '#1f1f1f', min: 4.5 },
+  { note: 'S inv-ink-3 / deep   ', fg: '#afafaf', bg: '#1f1f1f', min: 4.5 },
+  { note: 'S inv-ink   / d-field', fg: '#f5f5f7', bg: '#3d3d3d', min: 4.5 },
   { note: 'D accent    / tint   ', fg: '#9fb87e', bg: TINT_D, min: 4.5 },
 
   // --- dark: type on solid fills --------------------------------------------
@@ -258,6 +273,36 @@ const pairs = [
   // than as an outline on paper, which is the tighter of the two by a long way.
   { note: 'L role-muted/ ground   ', fg: '#d8d7cc', bg: '#f8f7f3', min: 1.25 },
   { note: 'D role-muted/ ground   ', fg: '#d8d7cc', bg: '#0e120f', min: 1.25 },
+
+  // --- THE CUSTOMER CASE CARD. Fixed in both themes, so one entry each. ------
+  // The body: a white card with the neutral ink ramp and a solid Next pill.
+  { note: '  case-ink    / case-body', fg: '#1d1d1f', bg: '#ffffff', min: 4.5 },
+  { note: '  case-read   / case-body', fg: '#424245', bg: '#ffffff', min: 4.5 },
+  { note: '  case-ink-3  / case-body', fg: '#6e6e73', bg: '#ffffff', min: 4.5 },
+  { note: '  case-cta    / cta-bg   ', fg: '#ffffff', bg: '#1d1d1f', min: 4.5 },
+  // The card's edge on the light page surface, and the card as a field on the
+  // dark one — separations, so the parity bar rather than the text bar.
+  { note: 'L case-edge   / surface  ', fg: '#1d1d1f@0.12', bg: '#f5f5f7', min: 1.25 },
+  { note: 'D case-body   / surface  ', fg: '#ffffff', bg: '#171719', min: 1.25 },
+  // TYPE ON THE ART — EVERY CARD ON THE SITE. A gradient has no single
+  // background, so each row is the LIGHTEST pixel found under any heading set on
+  // that art, across the customer deck, Scope, Thinking and #styleguide, at
+  // 1512, 834, 390 and 320, read off the rendered page with the ink made
+  // transparent (WCAG F83) by `.shots/probe/art-contrast.mjs`. The arts are
+  // mesh gradients under contour lines now; the worst case is wherever the lines'
+  // fading tail or a bloom reaches a heading's first line. If an art, the lines
+  // or a card size changes, re-run the probe and move these numbers — they are
+  // measurements, not colours anyone chose. (The track record no longer sets
+  // type on an art; its cards carry the art as a stripe only.)
+  { note: '  art-ink     / ocean    ', fg: '#ffffff', bg: '#245a84', min: 4.5 },
+  { note: '  art-ink     / ember    ', fg: '#ffffff', bg: '#c5393c', min: 4.5 },
+  { note: '  art-ink     / forest   ', fg: '#ffffff', bg: '#247b4b', min: 4.5 },
+  { note: '  art-ink     / violet   ', fg: '#ffffff', bg: '#6736ac', min: 4.5 },
+  // A label pill on the art: 86% white over the DARKEST art stop (ocean's deep
+  // pool, #0b1d40), which is the worst case for dark ink on a light capsule —
+  // composited by hand to #dddfe4. Over any lighter art pixel the capsule only
+  // gets lighter and the pair only improves.
+  { note: '  pill-ink    / pill-bg  ', fg: '#1d1d1f', bg: '#dddfe4', min: 4.5 },
 
   // --- THE EYEBROW, AND WHY IT ADDS NO LINE ---------------------------------
   // `.eyebrow` was rebuilt (see index.css): 12px in `--ink` rather than 10.5px

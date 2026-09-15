@@ -1,4 +1,5 @@
-import { Outlet, ScrollRestoration } from 'react-router'
+import { useLayoutEffect, useRef } from 'react'
+import { Outlet, ScrollRestoration, useLocation } from 'react-router'
 import { Nav } from '@/components/nav/Nav'
 import { Footer } from '@/components/sections/Footer'
 import { useSceneArrival } from '@/hooks/useSceneArrival'
@@ -46,15 +47,56 @@ import { useSceneArrival } from '@/hooks/useSceneArrival'
  * page sat at 569px, and stayed there for every anchor for the rest of the
  * visit.
  *
- * Keying on `pathname + hash` gives that fragment entry a key of its own, which
- * has no saved position, so `restoreScrollPosition` comes back `null` and the
- * effect falls through to the branch that was always the right one for a
- * fragment: `scrollIntoView` on the named element.
+ * NO PAGE IS EVER PUT BACK WHERE IT WAS — the repo owner's call. This used to
+ * key on `pathname + hash`, which is per-PLACE: leave `/work` halfway down, come
+ * back by the bar or by Back, and it reopened halfway down. The reading was
+ * "it scrolls me back to the same point, which is annoying." So the key is now
+ * unique to every lookup and never matches anything saved. Every arrival —
+ * link, Back, Forward, reload — takes the no-saved-position branch: the hash's
+ * element if the URL names one, otherwise the top.
  *
- * It is also the better key on its own terms. `location.key` is per-VISIT, so
- * arriving at `/work` a second time restores nothing; `pathname + hash` is
- * per-PLACE, which is what "put me back where I was on the work page" means.
+ * That same branch is what still fixes the fragment bug above: the `#contact`
+ * entry has no saved position to be dragged back to, so it `scrollIntoView`s.
+ *
+ * The key carries `timeOrigin` because saved positions outlive the document in
+ * `sessionStorage`; a bare counter restarts at 0 on reload and could collide with
+ * a key the previous document wrote. It lives at module scope so the component
+ * does not hand the router a new function, and re-register, on every render.
  */
+let scrollKeySeq = 0
+const neverRestore = () => `${performance.timeOrigin}:${scrollKeySeq++}`
+
+/**
+ * A NEW PAGE ARRIVES AT THE TOP, IT DOES NOT SCROLL THERE.
+ *
+ * `html { scroll-behavior: smooth }` is global, so the router's `scrollTo(0, 0)`
+ * animated: measured after Back from 900px, the fresh page glided up over ~0.7s,
+ * which is the old annoyance played in reverse. For one frame, and only when the
+ * PATHNAME changed, the behaviour is `auto`. A same-page `#contact` click keeps
+ * its glide, because its pathname does not change.
+ *
+ * It must render BEFORE `<ScrollRestoration />`: sibling layout effects run in
+ * order, so this lands in the same commit, just ahead of the scroll.
+ */
+function InstantArrival() {
+  const { pathname } = useLocation()
+  const last = useRef(pathname)
+  useLayoutEffect(() => {
+    if (last.current === pathname) return
+    last.current = pathname
+    const html = document.documentElement
+    html.style.scrollBehavior = 'auto'
+    const frame = requestAnimationFrame(() => {
+      html.style.scrollBehavior = ''
+    })
+    return () => {
+      cancelAnimationFrame(frame)
+      html.style.scrollBehavior = ''
+    }
+  }, [pathname])
+  return null
+}
+
 export function SiteLayout() {
   /* Scenes already on screen at first paint arrive without a scroll. Here
      rather than per-section because it is a property of the route, and every
@@ -66,7 +108,8 @@ export function SiteLayout() {
       <a href="#main" className="skip-link">
         Skip to content
       </a>
-      <ScrollRestoration getKey={(location) => location.pathname + location.hash} />
+      <InstantArrival />
+      <ScrollRestoration getKey={neverRestore} />
       <Nav />
       <main id="main">
         <Outlet />

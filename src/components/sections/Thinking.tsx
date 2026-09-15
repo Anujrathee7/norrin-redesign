@@ -1,3 +1,4 @@
+import { Tabs as TabsPrimitive } from 'radix-ui'
 import { Container, SectionHeader } from '@/components/primitives/Layout'
 import { publications } from '@/data/norrin'
 
@@ -18,17 +19,38 @@ import { publications } from '@/data/norrin'
  * it asks the most and because a dated promo is the most perishable thing a
  * homepage can lead with.
  *
- * Two deliberate absences:
+ * ---------------------------------------------------------------------------
+ * AN INDEX AND ONE OPEN CARD — chosen by the user from four rendered layouts
+ * ---------------------------------------------------------------------------
+ * It replaced a draggable spotlight carousel that overlapped its cards and
+ * cropped the two flanking ones mid-sentence. The four rungs are now a list on
+ * the left — step, title, and what each asks for — and the selected rung opens
+ * as one full card on the right. Nothing is cropped, nothing moves on its own
+ * (so the carousel's open WCAG 2.2.2 pause question is gone with it), and the
+ * ladder's order is visible all at once instead of one slot at a time.
+ *
+ * REAL TABS, FROM RADIX (§2.1). Roving tabindex, arrow keys and the
+ * tab/panel wiring are the primitive's, not hand-written. `forceMount` keeps
+ * all four panels rendered in one grid cell so the card area is always the
+ * tallest card's size — switching never resizes the section or moves the list
+ * — and the inactive three are `visibility: hidden`, which also takes them out
+ * of the accessibility tree and the tab order, exactly as unmounting would.
+ *
+ * THE CARD takes its labels into the art as two pills (user pick, card 2):
+ * the step top-left, the commitment top-right, the title settled at the art's
+ * floor. The call to action stays a statement with no arrow — these rungs are
+ * shown rather than linked, and an arrow is a link's affordance (§3).
+ *
+ * Two deliberate absences, unchanged:
  *
  * The rungs are not numbered. The heading directly above them says "Start
  * anywhere you like." and 01/02/03 in fixed order says the opposite, in the same
  * viewport. What the reader needs is the COMMITMENT each one asks for, which is
- * already the right-hand label — so that carries the row and the digit goes.
+ * what the right-hand label in the index carries.
  *
- * The calls to action are not links. They were `<a href="#thinking">` inside
- * `<section id="thinking">` under labels naming real destinations. We hold no
- * sourced URL for any of the three, and inventing one is the same failure as
- * inventing a statistic, so the section states where they live instead.
+ * The calls to action are not links. We hold no sourced URL for any of them, and
+ * inventing one is the same failure as inventing a statistic, so the section
+ * states where they live instead.
  */
 
 const RUNGS = [
@@ -37,6 +59,7 @@ const RUNGS = [
     commitment: 'No email',
     title: publications.insights.title,
     body: publications.insights.excerpt,
+    detail: publications.insights.detail,
     cta: 'Browse NorrInsights',
   },
   {
@@ -44,6 +67,7 @@ const RUNGS = [
     commitment: 'No email',
     title: publications.pod.title,
     body: publications.pod.excerpt,
+    detail: publications.pod.detail,
     cta: 'Listen to the Pod',
   },
   {
@@ -51,6 +75,7 @@ const RUNGS = [
     commitment: 'Email',
     title: publications.visionPaper.title,
     body: publications.visionPaper.excerpt,
+    detail: publications.visionPaper.detail,
     cta: publications.visionPaper.cta,
   },
   /**
@@ -64,20 +89,26 @@ const RUNGS = [
    * position that should carry the most durable. Here it is the top of the
    * ladder because it asks the most, not because it is the most important.
    *
-   * "Registration" IS AN INFERENCE, and the only one in this file. Their card
-   * does not say whether the webinar is gated, live or on demand, so this does
-   * not claim an email is required — `Email` would have been that claim.
-   * "Registration" describes the act a webinar involves and nothing more. If it
-   * turns out to be an open link, the correction is one word.
+   * IT IS A RECORDING, NOT AN EVENT. This rung read "Attend · Registration ·
+   * See upcoming webinars" until the webinar's own page was read: it offers
+   * "Download the webinar recording", so there is nothing to attend and no
+   * "upcoming" to see. Whether that download sits behind a form is not visible
+   * without running their page's scripts, so the commitment names the format
+   * rather than claiming an email — `Email` would be that claim, unverified.
    */
   {
-    step: 'Attend',
-    commitment: 'Registration',
+    step: 'Watch',
+    commitment: 'Recording',
     title: publications.webinar.title,
     body: publications.webinar.excerpt,
-    cta: 'See upcoming webinars',
+    detail: publications.webinar.detail,
+    cta: publications.webinar.cta,
   },
 ]
+
+// The site-wide art names (index.css, THE ART CARD). The order keeps the colours
+// this row had under its old pastel names: ocean, violet, ember, forest.
+const TONES = ['slate', 'plum', 'clay', 'sage'] as const
 
 export function Thinking() {
   return (
@@ -99,84 +130,40 @@ export function Thinking() {
           Start anywhere you like.
         </SectionHeader>
 
-        {/* Wiped rather than faded: the rungs are one framed object, and a wipe
-            crossing it reads as one gesture where four fades read as four
-            separate arrivals. */}
-        {/* THE `relative` HERE IS NOW UNCLAIMED. It existed for one reason —
-            Nori peeked over the frame's top border, and the border sits on the
-            <ul> two levels down inside an `overflow-hidden` frame, so anything
-            positioned in there would have been clipped. Nori has been deleted
-            from the codebase, so nothing is positioned against this wrapper any
-            more and the `relative` can probably go with it. Left in place rather
-            than removed blind, because this section is being redesigned by hand
-            and pulling a positioning context out from under a layout mid-edit is
-            how a subtle break gets introduced.
-
-            The drift stays on this shared wrapper rather than on the frame
-            below it. */}
-        <div data-scroll="drift-slow" className="relative">
-        {/* Uncovered left to right against its own scroll range, so it runs
-            backwards when you scroll back up instead of being spent on the
-            first pass. Still ONE gesture across the whole frame and not four
-            staggered cells: the rungs are hairline-separated parts of a single
-            object, and four arrivals would argue they are four competing
-            boxes — which is the exact reading the frame was built to prevent.
-
-            The clip lives on a wrapper rather than on the <ul>, because the
-            <ul> is `overflow-hidden` (that is what clips the cells' square
-            grounds to the rounded frame) and `overflow: hidden` is a scroll
-            container — an element's own view timeline inside one never
-            advances. Out here it is measured against the page. */}
-        {/* Its own window, later and wider than the shared default. This is
-            the tallest single object that animates on the page, and how far a
-            block must travel before it is properly on screen scales with its
-            height — a 40px list row is readable almost as soon as it appears, a
-            302px frame is not. Measured at 900px viewport: the wipe now runs
-            from the frame having ~200px on screen to it sitting complete near
-            the middle, instead of finishing while it was still a sliver at the
-            bottom edge. */}
-        <div
-          data-scroll="uncover"
-          style={{
-            ['--scrub-from' as string]: 'cover 16%',
-            ['--scrub-to' as string]: 'cover 46%',
-          }}
-        >
-          {/* One frame with four cells, not four cards.
-              The rungs are hairline-separated already, so the radius goes on the
-              OUTER edge and the interior stays ruled — sixteen rounded corners
-              become four, and the block still reads as one object you can choose
-              from rather than four competing boxes. `overflow-hidden` is what
-              lets the cells' own square backgrounds be clipped by the frame.
-
-              THE COLUMN COUNT HAS TO DIVIDE THE RUNGS. This was `md:grid-cols-3`
-              when there were three; adding the webinar left a fourth cell alone
-              on a second row beside two cells of bare frame — the one failure
-              mode a single framed object cannot survive, because the empty space
-              is inside the frame and reads as a rendering fault. Two-up from
-              `md`, four-up from `xl` where there is room for four measures of
-              this length. Never an odd column count while there are four. */}
-          <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-panel border border-hairline bg-hairline md:grid-cols-2 xl:grid-cols-4">
+        <TabsPrimitive.Root defaultValue={RUNGS[0].title} orientation="vertical" data-thinking-index>
+          <TabsPrimitive.List aria-label="Thinking, by what each asks of you" data-thinking-list>
             {RUNGS.map((r) => (
-              <li key={r.title} className="flex flex-col bg-surface p-7 md:p-9">
-                <div className="mb-7 flex items-baseline justify-between gap-4 border-b border-hairline pb-4">
-                  <span className="label text-ink-3">{r.step}</span>
-                  <span className="label text-ink-3">{r.commitment}</span>
-                </div>
-
-                <h3 className="display-4">
-                  {r.title}
-                </h3>
-                <p className="caption mt-4 grow text-ink-2">{r.body}</p>
-
-                <p className="mt-8 ui text-ink-3">{r.cta}</p>
-              </li>
+              <TabsPrimitive.Trigger key={r.title} value={r.title} className="thinking-tab">
+                <span className="label thinking-tab-step">{r.step}</span>
+                <span className="thinking-tab-title">{r.title}</span>
+                <span className="label thinking-tab-ask">{r.commitment}</span>
+              </TabsPrimitive.Trigger>
             ))}
-          </ul>
-        </div>
-        </div>
+          </TabsPrimitive.List>
 
-        <p className="caption mt-8 text-ink-3">
+          <div data-thinking-panels>
+            {RUNGS.map((r, i) => (
+              <TabsPrimitive.Content key={r.title} value={r.title} forceMount data-tone={TONES[i]}>
+                <article className="art-card">
+                  <div className="case-art">
+                    <div className="art-top">
+                      <span className="art-pill">{r.step}</span>
+                      <span className="art-pill">{r.commitment}</span>
+                    </div>
+                    <h3 className="case-title">{r.title}</h3>
+                  </div>
+                  <div className="case-body">
+                    <p className="case-summary">{r.body}</p>
+                    <p className="art-detail">{r.detail}</p>
+                    <p className="art-floor-note">{r.cta}</p>
+                  </div>
+                </article>
+              </TabsPrimitive.Content>
+            ))}
+          </div>
+        </TabsPrimitive.Root>
+
+        <p className="caption mt-10 text-ink-3">
           Each of these is published or announced on norrin.com. This speculative rebuild
           does not reproduce them, so the rungs above are shown rather than linked.
         </p>

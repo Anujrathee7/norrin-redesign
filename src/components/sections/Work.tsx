@@ -1,6 +1,7 @@
 import { Container, Grid, SectionHeader } from '@/components/primitives/Layout'
 import { CardStack } from '@/components/primitives/CardStack'
-import { cases, customers, customersIntro } from '@/data/norrin'
+import { caseStackItems } from '@/components/primitives/caseStackItems'
+import { customers, customersIntro } from '@/data/norrin'
 
 /**
  * Work — the roster and the cases.
@@ -42,24 +43,14 @@ export function Work() {
       id="work"
       data-shot="work"
       aria-labelledby="work-heading"
-      // THE NIGHT BAND. Full-bleed, edge to edge — the background is on the
-      // SECTION, which already spans the viewport, so there is no inset panel
-      // and `--radius-section` stays unspent and still flagged in §4.
-      //
-      // FIXED IN BOTH THEMES. `--band-night` is `--ground`'s dark branch pinned,
-      // and index.css carries the argument: the pile on it is four sheets
-      // separated by tone, and a ground that flips takes that separation with it.
-      //
-      // `data-tone="inverse"` is the page's existing switch for "this plane is
-      // dark". It is what repaints the focus ring in sun, which is the one thing
-      // in this section that axe cannot check and that this repo has shipped two
-      // real bugs in.
+      // Full-bleed and theme-aware. The section uses the ordinary surface and
+      // ink tokens so light mode is actually light while dark mode keeps the
+      // same deep band. The cards retain their own shared colour palette.
       //
       // `overflow-clip` STAYS, and not as a formality: the deal keyframe throws
       // the leaving card to `translate(128%)` and something has to take it, and
       // `hidden` would create a scroll container that freezes the roster's
       // `view()` timeline at 0% forever. The comment above says so at length.
-      data-tone="inverse"
       // THE SECTION MOVES DOWN. THE PILE DOES NOT MOVE INSIDE IT.
       //
       // The position row — the 3px bar above the front card — was invisible, and
@@ -84,7 +75,7 @@ export function Work() {
       // Mobile takes 112 rather than 80 for the same reason Pillars does: at
       // `py-20` the eyebrow rendered 7px under the bar's edge. `-mt-18` is `md:`
       // only, so the pile is not involved down there.
-      className="overflow-clip bg-band-night pt-28 pb-20 text-inverse-ink md:pt-42 md:pb-14"
+      className="overflow-clip bg-surface pt-28 pb-20 text-ink md:pt-42 md:pb-14"
     >
       <Container>
         {/* READING MATTER LEFT, THE PILE RIGHT.
@@ -124,10 +115,10 @@ export function Work() {
             that changed is what gives. */}
         <Grid className="items-start">
           <div className="col-span-4 md:col-span-5">
-            <SectionHeader label="Customers" id="work-heading" gap="tight" tone="inverse">
+            <SectionHeader label="Customers" id="work-heading" gap="tight">
               Forerunners, mostly Nordic.
             </SectionHeader>
-            <p className="body-serif measure-serif mt-6 text-inverse-ink-2">{customersIntro}</p>
+            <p className="body-serif measure-serif mt-6 text-ink-2">{customersIntro}</p>
             {/* THE ROSTER, UNDER THE INTRO IT BELONGS TO.
 
                 It used to be a full-width row of ten names set large, panning
@@ -159,7 +150,7 @@ export function Work() {
                 the sentence above it says "most of our customers", not "all".
                 The moment anything here does claim completeness, this filter has
                 to go. */}
-            <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-2.5 border-t border-inverse-hairline pt-8 sm:grid-cols-3">
+            <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-2.5 border-t border-hairline pt-8 sm:grid-cols-3">
               {customers
                 .filter((name) => name !== 'Plan International Finland')
                 .map((name, i) => (
@@ -175,7 +166,7 @@ export function Work() {
                     ['--scrub-from' as string]: `cover ${12 + (i % 3) * 4}%`,
                     ['--scrub-to' as string]: `cover ${12 + (i % 3) * 4 + 26}%`,
                   }}
-                  className="ui text-inverse-ink-2"
+                  className="ui text-ink-2"
                   >
                     {name}
                   </li>
@@ -189,30 +180,17 @@ export function Work() {
               narrows the card: at six columns it was 744px, which sets the
               quote to two lines and reads as a panel lying on its side rather
               than as a card. */}
-          {/* `md:-mt-18` — the card's top edge rides above the heading's, which
-              is what stops the two columns reading as two halves of the same
-              band. The quotation mark hangs a further 13px above the card, and
-              the section's own top padding is 112px, so there is still 27px of
-              clearance to the section's clip box at the tightest viewport.
+          {/* `md:-mt-6` — the card's top edge still rides above the heading's,
+              which is what stops the two columns reading as two halves of the
+              same band. It was `-mt-18` and was moved 48px down at the user's
+              request, because the pile sat hard under the bar.
 
               `pr` is gone with the right-alignment: it existed to hold the card
               off the container's right edge, and the card is no longer near it.
               Keeping it would have cost the tablet column 50px of a 306px
               budget, which comes straight off the quote's measure. */}
-          <div className="col-span-4 mt-12 md:col-span-5 md:col-start-8  md:-mt-18">
-            <CardStack
-              items={cases.map((c) => ({
-                id: c.id,
-                // The design puts a name and a role on the card floor. Ours are a
-                // company and a sector, because that is what a case is about — see
-                // the note in CardStack about the avatar that is not there.
-                who: c.client,
-                role: c.sector,
-                kicker: c.title,
-                body: c.quote,
-                note: 'attribution' in c && c.attribution ? c.attribution : undefined,
-              }))}
-            />
+          <div className="col-span-4 mt-12 md:col-span-5 md:col-start-8 md:-mt-6">
+            <CardStack items={caseStackItems} />
           </div>
         </Grid>
 

@@ -165,7 +165,7 @@ import { roles } from '@/data/norrin'
  * behind that name lives in the token layer at the end of `index.css`, which is
  * also where the dark tone is flagged as pending the §4 palette pick.
  */
-const TONES = ['dark', 'paper', 'paper', 'signal'] as const
+const TONES = ['slate', 'clay', 'sage', 'plum'] as const
 
 export function Roles() {
   return (
@@ -226,9 +226,11 @@ export function Roles() {
           items={roles.map((r, i) => ({
             id: r.id,
             body: r.claim,
+            points: r.points,
+            pointsLabel: 'In practice',
             floor: r.role,
             label: r.role,
-            tone: TONES[i] ?? 'paper',
+            tone: TONES[i % TONES.length],
           }))}
         />
       </div>

@@ -34,10 +34,9 @@ become a rail.
 
 ![Careers](docs/images/careers.png)
 
-`06 Careers` — the one band of norrin.com this site had no counterpart for, and the only
-place with an animated photograph. The frame wipes in on `clip-path` as the section is read,
-and the picture keeps travelling inside the fixed frame for as long as the section is on
-screen.
+`Careers` — the one band of norrin.com this site had no counterpart for. It stands on
+Norrin's own team photograph under a scrim, with the invitation on the left and their values
+— "We believe in" and "Ways of working", verbatim from `/about-us` — as tabs on the right.
 
 ![Proof](docs/images/proof.png)
 
@@ -217,9 +216,13 @@ Two things that will save you a debugging session:
 
 Nothing here invents a statistic, client, testimonial, award or capability. Where content
 does not exist publicly it is **absent rather than fabricated**. The customer roster is set
-as type because I hold no licence to those marks, and there are no headshots for the same
-reason. The photography is Norrin's own, self-hosted rather than hotlinked; the alt text is
-mine, because five of their six homepage images ship with none.
+as type because I hold no licence to those marks. The photography is Norrin's own,
+self-hosted rather than hotlinked — including the headshots of the three people the Contact
+band names, which Norrin publishes on its own services page; the alt text is mine, because
+five of their six homepage images ship with none. Two photographs are treated: the causeway
+under the Contact band and the team photograph under the Careers band each sit beneath a
+scrim, as explicit, recorded exceptions to the rule that Norrin's photographs are never
+altered (`CLAUDE.md` §1.8).
 
 Assumed, because no internal information was available: that the primary visitor is an
 enterprise buyer at a large Nordic enterprise with candidates secondary, that the primary

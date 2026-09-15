@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePageVisible } from '@/hooks/usePageVisible'
 
@@ -55,12 +55,10 @@ import { usePageVisible } from '@/hooks/usePageVisible'
  * time that was actually spent running, and the next start asks for what is
  * LEFT. A pause now costs the reader the length of the pause and nothing else.
  *
- * WHY THERE IS NO FLOOR UNDER THE REMAINDER, which is where this deliberately
- * differs from `useCardSlider`'s `nudge`. That hook restarts the whole clock on
- * a manual move, because a reader who pressed "next" asked for THAT card and
- * would otherwise get it for a fifth of a second. Nothing here is a request, so
- * resuming mid-beat is the pile carrying on where it was rather than a card
- * being snatched.
+ * A MANUAL TURN RESTARTS THE WHOLE CLOCK. A reader who clicked the pile asked
+ * for that next card and should not lose it to the remainder of the previous
+ * card's interval. Visibility pauses still preserve their remainder; only an
+ * explicit turn starts a fresh reading beat.
  *
  * WITH HOVER GONE THE ONLY REMAINING PAUSE IS A BACKGROUNDED TAB, so this now
  * does one job: a reader who leaves and comes back finishes the beat they left
@@ -124,6 +122,8 @@ export function useCardStack(
   const visible = usePageVisible()
 
   const [rotations, setRotations] = useState(0)
+  const [timerVersion, setTimerVersion] = useState(0)
+  const latestTimerVersion = useRef(0)
 
   // Every reason to stop, in one expression. It is ANDed in one place rather
   // than each condition clearing a shared flag — which is the version that goes
@@ -139,6 +139,8 @@ export function useCardStack(
   useEffect(() => {
     if (!running) return
 
+    const version = timerVersion
+
     let id = 0
     const turn = () => {
       setRotations((r) => r + 1)
@@ -152,11 +154,22 @@ export function useCardStack(
 
     return () => {
       window.clearTimeout(id)
+      // A manual turn starts a fresh beat for the card the reader requested.
+      // Do not subtract the old card's elapsed time from that new interval.
+      if (latestTimerVersion.current !== version) return
       // Bank the part of the beat that was actually spent on screen. Clamped at
       // zero so a long frame cannot hand the next start a negative delay.
       left.current = Math.max(0, left.current - (performance.now() - since.current))
     }
-  }, [running, interval])
+  }, [running, interval, timerVersion])
+
+  const next = useCallback(() => {
+    if (count < 2) return
+    setRotations((r) => r + 1)
+    left.current = interval
+    latestTimerVersion.current += 1
+    setTimerVersion(latestTimerVersion.current)
+  }, [count, interval])
 
   const index = count > 0 ? rotations % count : 0
 
@@ -165,5 +178,5 @@ export function useCardStack(
   // page and back every beat.
   const leaving = rotations === 0 || count < 2 ? null : (rotations - 1) % count
 
-  return { index, leaving, reduced }
+  return { index, leaving, reduced, next }
 }

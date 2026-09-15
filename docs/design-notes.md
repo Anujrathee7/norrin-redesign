@@ -13,8 +13,10 @@ artwork will eventually repaint it by accident.
 **The small mark is a crop, not a second asset.** At nav size a full-body Nori collapses
 into a grey pill — antenna, arms and feet all disappear into the silhouette — so
 `crop="head"` re-declares the viewBox over the same file to keep the eyes, which are the
-only part that has to survive. The favicon (`public/nori-mark.svg`) is the same crop baked
-into a standalone file, since a favicon cannot reliably reference another SVG.
+only part that has to survive. The favicon used to be the same crop baked into
+`public/nori-mark.svg`. That file is deleted: the tab icon is now Norrin's own favicon
+(`public/norrin-mark.svg`, copied unchanged from norrin.com), and the same mark sits beside
+the wordmark in the bar.
 
 Motion is placement-level only and obeys the same contract as everything else here:
 transform and opacity, no filters, no JS in the motion path, `data-static` to kill it, and

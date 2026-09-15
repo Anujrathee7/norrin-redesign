@@ -118,6 +118,20 @@ graphic layers may be treated freely.
 well — but tinting a *client's* photographs quietly makes them ours. That is the same
 class of move as repainting someone's logo. The line is ownership, not taste.
 
+**One exception, granted by the repo owner and not a precedent.** The causeway aerial
+(`photos.vision`) sits under the Contact band beneath a flat `--scrim`. It was picked
+from four rendered options — a blurred Gap backdrop, a reveal at the end of the Gap,
+this, and a frame opening in place. The scrim is 76% because inverse type has to pass
+against the lightest pixel it can land on (WCAG F83), and those pairs are gated in
+`tools/palette.mjs`. Every further treated photograph needs the same conversation again.
+
+**A second exception, granted the same way.** The careers photograph (`photos.careers`)
+sits under the Careers band on `/company` beneath `--scrim-deep`, chosen with the repo
+owner from four rendered layouts when Values was merged into that band. 88% rather than
+76%, because a close-range photograph of faces competed with the copy where an aerial
+landscape does not; the pairs are gated the same way, and it no longer animates — a moving picture under running text is a
+reading problem. Two is still not a precedent: a third needs the conversation too.
+
 ### 1.9 Alt text is written from the picture
 
 Never from a filename, a URL, or a section heading. **Open the file and look at it.**
