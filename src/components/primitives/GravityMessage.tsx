@@ -293,6 +293,8 @@ export function GravityMessage({ children }: { children: string }) {
       className="gravity-message"
       aria-label={children}
       onPointerMove={disturb}
+      onPointerUp={() => { cursor.current.active = false }}
+      onPointerCancel={() => { cursor.current.active = false }}
       onPointerLeave={() => { cursor.current.active = false }}
     >
       <span aria-hidden="true" className="gravity-message-line">
