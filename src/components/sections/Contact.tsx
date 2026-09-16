@@ -58,7 +58,7 @@ export function Contact() {
       data-shot="contact"
       aria-labelledby="contact-heading"
       data-tone="inverse"
-      className="relative isolate overflow-clip bg-inverse py-20 text-inverse-ink md:pt-20 md:pb-28"
+      className="relative isolate overflow-clip bg-inverse py-12 text-inverse-ink md:py-14"
     >
       {/* `isolate` so the two negative layers stay inside the band — without a
           stacking context of its own they would drop behind the page. */}
@@ -149,7 +149,7 @@ export function Contact() {
       </div>
 
       <Container>
-        <Grid className="gap-y-20">
+        <Grid className="gap-y-10">
           <div className="col-span-4 md:col-span-12 lg:col-span-6">
             {/* This column had no entrance at all — it was the one band on the
                 page that simply appeared. Each line now runs off its own scroll
@@ -162,7 +162,7 @@ export function Contact() {
                 ['--scrub-to' as string]: 'cover 34%',
               }}
             >
-              <Eyebrow label="Next" tone="inverse" className="mb-8" />
+              <Eyebrow label="Next" tone="inverse" className="mb-3" />
             </div>
             <h2
               id="contact-heading"
@@ -171,7 +171,7 @@ export function Contact() {
                 ['--scrub-from' as string]: 'cover 14%',
                 ['--scrub-to' as string]: 'cover 38%',
               }}
-              className="display-2"
+              className="display-3"
             >
               Let&rsquo;s talk about what it takes to reach production.
             </h2>
@@ -181,7 +181,7 @@ export function Contact() {
                 ['--scrub-from' as string]: 'cover 18%',
                 ['--scrub-to' as string]: 'cover 42%',
               }}
-              className="lead measure-serif mt-8 text-inverse-ink-2"
+              className="body-serif measure-serif mt-3 text-inverse-ink-2"
             >
               Bring the pilot that stalled, the platform that needs rebuilding, or the roadmap you
               haven&rsquo;t written yet.
@@ -193,68 +193,47 @@ export function Contact() {
                 ['--scrub-from' as string]: 'cover 22%',
                 ['--scrub-to' as string]: 'cover 46%',
               }}
-              className="mt-12"
+              className="mt-5"
             >
               <ContactForm />
             </div>
           </div>
 
-          {/* The people, stepped in two columns.
-
-              The second card spans both rows of the first column and centres on
-              them, so it sits exactly midway between the two cards beside it —
-              a fixed offset only ever looked right at one card height, and it
-              read as out of place. Placed by the grid rather than nudged by a
-              translate, because `data-scroll="enter"` animates the card's
-              transform. The wide column gap is what keeps the stagger from
-              reading as a cramped 2x2 with a hole in it.
-
-              THE TRACKS ARE CAPPED SO THE COLUMN ENDS WHERE THE FORM DOES. The
-              repo owner asked for the portraits a little smaller so the two
-              halves of the band finish on one line; the cap is measured against
-              the form's last row at 1512, not picked.
-
-              4:5 FROM A SQUARE SOURCE. Norrin's headshots are square studio
-              crops; `object-cover` takes a little off each side, and 4:5 reads
-              as a person where a square reads as an avatar.
-
-              A ROW ON A PHONE, NOT A STACK. Below `sm` each card turns sideways
-              — a 96px portrait with the details beside it — so a phone does not
-              get three full-width portraits before the first phone number. */}
+          {/* Compact contact rows rather than portrait cards. The names and
+              direct details remain visible, while 80px square portraits keep
+              the people recognisable without making this closing action feel
+              like a second team section. The same row works at every width. */}
           <div className="col-span-4 md:col-span-12 lg:col-span-5 lg:col-start-8">
-            <h3 className="display-3 text-inverse-ink">Who you&rsquo;ll reach</h3>
-            <ul className="mt-8 grid grid-cols-1 gap-10 sm:grid-cols-[repeat(2,minmax(0,var(--contact-card)))] sm:gap-x-20 [--contact-card:200px]">
-              {contacts.map((c, i) => (
+            <h3 className="display-4 text-inverse-ink">Who you&rsquo;ll reach</h3>
+            <ul className="mt-4 grid grid-cols-1 gap-4">
+              {contacts.map((c) => (
                 <li
                   key={c.name}
                   data-scroll="enter"
                   style={{
                     ['--enter-y' as string]: '26px',
-                    ['--scrub-from' as string]: `cover ${10 + i * 4}%`,
-                    ['--scrub-to' as string]: `cover ${10 + i * 4 + 26}%`,
+                    ['--scrub-from' as string]: 'cover 10%',
+                    ['--scrub-to' as string]: 'cover 36%',
                   }}
-                  className={cx(
-                    'flex items-start gap-5 sm:block',
-                    i === 1 ? 'sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:self-center' : 'sm:col-start-1',
-                  )}
+                  className="flex items-center gap-4"
                 >
                   <Photo
                     file={c.photo.file}
                     alt={c.photo.alt}
                     width={c.photo.w}
                     height={c.photo.h}
-                    sizes="(min-width: 640px) 200px, 96px"
+                    sizes="80px"
                     tone="inverse"
-                    className="size-24 shrink-0 sm:aspect-[4/5] sm:size-auto sm:w-full"
+                    className="size-20 shrink-0"
                   />
-                  <div className="min-w-0 sm:mt-5">
+                  <div className="min-w-0">
                     <p className="display-4 text-inverse-ink">{c.name}</p>
                     <p className="label mt-1.5 text-inverse-ink-3">{c.title}</p>
                     {/* The visible text IS the address and the number, so each
                         link names itself — no "Email" label for a screen
                         reader to hear with nothing after it. Plain text, no
                         underline: the underline read as one more rule. */}
-                    <div className="mt-4 flex flex-col items-start gap-1">
+                    <div className="mt-2 flex flex-col items-start gap-0.5">
                       <a
                         href={`mailto:${c.email}`}
                         className="ui break-all text-inverse-ink-2 transition-colors hover:text-inverse-ink"
@@ -280,7 +259,7 @@ export function Contact() {
 }
 
 const fieldClass =
-  'ui mt-2 block w-full rounded-(--radius-control) bg-inverse-field px-4 py-3 text-inverse-ink'
+  'ui mt-1.5 block w-full rounded-(--radius-control) bg-inverse-field px-4 py-2.5 text-inverse-ink'
 
 /**
  * THE FORM DOES NOT PRETEND TO SUBMIT ANYWHERE. There is no backend and no CRM
@@ -306,17 +285,23 @@ function ContactForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-6">
+    <form onSubmit={onSubmit} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       <Field id={`${id}-name`} name="name" label="Name" autoComplete="name" required />
       <Field id={`${id}-email`} name="email" label="Work email" type="email" autoComplete="email" required />
-      <Field id={`${id}-company`} name="company" label="Company" autoComplete="organization" />
-      <div>
+      <Field
+        id={`${id}-company`}
+        name="company"
+        label="Company"
+        autoComplete="organization"
+        containerClassName="sm:col-span-2 lg:col-span-1"
+      />
+      <div className="sm:col-span-2 lg:col-span-3">
         <label htmlFor={`${id}-message`} className="ui text-inverse-ink-2">
           What are you trying to get into production?
         </label>
-        <textarea id={`${id}-message`} name="message" required rows={5} className={cx(fieldClass, 'resize-y')} />
+        <textarea id={`${id}-message`} name="message" required rows={2} className={cx(fieldClass, 'resize-y')} />
       </div>
-      <div>
+      <div className="sm:col-span-2 lg:col-span-3">
         <div className="flex flex-wrap items-center gap-2">
           <button type="submit" className="btn btn-signal">
             Send enquiry
@@ -336,9 +321,18 @@ function ContactForm() {
   )
 }
 
-function Field({ id, label, ...rest }: { id: string; label: string } & InputHTMLAttributes<HTMLInputElement>) {
+function Field({
+  id,
+  label,
+  containerClassName,
+  ...rest
+}: {
+  id: string
+  label: string
+  containerClassName?: string
+} & InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <div>
+    <div className={containerClassName}>
       <label htmlFor={id} className="ui text-inverse-ink-2">
         {label}
       </label>
