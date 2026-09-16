@@ -277,17 +277,12 @@ export function Hero() {
               empty — a gutter nobody asked for. Taking it gives the headline a
               whole column more to run in.
 
-              IT IS STILL THREE LINES, and that is measured rather than assumed —
-              3 at 1280, 1440 and 1920 (`h1` box 790px, 892px, 888px against a
-              96px face). The authored split is two lines; the first of them,
-              "Enterprise AI is won in", needs roughly 1100px at this size and
-              gets under 900, so it wraps. Widening the column and shrinking the
-              type both helped and neither was enough to change the count.
-
-              Left as is on purpose. Forcing two lines would mean either another
-              cut to `display-1` — which is already down a fifth — or taking
-              columns from the lede. The three-line stack reads as deliberate at
-              this measure; a note here beats a surprise later. */}
+              THREE LINES, AUTHORED — "Enterprise / AI is won in / production."
+              It used to be a two-line split that wrapped to three because the
+              first line was wider than the column. The move to LFS Adelia made
+              that line narrow enough to fit, and the heading silently collapsed
+              to two. A line count that depends on a font's width is not a
+              decision, so the three lines are now stated in the markup. */}
           <div className="col-span-4 md:col-span-8 lg:col-span-8">
             {/* THEIR h1 IS NOT HERE AT ALL, and the deletion is the argument
                 this section makes — more plainly than the demotion it replaces.
@@ -313,14 +308,15 @@ export function Hero() {
                 site's own device instead: moss ink, and the solid half of the
                 production line drawn under the word that earns it.
 
-                The two lines rise out from behind their own edges, in sequence.
+                The three lines rise out from behind their own edges, in sequence.
                 The split is stated in the markup rather than measured, so it
                 cannot disagree with what actually renders. */}
             {/* `relative` so the mascot can be positioned against the heading's
                 own em rather than against the column. */}
             <div className="relative">
               <Reveal as="h1" lines className="display-1" stagger={0.11}>
-                <Line>Enterprise AI is won in</Line>
+                <Line>Enterprise</Line>
+                <Line>AI is won in</Line>
                 {/* The accent carries the emphasis on its own. There used to be
                   a solid rule under this word as well — the production line
                   restated at heading scale — and one device stated twice inside
