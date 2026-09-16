@@ -277,7 +277,7 @@ export function Hero() {
               empty — a gutter nobody asked for. Taking it gives the headline a
               whole column more to run in.
 
-              THREE LINES, AUTHORED — "Enterprise / AI is won in / production."
+              THREE LINES, AUTHORED — "Enterprise AI / is won in / production."
               It used to be a two-line split that wrapped to three because the
               first line was wider than the column. The move to LFS Adelia made
               that line narrow enough to fit, and the heading silently collapsed
@@ -315,8 +315,8 @@ export function Hero() {
                 own em rather than against the column. */}
             <div className="relative">
               <Reveal as="h1" lines className="display-1" stagger={0.11}>
-                <Line>Enterprise</Line>
-                <Line>AI is won in</Line>
+                <Line>Enterprise AI</Line>
+                <Line>is won in</Line>
                 {/* The accent carries the emphasis on its own. There used to be
                   a solid rule under this word as well — the production line
                   restated at heading scale — and one device stated twice inside
