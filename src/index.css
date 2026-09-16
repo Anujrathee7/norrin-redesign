@@ -1461,17 +1461,13 @@
    -------------------------------------------------------------------------- */
 .gravity-message {
   position: relative;
-  block-size: clamp(10rem, 16vw, 13rem);
+  block-size: clamp(14rem, 18vw, 16rem);
   margin: 0;
   overflow: clip;
   color: var(--accent);
-  cursor: grab;
+  cursor: crosshair;
   user-select: none;
   touch-action: pan-y;
-}
-
-.gravity-message:active {
-  cursor: grabbing;
 }
 
 .gravity-message-line {
