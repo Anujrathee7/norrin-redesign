@@ -1,314 +1,168 @@
 import { useEffect, useMemo, useRef } from 'react'
-import type { PointerEvent as ReactPointerEvent } from 'react'
+import Matter from 'matter-js'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
-type Body = {
-  el: HTMLSpanElement
-  x: number
-  y: number
-  vx: number
-  vy: number
-  width: number
-  height: number
-  left: number
-  top: number
-  asleep: boolean
-  stillFrames: number
-}
-
-type Cursor = { x: number; y: number; vx: number; vy: number; active: boolean; time: number }
-
-const GRAVITY = 980
-const CURSOR_RADIUS = 92
+const { Engine, Bodies, Body, Composite, Sleeping } = Matter
 const RETURN_DELAY = 2000
 
-/** A readable sentence whose visual glyphs become a small bounce field. */
+/** Accessible text with a separate, rigid-body visual treatment. */
 export function GravityMessage({ children }: { children: string }) {
   const reduced = useReducedMotion()
   const root = useRef<HTMLParagraphElement>(null)
-  const glyphs = useRef<Array<HTMLSpanElement | null>>([])
-  const bodies = useRef<Body[]>([])
-  const frame = useRef(0)
-  const returnTimer = useRef(0)
-  const active = useRef(false)
-  const returning = useRef(false)
-  const start = useRef<() => void>(() => {})
-  const kick = useRef<(x: number, y: number, vx: number, vy: number) => void>(() => {})
-  const scheduleReturn = useRef<() => void>(() => {})
-  const cursor = useRef<Cursor>({ x: 0, y: 0, vx: 0, vy: 0, active: false, time: 0 })
-
-  const words = useMemo(() => {
-    let index = 0
-    return children.split(' ').map((word) => ({
-      word,
-      letters: [...word].map((letter) => ({ letter, index: index++ })),
-    }))
-  }, [children])
+  const words = useMemo(() => children.split(' '), [children])
 
   useEffect(() => {
     const container = root.current
-    if (!container || reduced) return
+    if (!container) return
+    const glyphs = Array.from(container.querySelectorAll<HTMLElement>('.gravity-message-glyph'))
+    if (reduced) return
+    const engine = Engine.create({ enableSleeping: true, positionIterations: 10, velocityIterations: 8 })
+    engine.gravity.y = 1
+    let letters: Array<{ el: HTMLElement; body: Matter.Body; x: number; y: number }> = []
+    let state: 'idle' | 'falling' | 'returning' = 'idle'
+    let frame = 0
+    let timer = 0
+    let entranceTimer = 0
+    let previous = 0
+    let returnStart = 0
+    let returnFrom: Array<{ x: number; y: number; angle: number }> = []
+    let pointer: { x: number; y: number; time: number } | null = null
 
+    const reset = () => {
+      cancelAnimationFrame(frame)
+      clearTimeout(timer)
+      state = 'idle'
+      pointer = null
+      container.removeAttribute('data-active')
+      glyphs.forEach(el => { el.style.transform = '' })
+      Composite.clear(engine.world, false)
+      Engine.clear(engine)
+    }
     const measure = () => {
-      if (active.current) return
       const box = container.getBoundingClientRect()
-      bodies.current = glyphs.current.flatMap((el) => {
-        if (!el) return []
-        const glyph = el.getBoundingClientRect()
-        return [{
-          el,
-          x: 0,
-          y: 0,
-          vx: 0,
-          vy: 0,
-          width: glyph.width,
-          height: glyph.height,
-          left: glyph.left - box.left,
-          top: glyph.top - box.top,
-          asleep: false,
-          stillFrames: 0,
-        }]
+      letters = glyphs.map(el => {
+        const r = el.getBoundingClientRect()
+        const x = r.left - box.left + r.width / 2
+        const y = r.top - box.top + r.height / 2
+        const body = Bodies.rectangle(x, y, r.width + 2, r.height + 2, {
+          restitution: 0.42, friction: 0.65, frictionStatic: 1, frictionAir: 0.025,
+          sleepThreshold: 45,
+        })
+        return { el, body, x, y }
       })
+      const w = box.width, h = box.height, thickness = 100
+      Composite.add(engine.world, [
+        ...letters.map(l => l.body),
+        Bodies.rectangle(w / 2, h + thickness / 2, w + thickness * 2, thickness, { isStatic: true }),
+        Bodies.rectangle(-thickness / 2, h / 2, thickness, h * 3, { isStatic: true }),
+        Bodies.rectangle(w + thickness / 2, h / 2, thickness, h * 3, { isStatic: true }),
+        Bodies.rectangle(w / 2, -thickness / 2, w + thickness * 2, thickness, { isStatic: true }),
+      ])
     }
-
-    let previous = performance.now()
+    const paint = () => {
+      for (const { el, body, x, y } of letters) {
+        el.style.transform = `translate3d(${body.position.x - x}px, ${body.position.y - y}px, 0) rotate(${body.angle}rad)`
+      }
+    }
     const tick = (now: number) => {
-      const dt = Math.min((now - previous) / 1000, 0.032)
+      if (state === 'returning') {
+        const progress = Math.min(1, (now - returnStart) / 700)
+        const eased = 1 - Math.pow(1 - progress, 3)
+        letters.forEach(({ body, x, y }, i) => {
+          const from = returnFrom[i]
+          Body.setPosition(body, { x: from.x + (x - from.x) * eased, y: from.y + (y - from.y) * eased })
+          Body.setAngle(body, from.angle * (1 - eased))
+        })
+        paint()
+        if (progress === 1) { reset(); return }
+      } else {
+        // Small fixed substeps keep fast cursor throws from crossing letters.
+        const delta = Math.min(now - previous, 32)
+        const steps = Math.max(1, Math.ceil(delta / 8))
+        for (let i = 0; i < steps; i++) Engine.update(engine, delta / steps)
+        paint()
+      }
       previous = now
-      const box = container.getBoundingClientRect()
-      const list = bodies.current
-      const supported = list.map(() => false)
-
-      if (returning.current) {
-        let home = true
-        for (const body of list) {
-          body.vx += (-body.x * 32 - body.vx * 9) * dt
-          body.vy += (-body.y * 32 - body.vy * 9) * dt
-          body.x += body.vx * dt
-          body.y += body.vy * dt
-          body.el.style.transform = `translate3d(${body.x}px, ${body.y}px, 0)`
-          if (Math.abs(body.x) > 0.3 || Math.abs(body.y) > 0.3 || Math.abs(body.vx) > 1 || Math.abs(body.vy) > 1) {
-            home = false
-          }
-        }
-        if (home) {
-          for (const body of list) {
-            body.x = 0
-            body.y = 0
-            body.vx = 0
-            body.vy = 0
-            body.el.style.transform = ''
-          }
-          active.current = false
-          returning.current = false
-          container.removeAttribute('data-active')
-          return
-        }
-        frame.current = requestAnimationFrame(tick)
-        return
-      }
-
-      for (let index = 0; index < list.length; index += 1) {
-        const body = list[index]
-        if (!body.asleep) {
-          body.vy += GRAVITY * dt
-          body.x += body.vx * dt
-          body.y += body.vy * dt
-        }
-
-        const floor = box.height - body.top - body.height
-        const right = box.width - body.left - body.width
-        if (body.y >= floor) {
-          body.y = floor
-          body.vy *= -0.38
-          body.vx *= 0.78
-          supported[index] = true
-          if (Math.abs(body.vy) < 24) body.vy = 0
-          if (Math.abs(body.vx) < 7) body.vx = 0
-        }
-        if (body.x <= -body.left || body.x >= right) {
-          body.x = Math.max(-body.left, Math.min(right, body.x))
-          body.vx *= -0.55
-        }
-      }
-
-      // Separate visible glyph boxes, then exchange velocity only on the
-      // collision axis. This produces a bounce without corrective jitter.
-      for (let pass = 0; pass < 8; pass += 1) {
-        for (let i = 0; i < list.length; i += 1) {
-          for (let j = i + 1; j < list.length; j += 1) {
-            const a = list[i]
-            const b = list[j]
-            const ax = a.left + a.x + a.width / 2
-            const ay = a.top + a.y + a.height / 2
-            const bx = b.left + b.x + b.width / 2
-            const by = b.top + b.y + b.height / 2
-            const dx = bx - ax
-            const dy = by - ay
-            const overlapX = (a.width + b.width) / 2 + 1 - Math.abs(dx)
-            const overlapY = (a.height + b.height) / 2 + 1 - Math.abs(dy)
-            if (overlapX <= 0 || overlapY <= 0) continue
-
-            a.asleep = false
-            b.asleep = false
-            if (overlapX < overlapY) {
-              const direction = dx >= 0 ? 1 : -1
-              a.x -= direction * overlapX / 2
-              b.x += direction * overlapX / 2
-              const av = a.vx
-              a.vx = b.vx * 0.46
-              b.vx = av * 0.46
-            } else {
-              const direction = dy >= 0 ? 1 : -1
-              a.y -= direction * overlapY / 2
-              b.y += direction * overlapY / 2
-              const av = a.vy
-              a.vy = b.vy * 0.28
-              b.vy = av * 0.28
-              supported[direction > 0 ? i : j] = true
-            }
-          }
-        }
-
-        for (const body of list) {
-          body.x = Math.max(-body.left, Math.min(box.width - body.left - body.width, body.x))
-          body.y = Math.max(-body.top, Math.min(box.height - body.top - body.height, body.y))
-        }
-      }
-
-      for (let index = 0; index < list.length; index += 1) {
-        const body = list[index]
-        if (supported[index] && Math.abs(body.vx) < 5 && Math.abs(body.vy) < 5) {
-          body.stillFrames += 1
-          if (body.stillFrames > 24) {
-            body.vx = 0
-            body.vy = 0
-            body.asleep = true
-          }
-        } else {
-          body.stillFrames = 0
-        }
-        body.el.style.transform = `translate3d(${body.x}px, ${body.y}px, 0)`
-      }
-
-      frame.current = requestAnimationFrame(tick)
+      frame = requestAnimationFrame(tick)
     }
-
-    kick.current = (x, y, pointerVx, pointerVy) => {
-      const pointerSpeed = Math.hypot(pointerVx, pointerVy)
-      const impulse = (85 + Math.min(pointerSpeed * 0.035, 115)) * 1.5
-      const box = container.getBoundingClientRect()
-      for (const body of bodies.current) {
-        const cx = body.left + body.x + body.width / 2
-        const cy = body.top + body.y + body.height / 2
-        let dx = cx - x
-        let dy = cy - y
-        let distance = Math.hypot(dx, dy)
-        if (distance >= CURSOR_RADIUS) continue
-        if (distance < 2) {
-          dx = pointerVx === 0 ? 1 : -pointerVx
-          dy = pointerVy === 0 ? -1 : -pointerVy
-          distance = Math.hypot(dx, dy)
-        }
-        const strength = 1 - distance / CURSOR_RADIUS
-        body.vx += (dx / distance) * impulse * strength
-        body.vy += (dy / distance) * impulse * strength
-        const floor = box.height - body.top - body.height
-        if (body.y >= floor - 2) body.vy -= impulse * strength * 0.65
-        body.asleep = false
-        body.stillFrames = 0
-      }
-    }
-
-    scheduleReturn.current = () => {
-      window.clearTimeout(returnTimer.current)
-      returnTimer.current = window.setTimeout(() => {
-        returning.current = true
-        bodies.current.forEach((body) => { body.asleep = false })
+    const scheduleReturn = () => {
+      clearTimeout(timer)
+      timer = window.setTimeout(() => {
+        state = 'returning'
+        returnStart = performance.now()
+        returnFrom = letters.map(({ body }) => ({ ...body.position, angle: Math.atan2(Math.sin(body.angle), Math.cos(body.angle)) }))
       }, RETURN_DELAY)
     }
-
-    start.current = () => {
-      if (active.current) return
-      measure()
-      active.current = true
-      returning.current = false
-      container.dataset.active = 'true'
-      bodies.current.forEach((body) => {
-        body.vx = (Math.random() - 0.5) * 260
-        body.vy = -110 - Math.random() * 190
-      })
-      previous = performance.now()
-      frame.current = requestAnimationFrame(tick)
-      scheduleReturn.current()
+    const start = () => {
+      if (state === 'idle') {
+        measure()
+        letters.forEach(({ body }) => {
+          Body.setVelocity(body, { x: (Math.random() - 0.5) * 5, y: -2 - Math.random() * 2 })
+          Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.16)
+        })
+        previous = performance.now()
+        frame = requestAnimationFrame(tick)
+        container.dataset.active = 'true'
+      }
+      state = 'falling'
+      scheduleReturn()
     }
-
-    measure()
-    const resize = new ResizeObserver(measure)
+    const disturb = (event: PointerEvent) => {
+      start()
+      const box = container.getBoundingClientRect()
+      const x = event.clientX - box.left, y = event.clientY - box.top
+      const speed = pointer ? Math.hypot(x - pointer.x, y - pointer.y) / Math.max(8, event.timeStamp - pointer.time) : 0
+      const power = Math.min(12, 4.5 + speed * 2)
+      for (const { body } of letters) {
+        const dx = body.position.x - x, dy = body.position.y - y
+        const distance = Math.hypot(dx, dy)
+        if (distance >= 92) continue
+        Sleeping.set(body, false)
+        const strength = (1 - distance / 92) * power
+        const floor = body.bounds.max.y >= box.height - 5
+        Body.setVelocity(body, {
+          x: Math.max(-18, Math.min(18, body.velocity.x + dx / Math.max(distance, 1) * strength)),
+          y: Math.max(-18, Math.min(18, body.velocity.y + (floor ? -Math.max(0.8, Math.abs(dy) / Math.max(distance, 1)) : dy / Math.max(distance, 1)) * strength)),
+        })
+        Body.setAngularVelocity(body, Math.max(-0.22, Math.min(0.22, body.angularVelocity + dx / 92 * strength * 0.025)))
+      }
+      pointer = { x, y, time: event.timeStamp }
+    }
+    const release = () => { pointer = null }
+    container.addEventListener('pointermove', disturb)
+    container.addEventListener('pointerup', release)
+    container.addEventListener('pointercancel', release)
+    container.addEventListener('pointerleave', release)
+    let size = `${container.clientWidth}:${container.clientHeight}`
+    const resize = new ResizeObserver(() => {
+      const next = `${container.clientWidth}:${container.clientHeight}`
+      if (next !== size) { reset(); size = next }
+    })
     resize.observe(container)
-    let entranceTimer = 0
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return
       observer.disconnect()
-      entranceTimer = window.setTimeout(() => start.current(), 900)
+      entranceTimer = window.setTimeout(start, 900)
     }, { threshold: 0.65 })
     observer.observe(container)
-
     return () => {
+      reset()
+      clearTimeout(entranceTimer)
       observer.disconnect()
       resize.disconnect()
-      window.clearTimeout(entranceTimer)
-      window.clearTimeout(returnTimer.current)
-      cancelAnimationFrame(frame.current)
+      container.removeEventListener('pointermove', disturb)
+      container.removeEventListener('pointerup', release)
+      container.removeEventListener('pointercancel', release)
+      container.removeEventListener('pointerleave', release)
     }
-  }, [reduced])
-
-  const disturb = (event: ReactPointerEvent<HTMLParagraphElement>) => {
-    if (reduced) return
-    returning.current = false
-    start.current()
-    const bounds = event.currentTarget.getBoundingClientRect()
-    const now = event.timeStamp
-    const x = event.clientX - bounds.left
-    const y = event.clientY - bounds.top
-    const dt = Math.max((now - cursor.current.time) / 1000, 0.008)
-    const pointerVx = cursor.current.active ? (x - cursor.current.x) / dt : 0
-    const pointerVy = cursor.current.active ? (y - cursor.current.y) / dt : 0
-    kick.current(x, y, pointerVx, pointerVy)
-    scheduleReturn.current()
-
-    cursor.current = {
-      x,
-      y,
-      vx: pointerVx,
-      vy: pointerVy,
-      active: true,
-      time: now,
-    }
-  }
+  }, [reduced, children])
 
   return (
-    <p
-      ref={root}
-      className="gravity-message"
-      aria-label={children}
-      onPointerMove={disturb}
-      onPointerUp={() => { cursor.current.active = false }}
-      onPointerCancel={() => { cursor.current.active = false }}
-      onPointerLeave={() => { cursor.current.active = false }}
-    >
+    <p ref={root} className="gravity-message" aria-label={children}>
       <span aria-hidden="true" className="gravity-message-line">
-        {words.map(({ word, letters }) => (
-          <span key={word} className="gravity-message-word">
-            {letters.map(({ letter, index }) => (
-              <span
-                key={`${letter}-${index}`}
-                ref={(node) => { glyphs.current[index] = node }}
-                className="gravity-message-glyph"
-              >
-                {letter}
-              </span>
-            ))}
+        {words.map((word, i) => (
+          <span key={i} className="gravity-message-word">
+            {[...word].map((letter, j) => <span key={j} className="gravity-message-glyph">{letter}</span>)}
           </span>
         ))}
       </span>
