@@ -20,6 +20,7 @@ type Cursor = { x: number; y: number; vx: number; vy: number; active: boolean; t
 
 const GRAVITY = 980
 const CURSOR_RADIUS = 92
+const RETURN_DELAY = 2000
 
 /** A readable sentence whose visual glyphs become a small bounce field. */
 export function GravityMessage({ children }: { children: string }) {
@@ -28,9 +29,12 @@ export function GravityMessage({ children }: { children: string }) {
   const glyphs = useRef<Array<HTMLSpanElement | null>>([])
   const bodies = useRef<Body[]>([])
   const frame = useRef(0)
+  const returnTimer = useRef(0)
   const active = useRef(false)
+  const returning = useRef(false)
   const start = useRef<() => void>(() => {})
   const kick = useRef<(x: number, y: number, vx: number, vy: number) => void>(() => {})
+  const scheduleReturn = useRef<() => void>(() => {})
   const cursor = useRef<Cursor>({ x: 0, y: 0, vx: 0, vy: 0, active: false, time: 0 })
 
   const words = useMemo(() => {
@@ -74,6 +78,35 @@ export function GravityMessage({ children }: { children: string }) {
       const box = container.getBoundingClientRect()
       const list = bodies.current
       const supported = list.map(() => false)
+
+      if (returning.current) {
+        let home = true
+        for (const body of list) {
+          body.vx += (-body.x * 32 - body.vx * 9) * dt
+          body.vy += (-body.y * 32 - body.vy * 9) * dt
+          body.x += body.vx * dt
+          body.y += body.vy * dt
+          body.el.style.transform = `translate3d(${body.x}px, ${body.y}px, 0)`
+          if (Math.abs(body.x) > 0.3 || Math.abs(body.y) > 0.3 || Math.abs(body.vx) > 1 || Math.abs(body.vy) > 1) {
+            home = false
+          }
+        }
+        if (home) {
+          for (const body of list) {
+            body.x = 0
+            body.y = 0
+            body.vx = 0
+            body.vy = 0
+            body.el.style.transform = ''
+          }
+          active.current = false
+          returning.current = false
+          container.removeAttribute('data-active')
+          return
+        }
+        frame.current = requestAnimationFrame(tick)
+        return
+      }
 
       for (let index = 0; index < list.length; index += 1) {
         const body = list[index]
@@ -163,7 +196,8 @@ export function GravityMessage({ children }: { children: string }) {
 
     kick.current = (x, y, pointerVx, pointerVy) => {
       const pointerSpeed = Math.hypot(pointerVx, pointerVy)
-      const impulse = 85 + Math.min(pointerSpeed * 0.035, 115)
+      const impulse = (85 + Math.min(pointerSpeed * 0.035, 115)) * 1.5
+      const box = container.getBoundingClientRect()
       for (const body of bodies.current) {
         const cx = body.left + body.x + body.width / 2
         const cy = body.top + body.y + body.height / 2
@@ -179,15 +213,26 @@ export function GravityMessage({ children }: { children: string }) {
         const strength = 1 - distance / CURSOR_RADIUS
         body.vx += (dx / distance) * impulse * strength
         body.vy += (dy / distance) * impulse * strength
+        const floor = box.height - body.top - body.height
+        if (body.y >= floor - 2) body.vy -= impulse * strength * 0.65
         body.asleep = false
         body.stillFrames = 0
       }
+    }
+
+    scheduleReturn.current = () => {
+      window.clearTimeout(returnTimer.current)
+      returnTimer.current = window.setTimeout(() => {
+        returning.current = true
+        bodies.current.forEach((body) => { body.asleep = false })
+      }, RETURN_DELAY)
     }
 
     start.current = () => {
       if (active.current) return
       measure()
       active.current = true
+      returning.current = false
       container.dataset.active = 'true'
       bodies.current.forEach((body) => {
         body.vx = (Math.random() - 0.5) * 260
@@ -195,6 +240,7 @@ export function GravityMessage({ children }: { children: string }) {
       })
       previous = performance.now()
       frame.current = requestAnimationFrame(tick)
+      scheduleReturn.current()
     }
 
     measure()
@@ -212,12 +258,14 @@ export function GravityMessage({ children }: { children: string }) {
       observer.disconnect()
       resize.disconnect()
       window.clearTimeout(entranceTimer)
+      window.clearTimeout(returnTimer.current)
       cancelAnimationFrame(frame.current)
     }
   }, [reduced])
 
   const disturb = (event: ReactPointerEvent<HTMLParagraphElement>) => {
     if (reduced) return
+    returning.current = false
     start.current()
     const bounds = event.currentTarget.getBoundingClientRect()
     const now = event.timeStamp
@@ -227,6 +275,7 @@ export function GravityMessage({ children }: { children: string }) {
     const pointerVx = cursor.current.active ? (x - cursor.current.x) / dt : 0
     const pointerVy = cursor.current.active ? (y - cursor.current.y) / dt : 0
     kick.current(x, y, pointerVx, pointerVy)
+    scheduleReturn.current()
 
     cursor.current = {
       x,
