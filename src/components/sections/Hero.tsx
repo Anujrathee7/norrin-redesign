@@ -6,7 +6,6 @@ import { metrics, offices, positioning, story } from '@/data/norrin'
 import { Line } from '@/components/primitives/SplitLines'
 import { Reveal } from '@/components/primitives/Reveal'
 import { Counter } from '@/components/primitives/Counter'
-import { GravityMessage } from '@/components/primitives/GravityMessage'
 
 /**
  * Hero.
@@ -362,9 +361,9 @@ export function Hero() {
                 one serif line under the display type reads as the headline's
                 second breath. Sentence case, not their uppercase — the caps
                 were a styling decision, so they stay one. */}
-            <div className="mt-6">
-              <GravityMessage>{positioning.slogan}</GravityMessage>
-            </div>
+            <Reveal as="p" delay={0.34} className="lead measure-serif mt-7 text-ink-2">
+              {positioning.slogan}
+            </Reveal>
 
             {/* The ghost carries the same pill geometry as the solid one, so the
                 pair sits on one baseline and one height. It was previously bare
