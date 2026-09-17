@@ -249,7 +249,7 @@ export function Pillars() {
                     "Continuous Services" — were the least interesting form the
                     same information can take, and the company writes them
                     better than a redesign should invent them. */}
-                <dl className="mt-8 border-t border-hairline">
+                <dl className="mt-8">
                   {services
                     .filter((sv) => sv.pillar === p.id)
                     .map((sv, j) => (
@@ -266,7 +266,7 @@ export function Pillars() {
                           ['--scene-from' as string]: `cover ${28 + j * 3}%`,
                           ['--scene-to' as string]: `cover ${28 + j * 3 + 22}%`,
                         }}
-                        className="flex flex-wrap items-baseline gap-x-6 gap-y-1 border-b border-hairline py-3"
+                        className="flex flex-wrap items-baseline gap-x-6 gap-y-1 border-b border-hairline py-3 first:pt-0"
                       >
                         <dt className="ui w-full text-ink sm:w-[13rem]">{sv.name}</dt>
                         <dd className="caption text-ink-2">{sv.tagline}</dd>
@@ -339,16 +339,21 @@ export function Pillars() {
                 part goes on a wrapper. Not worth widening that component's API
                 for one caller — and a wrapper here is honest about what is
                 being animated, which is the row, not the eyebrow's internals. */}
+            {/* The eyebrow takes a row of its own across both columns, so the
+                claim and the list below it start on the same line: the first
+                row of names sits level with "Logic Apps in production since",
+                not under a rule halfway down it. */}
+            <div
+              data-scroll="enter"
+              style={{
+                ['--scrub-from' as string]: 'cover 10%',
+                ['--scrub-to' as string]: 'cover 36%',
+              }}
+              className="col-span-4 md:col-span-12"
+            >
+              <Eyebrow label="Built on the stack you already run" className="mb-7" />
+            </div>
             <div className="col-span-4 md:col-span-5">
-              <div
-                data-scroll="enter"
-                style={{
-                  ['--scrub-from' as string]: 'cover 10%',
-                  ['--scrub-to' as string]: 'cover 36%',
-                }}
-              >
-                <Eyebrow label="Built on the stack you already run" className="mb-7" />
-              </div>
               <p
                 data-scroll="enter"
                 style={{
@@ -403,15 +408,14 @@ export function Pillars() {
                 resolves by dropping the list onto a row of its own and making
                 the band 100px TALLER than the layout it replaced.
 
-                `md:self-end` bottom-aligns it against the claim. The two
-                columns have different natural heights — the claim runs 255px,
-                three rows of names run 151 — so one of them has to decide where
-                the 104px difference goes. Top-aligned it fell under the list as
-                185px of empty band, which is the same hole the old two-column
-                grid left in the corner, moved to the floor. Ending both columns
-                on one line is the thing a two-column block gets most out of;
-                the air moves up beside the claim's own display type, where
-                there is already air.
+                TOP-ALIGNED WITH THE CLAIM, AND NO RULE ABOVE IT. It used to be
+                bottom-aligned under a top rule, and the repo owner asked for
+                both to go: a rule over a list reads as a heading that never
+                arrives, and the first row belongs level with "Logic Apps in
+                production since" rather than a line and a half below it. With
+                nothing above the first row, its top padding goes too
+                (`first:`/`nth-child` per column count), so every row is the
+                same distance from the rule under the row before it.
 
                 The md overrides below are `odd:`/`even:`, not a flat `px-0`:
                 `sm:even:pl-8` carries a pseudo-class and therefore outranks a
@@ -420,7 +424,7 @@ export function Pillars() {
                 grid kept a 32px indent that nothing had asked for. */}
             <ul
               data-scroll="breathe"
-              className="col-span-4 mt-12 grid grid-cols-1 self-start border-t border-hairline-strong sm:grid-cols-2 md:col-span-7 md:col-start-6 md:mt-0 md:grid-cols-3 md:gap-x-6 md:self-end"
+              className="col-span-4 mt-12 grid grid-cols-1 self-start sm:grid-cols-2 md:col-span-7 md:col-start-6 md:mt-0 md:grid-cols-3 md:gap-x-6"
             >
               {/* The stack list arrives row by row against the claim beside it.
                   Staggered by index rather than by column: this is a two-column
@@ -435,7 +439,7 @@ export function Pillars() {
                     ['--scrub-from' as string]: `cover ${10 + i * 3}%`,
                     ['--scrub-to' as string]: `cover ${10 + i * 3 + 26}%`,
                   }}
-                  className="border-b border-hairline-strong py-3 sm:odd:pr-8 sm:even:pl-8 md:odd:pr-0 md:even:pl-0"
+                  className="border-b border-hairline-strong py-3 first:pt-0 sm:odd:pr-8 sm:even:pl-8 sm:[&:nth-child(2)]:pt-0 md:odd:pr-0 md:even:pl-0 md:[&:nth-child(3)]:pt-0"
                 >
                   <span className="ui">{t.name}</span>
                 </li>

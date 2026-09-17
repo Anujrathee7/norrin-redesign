@@ -150,7 +150,7 @@ export function Work() {
                 the sentence above it says "most of our customers", not "all".
                 The moment anything here does claim completeness, this filter has
                 to go. */}
-            <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-2.5 border-t border-hairline pt-8 sm:grid-cols-3">
+            <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-3">
               {customers
                 .filter((name) => name !== 'Plan International Finland')
                 .map((name, i) => (
