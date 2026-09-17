@@ -21,20 +21,7 @@ function NavLink({ href, ...rest }: { href: string } & Omit<ComponentProps<'a'>,
 /**
  * Wordmark. Held at `production` — the mark must read at 26px in every state.
  *
- * IT IS NOT A LINK, AND THAT IS DELIBERATE RATHER THAN AN OMISSION.
- *
- * It has been two things already: `#top`, a scroll to the top of the one page
- * there was, and then `<Link to="/">` once home became a route. It is now plain
- * text, because the bar carries an explicit Home item and a wordmark that goes
- * home beside a link that goes home is one destination wearing two controls.
- *
- * The convention it declines is a real one — a clickable logo is what most
- * readers reach for — so the replacement has to be visible rather than implied,
- * which is exactly what a first nav item labelled Home is. What is NOT
- * acceptable is the middle state: a mark that looks pressable and is not is the
- * fabricated affordance §3 bans. So the anchor, the `text-accent`, the focus
- * ring and the screen-reader "home" label all go with the link — nothing here
- * offers an interaction any more, and a `<div>` cannot be tabbed to.
+ * The wordmark links home on both desktop and mobile.
  *
  * THE MARK IS NORRIN'S, NOT OURS. It is the path from their own favicon,
  * norrin.com/hubfs/theme-2025/favicon/norrin-favicon.svg (the same file served
@@ -46,7 +33,7 @@ function NavLink({ href, ...rest }: { href: string } & Omit<ComponentProps<'a'>,
  */
 export function Wordmark() {
   return (
-    <div className="flex w-fit shrink-0 items-center gap-2 text-ink">
+    <Link to="/" aria-label="Norrin home" className="flex w-fit shrink-0 items-center gap-2 text-ink">
       <svg
         aria-hidden="true"
         focusable="false"
@@ -57,7 +44,7 @@ export function Wordmark() {
         <path d="m130.19 337.68h67.3v-3.08c-3.08-10.28-5.14-34.42-5.14-57.02v-177.24h9.25c41.1 0 73.46 19 88.36 38.01h3.6v-61.65c-17.98-8.22-60.1-13.35-92.98-13.35h-70.38v3.08c3.08 10.28 5.14 34.42 5.14 57.02v154.11c0 22.6-2.05 46.75-5.14 57.02v3.08zm101.2 110.96h67.29v-3.08c-3.08-10.28-5.14-34.42-5.14-57.02v-177.23h9.25c41.1 0 73.46 19 88.36 38.01h3.59v-61.65c-17.98-8.22-60.1-13.35-92.98-13.35h-70.38v3.08c3.08 10.28 5.14 34.42 5.14 57.02v154.11c0 22.6-2.05 46.75-5.14 57.02v3.08z" />
       </svg>
       <span className="wordmark">Norrin</span>
-    </div>
+    </Link>
   )
 }
 

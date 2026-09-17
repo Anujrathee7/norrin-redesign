@@ -3,7 +3,7 @@ import { Container } from '@/components/primitives/Layout'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { cx } from '@/lib/cx'
 import { NAV } from './navData'
-import { Hamburger, MobileSheet, RuleSegment, Wordmark } from './NavParts'
+import { Hamburger, MobileSheet, Wordmark } from './NavParts'
 import { useNavState } from './useNavState'
 
 /**
@@ -97,7 +97,7 @@ export function Nav() {
             <nav aria-label="Primary" className="hidden justify-self-center lg:block">
               <ul
                 style={{ height: rowHeight }}
-                className="flex items-center gap-1"
+                className="gooey-nav"
               >
                 {/* EVERY ITEM IS A LINK, AND THERE IS NO SECOND KIND.
                     Three of the four used to be `<button aria-haspopup>` with a
@@ -110,18 +110,14 @@ export function Nav() {
                 {NAV.map((item) => {
                   const isCurrent = item.owns.includes(currentPath)
                   return (
-                    <li key={item.label} className="relative flex h-full items-center">
+                    <li key={item.label} data-current={isCurrent ? 'true' : undefined}>
                       <Link
                         to={item.href}
                         aria-current={isCurrent ? 'page' : undefined}
-                        className={cx('control block px-3.5 py-2 ui', tone(isCurrent))}
+                        className={cx('control gooey-nav-link ui', tone(isCurrent))}
                       >
                         {item.label}
                       </Link>
-                      {/* Only the current page is marked. It used to also light
-                          for an open drawer, which is a second meaning on one
-                          line — and there are no drawers to have a state. */}
-                      <RuleSegment show={isCurrent} />
                     </li>
                   )
                 })}
