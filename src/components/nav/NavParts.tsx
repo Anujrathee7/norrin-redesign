@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react'
+import { useLayoutEffect, useRef, useState, type ComponentProps } from 'react'
 import { Link } from 'react-router'
 import { Container } from '@/components/primitives/Layout'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
@@ -65,23 +65,62 @@ export function Wordmark() {
    two different navigations on one site. */
 
 /**
- * The current item's length of the bar's bottom rule.
+ * The current page's length of the bar's bottom rule.
  *
  * This replaces a 3px square that floated in the dead space above the rule and
  * read as a speck. Sitting *on* the rule, it is the production line doing
  * wayfinding.
  *
- * It used to double as the thing an open drawer hung from, so the pop-out read
- * as attached to the word that opened it. There are no drawers, so it says one
- * thing: this is the page you are on.
+ * 2px OF INK, SQUARE-ENDED. Ink rather than accent so it can never be mistaken
+ * for the accent focus ring on the same word; square because a rule is a plane
+ * (§4). It was briefly replaced by a raised accent pill with a coloured glow —
+ * a shadow §2.7 does not allow and the most template-looking object in the
+ * chrome — and came back from four rendered options as the one with precedent
+ * in the reference set (Reaktor's nav marks the page with a 1px rule).
+ *
+ * IT SLIDES, AND ONLY AFTER IT HAS LANDED ONCE. The segment is measured against
+ * the `aria-current` link, so it cannot disagree with what is marked. The first
+ * placement is instant — a segment flying in from the left edge on page load
+ * would be motion that says nothing — and every route change after that
+ * travels. Reduced motion jumps. No current page (a 404) draws nothing.
  */
-export function RuleSegment({ show }: { show: boolean }) {
+export function RuleSegment({ currentPath }: { currentPath: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const [placed, setPlaced] = useState(false)
+
+  useLayoutEffect(() => {
+    const seg = ref.current
+    const list = seg?.parentElement
+    if (!seg || !list) return
+
+    const place = () => {
+      const link = list.querySelector<HTMLElement>('[aria-current="page"]')
+      if (!link) {
+        seg.style.width = '0px'
+        return
+      }
+      const l = link.getBoundingClientRect()
+      const u = list.getBoundingClientRect()
+      seg.style.transform = `translateX(${l.left - u.left}px)`
+      seg.style.width = `${l.width}px`
+    }
+
+    place()
+    setPlaced(true)
+    // The link's width depends on the face, which may land after first paint.
+    document.fonts?.ready.then(place)
+    const resize = new ResizeObserver(place)
+    resize.observe(list)
+    return () => resize.disconnect()
+  }, [currentPath])
+
   return (
     <span
+      ref={ref}
       aria-hidden="true"
       className={cx(
-        'pointer-events-none absolute inset-x-0 -bottom-px h-px bg-accent transition-opacity duration-300',
-        show ? 'opacity-100' : 'opacity-0',
+        'pointer-events-none absolute -bottom-px left-0 h-0.5 w-0 bg-ink motion-reduce:transition-none',
+        placed && 'transition-[transform,width] duration-[340ms] ease-(--ease-entrance)',
       )}
     />
   )

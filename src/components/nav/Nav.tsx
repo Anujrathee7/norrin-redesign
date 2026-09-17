@@ -3,7 +3,7 @@ import { Container } from '@/components/primitives/Layout'
 import { ThemeToggle } from '@/components/primitives/ThemeToggle'
 import { cx } from '@/lib/cx'
 import { NAV } from './navData'
-import { Hamburger, MobileSheet, Wordmark } from './NavParts'
+import { Hamburger, MobileSheet, RuleSegment, Wordmark } from './NavParts'
 import { useNavState } from './useNavState'
 
 /**
@@ -97,7 +97,7 @@ export function Nav() {
             <nav aria-label="Primary" className="hidden justify-self-center lg:block">
               <ul
                 style={{ height: rowHeight }}
-                className="gooey-nav"
+                className="relative flex items-center gap-1"
               >
                 {/* EVERY ITEM IS A LINK, AND THERE IS NO SECOND KIND.
                     Three of the four used to be `<button aria-haspopup>` with a
@@ -110,17 +110,20 @@ export function Nav() {
                 {NAV.map((item) => {
                   const isCurrent = item.owns.includes(currentPath)
                   return (
-                    <li key={item.label} data-current={isCurrent ? 'true' : undefined}>
+                    <li key={item.label} className="flex h-full items-center">
                       <Link
                         to={item.href}
                         aria-current={isCurrent ? 'page' : undefined}
-                        className={cx('control gooey-nav-link ui', tone(isCurrent))}
+                        className={cx('control block px-3.5 py-2 ui', tone(isCurrent))}
                       >
                         {item.label}
                       </Link>
                     </li>
                   )
                 })}
+                {/* One segment for the whole list, not one per item, so it can
+                    travel to the new page instead of blinking between two. */}
+                <RuleSegment currentPath={currentPath} />
               </ul>
             </nav>
 
