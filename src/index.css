@@ -3442,6 +3442,25 @@ html.js [data-reveal='lines']:not([data-revealed]) {
       }
     }
 
+    /* PHONES FINISH THE RISE SOONER. The section header's ranges (22-44% for the
+       eyebrow, 28-50% for the heading, set in Layout.tsx) end when the header is
+       near the middle of the screen. On a desktop that is still well above the
+       fold; on a phone the header spends most of its approach half-risen, and a
+       two-line heading with one line showing and a gap where its first line
+       should sit was read as broken spacing. Same sequence, earlier. `!important`
+       because the ranges are inline custom properties. */
+    @media (max-width: 47.999rem) {
+      header[data-scene] > .line-mask > [data-scene-part='line'] {
+        --scene-from: cover 6% !important;
+        --scene-to: cover 22% !important;
+      }
+
+      header[data-scene] > h2 > .line-mask > [data-scene-part='line'] {
+        --scene-from: cover 10% !important;
+        --scene-to: cover 28% !important;
+      }
+    }
+
     /* An arrival for decorative marks, and ONLY for decorative marks.
 
        This is the one entrance in the file that touches opacity, which every

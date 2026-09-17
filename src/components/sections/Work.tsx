@@ -75,7 +75,7 @@ export function Work() {
       // Mobile takes 112 rather than 80 for the same reason Pillars does: at
       // `py-20` the eyebrow rendered 7px under the bar's edge. `-mt-18` is `md:`
       // only, so the pile is not involved down there.
-      className="overflow-clip bg-surface pt-28 pb-20 text-ink md:pt-42 md:pb-14"
+      className="overflow-clip bg-surface pt-28 pb-8 text-ink md:pt-42 md:pb-14"
     >
       <Container>
         {/* READING MATTER LEFT, THE PILE RIGHT.
