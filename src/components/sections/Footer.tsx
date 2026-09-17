@@ -151,7 +151,7 @@ export function Footer() {
               ['--scrub-from' as string]: 'entry 8%',
               ['--scrub-to' as string]: 'entry 68%',
             }}
-            className="col-span-4 md:col-span-3"
+            className="col-span-4 md:col-span-6 lg:col-span-3"
           >
             {/* BACK TO TOP, AND IT STAYS A PLAIN FRAGMENT ON ALL FIVE PAGES.
                 `#top` is the hero's id, so on `/` this scrolls to the hero the
@@ -182,8 +182,9 @@ export function Footer() {
               THE ADDRESSES STAY. They were the one thing the deleted band had
               that the rest of the footer did not, and a footer that lists where a
               company is without saying where is a list of city names. Three
-              columns is ~330px at 1512, which takes the longest of the seven —
-              Bangkok's "496-502 Gaysorn Amarin Tower, 5th Floor" — to two lines.
+              A single stacked column of seven made this the tallest thing in the
+              footer by far, so the offices run three across on a tablet (a full
+              row of their own) and two across on desktop.
 
               NOT A `<nav>`, unlike the two columns after it. Nothing here is a
               link: there are no office pages to point at and no map URLs in
@@ -198,10 +199,10 @@ export function Footer() {
               ['--scrub-from' as string]: 'entry 13%',
               ['--scrub-to' as string]: 'entry 73%',
             }}
-            className="col-span-4 md:col-span-3 md:col-start-5"
+            className="col-span-4 md:col-span-12 md:row-start-2 lg:col-span-6 lg:col-start-4 lg:row-start-1"
           >
             <p className="label mb-4 text-ink-3">Locations</p>
-            <ul className="space-y-3">
+            <ul className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2">
               {offices.map((o) => (
                 <li key={o.city}>
                   <p className="ui text-ink-2">
@@ -213,14 +214,21 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* COMPANY AND ELSEWHERE SHARE ONE CELL, side by side at every width.
+              As two separate grid items they took a row of their own on a
+              tablet, under the blurb, and on desktop they stood beside a
+              seven-row address column that set the height of the whole footer.
+              Paired, they sit opposite the blurb on a tablet; and with the
+              offices laid out two or three across, no single column is tall
+              enough to leave the others standing in empty space. */}
+          <div className="col-span-4 grid grid-cols-2 gap-x-6 md:col-span-6 md:col-start-7 lg:col-span-3 lg:col-start-10">
           <nav
             aria-label="Company"
             style={{
               ['--scrub-from' as string]: 'entry 18%',
               ['--scrub-to' as string]: 'entry 78%',
             }}
-            className="col-span-2 md:col-span-2 md:col-start-9"
-          >
+                      >
             <p className="label mb-4 text-ink-3">Company</p>
             <ul className="space-y-2.5">
               {COMPANY_LINKS.map((l) =>
@@ -249,8 +257,7 @@ export function Footer() {
               ['--scrub-from' as string]: 'entry 28%',
               ['--scrub-to' as string]: 'entry 88%',
             }}
-            className="col-span-2 md:col-span-2 md:col-start-11"
-          >
+                      >
             <p className="label mb-4 text-ink-3">Elsewhere</p>
             <ul className="space-y-2.5">
               {social.map((s) => (
@@ -266,6 +273,7 @@ export function Footer() {
               ))}
             </ul>
           </nav>
+          </div>
         </Grid>
 
         {/* Legal. DELIBERATELY STILL — see the note at the top of this file.
@@ -274,7 +282,7 @@ export function Footer() {
             40px travel with 38px still to go. A permanently half-arrived
             copyright line is worse than a stationary one. */}
         {/* Legal */}
-        <div className="mt-16 flex flex-col gap-4 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-4 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="label text-ink-3">© {new Date().getFullYear()} Norrin</p>
           {/* Was `.label` — an 18-word sentence in 11px uppercase mono at 0.14em,
               wrapping to three lines, while the addresses above it are set in sans.
