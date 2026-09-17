@@ -2106,6 +2106,24 @@ html.js [data-reveal='lines']:not([data-revealed]) {
   transition: none;
 }
 
+/* STACKED, CENTRED — below 1024px, where the pile sits under the copy instead
+   of beside it. Left-aligned in a full-width cell it left a card-sized hole to
+   its right, and the progress bar, centred on the CELL, floated off to one side
+   of the card it counts. So the region shrinks to exactly one pile (card plus
+   travel) and centres, and the bar centres over the front card rather than the
+   region. On a phone the region is already narrower than a pile and only the
+   bar moves. The left-alignment note above still holds INSIDE the region. */
+@media (max-width: 63.999rem) {
+  [data-cardstack-region] {
+    max-inline-size: calc(22.5rem + var(--stack-reach));
+    margin-inline: auto;
+  }
+
+  .stack-progress {
+    margin-inline: calc((min(22.5rem, 100% - var(--stack-reach)) - 5rem) / 2) 0;
+  }
+}
+
 /* The full fan, where the column can pay for it out of its own slack without
    taking the width off the card. */
 @media (min-width: 64rem) {
@@ -3682,8 +3700,9 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 /* ==========================================================================
    THE TRACK RECORD TIMELINE  (#proof)
    --------------------------------------------------------------------------
-   A horizontal rail with the stations' cards alternating above and below it,
-   falling back to a vertical rail below 768px. Written here rather than as
+   A horizontal rail with the stations' cards alternating above and below it
+   from 1024px; a centred vertical rail with cards alternating left and right
+   on tablets; and a vertical rail down the left edge on phones. Written here rather than as
    utilities at the call site because §2.4 is absolute: `Proof.tsx` names no
    colour, and the rail's whole argument is carried in colour and dash.
 
@@ -3950,10 +3969,79 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 }
 
 /* --------------------------------------------------------------------------
-   THE WIDE BRANCH — horizontal, from 768px.
+   THE TABLET BRANCH — a centred vertical rail, 768px to 1023px.
+   --------------------------------------------------------------------------
+   The phone rail down the left edge, stretched to a tablet, was four
+   full-width cards hanging off a line in the margin: a list, not a timeline.
+   The horizontal rail does not fit either (see 64rem below). So the rail moves
+   to the middle and the cards alternate either side of it — the same
+   alternation the wide branch does above and below, turned ninety degrees.
+
+   Each item is a three-column row: card | station | card. The outer columns
+   are equal, so the station column's centre IS the item's centre, and the
+   segment is drawn at 50% with no measured offset. The station stacks node
+   over pill, so the node sits on the rail and the pill hangs under it,
+   opaque, with the line passing behind. */
+@media (min-width: 48rem) and (max-width: 63.999rem) {
+  .tl-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    column-gap: 1.5rem;
+    align-items: start;
+    padding-block-end: 2.5rem;
+  }
+
+  .tl-mark {
+    grid-row: 1;
+    grid-column: 2;
+    flex-direction: column;
+    gap: 0.5rem;
+    block-size: auto;
+  }
+
+  /* INTERLEAVED. Consecutive cards are on opposite sides, so each item tucks
+     `--tl-tuck` up beside the one before rather than starting under its
+     bottom edge — without it every card had an empty card-sized hole opposite
+     it. Cards on the SAME side stay well clear: they are two tucks apart. */
+  .tl {
+    --tl-tuck: 4.5rem;
+  }
+
+  .tl-item + .tl-item {
+    margin-block-start: calc(-1 * var(--tl-tuck));
+  }
+
+  /* From this node's centre (half its 14px) to the next one's. The next item
+     starts a tuck above this one's bottom edge and its node centre is 7px into
+     it, so the segment stops `tuck - 7px` short of this item's bottom. */
+  .tl-seg {
+    inset-block: 7px calc(var(--tl-tuck) - 7px);
+    inset-inline-start: calc(50% - 0.5px);
+  }
+
+  .tl-card {
+    grid-row: 1;
+    margin: 0;
+  }
+
+  .tl-item[data-side='above'] .tl-card {
+    grid-column: 1;
+  }
+
+  .tl-item[data-side='below'] .tl-card {
+    grid-column: 3;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   THE WIDE BRANCH — horizontal, from 1024px.
    -------------------------------------------------------------------------- */
 
-@media (min-width: 48rem) {
+/* 64rem, NOT 48rem. At 48rem four stations shared a 768px tablet: every card
+   was ~150px wide and wrapped its title to three lines, so the rail read as
+   crowded rather than composed. Tablets portrait get the vertical rail phones
+   already use, which has the width to set each card properly. */
+@media (min-width: 64rem) {
   /* Three rows: cards above, the rail, cards below. The outer two are `1fr` so
      they resolve EQUAL, which puts the rail at exactly 50% of the block's
      height and makes the composition symmetric about the line rather than
@@ -4098,7 +4186,7 @@ html.js [data-reveal='lines']:not([data-revealed]) {
 
    The GEOMETRY did not share, and forcing it would have damaged `#proof`.
    `.tl-*` is built around a 14px disc, a date pill, and a bordered card, laid
-   out on a grid that becomes four horizontal columns at 48rem. This rail has
+   out on a grid that becomes four horizontal columns at 64rem. This rail has
    no pill, no card, square marks rather than discs, and exists ONLY below
    48rem — so every one of `.tl`'s defining declarations would have needed a
    modifier to opt out of. That is the "do not break Proof by generalising its
